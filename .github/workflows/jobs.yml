@@ -1,0 +1,28 @@
+name: Survivor
+
+on:
+  push:
+    branches-ignore:
+      - ga-ignore-
+  pull_request:
+    branches-ignore:
+      - ga-ignore-
+
+env:
+  MIRROR_SSH: "git@github.com:EpitechPromo2027/B-SVR-500-REN-5-1-survivor-yann.morvan.git"
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: pixta-dev/repository-mirroring-action@v1
+        with:
+          target_repo_url: ${{ env.MIRROR_SSH }}
+          ssh_private_key: ${{ secrets.GIT_SSH_PRIVATE_KEY }}
