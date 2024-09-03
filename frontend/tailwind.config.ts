@@ -85,6 +85,12 @@ const config = {
         '144': '36rem',
         'half': '50%',
       },
+      width: {
+        '110': '28rem',
+        '128': '32rem',
+        '144': '36rem',
+        'half': '50%',
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
