@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Docker](https://img.shields.io/badge/docker-ready-blue)](https://www.docker.com/)
-[![Documentation](https://img.shields.io/badge/wiki-documentation-green)](#wiki)
+[![Documentation](https://img.shields.io/badge/wiki-documentation-green)](https://github.com/YannMorvan/Survivor/wiki)
 
 ## Survivor Pool
 
