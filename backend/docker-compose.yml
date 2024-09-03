@@ -4,7 +4,7 @@ services:
   php-server:
     container_name: backend-php-server
     build:
-      context: ./apache
+      context: ./php-server
     ports:
       - "80:80"
     volumes:
