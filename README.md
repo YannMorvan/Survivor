@@ -22,7 +22,7 @@ The task is to develop both the frontend and backend components of the applicati
 
 ## Getting Started
 
-To begin with **Survivor Pool**, ensure Docker and Docker Compose are installed on your system. For detailed setup instructions, refer to our [Wiki](#wiki) to get both backend and frontend services up and running efficiently.
+To begin with **Survivor Pool**, ensure Docker and Docker Compose are installed on your system. For detailed setup instructions, refer to our [Wiki](https://github.com/YannMorvan/Survivor/wiki) to get both backend and frontend services up and running efficiently.
 
 ## Team Members
 
