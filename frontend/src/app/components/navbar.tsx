@@ -1,25 +1,14 @@
 "use client";
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MessageSquareMore, User, UserRound, Menu } from 'lucide-react'
+import { MessageSquareMore, UserRound, Menu } from 'lucide-react'
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [language, setLanguage] = useState('English (US)');
   const [activeRoute, setActiveRoute] = useState('Dashboard');
 
-  const toggleDropdown = () => {
+  const toggleDropdown: () => void = () => {
     setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const handleLanguageChange: (newLanguage: string) => void = (newLanguage: string) => {
-    setLanguage(newLanguage);
-    setIsDropdownOpen(false);
   };
 
   const handleRouteChange: (route: string) => void = (route: string) => {
@@ -119,14 +108,14 @@ const Navbar = () => {
         </div>
         </div>
         </div>
-        <div className={`w-full lg:flex lg:w-auto ${isMenuOpen ? 'block' : 'hidden'}`}>
+        <div className={`w-full lg:flex lg:w-auto`}>
           <ul className="font-medium md:static absolute flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:border-0 dark:bg-gray-800 dark:border-gray-700">
             {['Dashboard', 'Coaches', 'Customers', 'Tips', 'Events'].map(route => (
               <li className="relative inline-block" key={route}>
                 <a
                   href={`#${route.toLowerCase()}`}
                   onClick={() => handleRouteChange(route)}
-                  className={`block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:p-0 md:dark:dark-blue-500 inline-block relative
+                  className={`block py-2 px-3 text-sky-700 bg-blue-700 rounded md:bg-transparent md:p-0 md:dark:dark-blue-500 inline-block relative
                       ${activeRoute === route ? 'text-sky-700' : 'md:text-slate-700'
                       }`}
                 >
