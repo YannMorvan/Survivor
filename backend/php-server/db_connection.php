@@ -1,5 +1,11 @@
 <?php
 
+if (!isset($_ENV["MYSQL_DATABASE"]) || !isset($_ENV["MYSQL_ROOT_PASSWORD"])) {
+    print("Error!: Environment variables not set. Please check the .env file." . "<br/>");
+    exit();
+}
+
+
 $dsn = "mysql:host=localhost;dbname=" . $_ENV["MYSQL_DATABASE"] . ";charset=utf8mb4";
 $user = "root";
 $pwd = $_ENV["MYSQL_ROOT_PASSWORD"];
