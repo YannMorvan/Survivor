@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db
--- Generation Time: Sep 03, 2024 at 09:31 AM
+-- Generation Time: Sep 03, 2024 at 12:42 PM
 -- Server version: 8.0.35
 -- PHP Version: 8.2.8
 
@@ -30,7 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `clothes` (
   `id` int NOT NULL,
   `id_customer` int NOT NULL,
-  `type` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
+  `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -53,13 +53,13 @@ CREATE TABLE `clothes_images` (
 
 CREATE TABLE `customers` (
   `id` int NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `surname` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `surname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `birth_date` date NOT NULL,
-  `gender` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `astrological_sign` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
+  `gender` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `astrological_sign` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -82,12 +82,12 @@ CREATE TABLE `customers_images` (
 
 CREATE TABLE `employees` (
   `id` int NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `surname` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `surname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `birth_date` date NOT NULL,
   `gender` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `work` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
+  `work` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -113,8 +113,8 @@ CREATE TABLE `encounters` (
   `id_customer` int NOT NULL,
   `date` date NOT NULL,
   `rating` int NOT NULL,
-  `comment` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `source` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
+  `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -126,13 +126,13 @@ CREATE TABLE `encounters` (
 CREATE TABLE `events` (
   `id` int NOT NULL,
   `id_employee` int NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `date` date NOT NULL,
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `max_participants` int NOT NULL,
   `location_x` float NOT NULL,
   `location_y` float NOT NULL,
-  `location_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
+  `location_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -145,9 +145,9 @@ CREATE TABLE `payments` (
   `id` int NOT NULL,
   `id_customer` int NOT NULL,
   `date` date NOT NULL,
-  `method` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `method` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `amount` int NOT NULL,
-  `comment` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
+  `comment` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -158,8 +158,8 @@ CREATE TABLE `payments` (
 
 CREATE TABLE `tips` (
   `id` int NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `tip` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `tip` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
