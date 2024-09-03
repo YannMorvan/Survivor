@@ -1,14 +1,19 @@
 "use client";
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MessageSquareMore, UserRound, Menu } from 'lucide-react'
+import { MessageSquareMore, User, UserRound, Menu } from 'lucide-react'
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeRoute, setActiveRoute] = useState('Dashboard');
 
-  const toggleDropdown: () => void = () => {
+  const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
   };
 
   const handleRouteChange: (route: string) => void = (route: string) => {
@@ -108,7 +113,7 @@ const Navbar = () => {
         </div>
         </div>
         </div>
-        <div className={`w-full lg:flex lg:w-auto`}>
+        <div className={`w-full lg:flex lg:w-auto ${isMenuOpen ? 'block' : 'hidden'}`}>
           <ul className="font-medium md:static absolute flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:border-0 dark:bg-gray-800 dark:border-gray-700">
             {['Dashboard', 'Coaches', 'Customers', 'Tips', 'Events'].map(route => (
               <li className="relative inline-block" key={route}>
