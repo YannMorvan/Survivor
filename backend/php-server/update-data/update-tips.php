@@ -28,12 +28,41 @@ $errors = [];
 
 
 $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/tips");
-check_status($res);
-$tips = $res["data"];
-// Add the tips to the database
+
+if ($res["status"] == false) {
+    $tips = [];
+    $errors[] = [
+        "context" => "Get all tips from the API",
+        "error" => $res["message"]
+    ];
+} else {
+    $tips = $res["data"];
+}
+
+
+foreach ($tips as $i => $tip) {
+    if (!isset($tip["id"])) {
+        $errors[] = [
+            "context" => "Get a tip from the API",
+            "error" => "No id found for the tip"
+        ];
+        continue;
+    }
+
+
+    $res = set_tip_from_api_data($tip);
+
+    if ($res["status"] == false) {
+        $errors[] = [
+            "context" => "Set a tip in database from the API data",
+            "error" => $res["message"]
+        ];
+    }
+}
 
 
 echo json_encode([
     "status" => true,
-    "message" => "Data updated successfully"
+    "message" => "Data updated successfully",
+    "errors" => $errors
 ]);

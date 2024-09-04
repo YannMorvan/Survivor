@@ -375,3 +375,42 @@ function set_cloth_image_from_api_data($id_cloth, $image)
         ];
     }
 }
+
+
+
+/**
+ * Set a tip in database from the API data.
+ * @param array $tip            Tip data from the API
+ * @return array                Status of the operation
+ */
+function set_tip_from_api_data($tip)
+{
+    require_once DB_PATH;
+
+    if (!isset($tip["id"]) || !isset($tip["title"]) || !isset($tip["tip"])) {
+        return [
+            "status" => false,
+            "message" => "Missing data"
+        ];
+    }
+
+    $sql = "INSERT INTO tips (id, title, tip) VALUES (:id, :title, :tip) ON DUPLICATE KEY UPDATE title = :title, tip = :tip";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute([
+        "id" => $tip["id"],
+        "title" => $tip["title"],
+        "tip" => $tip["tip"]
+    ]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    } else {
+        return [
+            "status" => true
+        ];
+    }
+}
