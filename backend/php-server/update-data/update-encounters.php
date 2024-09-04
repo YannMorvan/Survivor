@@ -41,6 +41,15 @@ if ($res["status"] == false) {
 
 
 foreach ($encounters as $i => $encounter) {
+    if (!isset($encounter["id"])) {
+        $errors[] = [
+            "context" => "Get an encounter from the API",
+            "error" => "No id found for the encounter"
+        ];
+        continue;
+    }
+
+
     $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/encounters/" . $encounter["id"]);
 
     if ($res["status"] == false) {

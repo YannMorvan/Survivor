@@ -28,14 +28,49 @@ $errors = [];
 
 
 $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/events");
-check_status($res);
-$events = $res["data"];
+
+if ($res["status"] == false) {
+    $events = [];
+    $errors[] = [
+        "context" => "Get all events from the API",
+        "error" => $res["message"]
+    ];
+} else {
+    $events = $res["data"];
+}
+
 
 foreach ($events as $i => $event) {
+    if (!isset($event["id"])) {
+        $errors[] = [
+            "context" => "Get an event from the API",
+            "error" => "No id found for the event"
+        ];
+        continue;
+    }
+
+
     $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/events/" . $event["id"]);
-    check_status($res);
+
+    if ($res["status"] == false) {
+        $errors[] = [
+            "context" => "Get an event from the API",
+            "error" => $res["message"]
+        ];
+        continue;
+    }
+
     $events[$i] = $res["data"];
-    // Add the event to the database
+
+
+    $res = set_event_from_api_data($event);
+
+    if ($res["status"] == false) {
+        $errors[] = [
+            "context" => "Set an event in database from the API data",
+            "error" => $res["message"]
+        ];
+    }
 }
 
 

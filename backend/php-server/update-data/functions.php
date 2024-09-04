@@ -460,3 +460,53 @@ function set_tip_from_api_data($tip)
         ];
     }
 }
+
+
+
+/**
+ * Set an event in database from the API data.
+ * @param array $event          Event data from the API
+ * @return array                Status of the operation
+ */
+function set_event_from_api_data($event)
+{
+    require_once DB_PATH;
+
+    if (!isset($event["id"]) || !isset($event["name"]) || !isset($event["date"]) || !isset($event["duration"]) || !isset($event["max_participants"]) || !isset($event["location_x"]) || !isset($event["location_y"]) || !isset($event["type"]) || !isset($event["employee_id"]) || !isset($event["location_name"])) {
+        return [
+            "status" => false,
+            "message" => "Missing data"
+        ];
+    }
+
+    $sql = "INSERT INTO events
+            (id, name, date, duration, max_participants, location_x, location_y, type, id_employee, location_name)
+            VALUES (:id, :name, :date, :duration, :max_participants, :location_x, :location_y, :type, :id_employee, :location_name)
+            ON DUPLICATE KEY UPDATE
+            name = :name, date = :date, duration = :duration, max_participants = :max_participants, location_x = :location_x, location_y = :location_y, type = :type, id_employee = :id_employee, location_name = :location_name";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute([
+        "id" => $event["id"],
+        "name" => $event["name"],
+        "date" => $event["date"],
+        "duration" => $event["duration"],
+        "max_participants" => $event["max_participants"],
+        "location_x" => $event["location_x"],
+        "location_y" => $event["location_y"],
+        "type" => $event["type"],
+        "id_employee" => $event["employee_id"],
+        "location_name" => $event["location_name"]
+    ]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    } else {
+        return [
+            "status" => true
+        ];
+    }
+}
