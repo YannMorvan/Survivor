@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4maps from "@amcharts/amcharts4/maps";
 import am4geodata_worldLow from "@amcharts/amcharts4-geodata/worldLow";
-import am4geodata_usaLow from "@amcharts/amcharts4-geodata/usaLow";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 
 const MapComponent = () => {
@@ -26,22 +25,11 @@ const MapComponent = () => {
 
     let polygonTemplate = worldSeries.mapPolygons.template;
     polygonTemplate.tooltipText = "{name}";
-    polygonTemplate.fill = chart.colors.getIndex(0);
+    polygonTemplate.fill = am4core.color("#C7D3E4");
     polygonTemplate.nonScalingStroke = true;
 
     let hs = polygonTemplate.states.create("hover");
-    hs.properties.fill = am4core.color("#367B25");
-
-    let usaSeries = chart.series.push(new am4maps.MapPolygonSeries());
-    usaSeries.geodata = am4geodata_usaLow;
-
-    let usPolygonTemplate = usaSeries.mapPolygons.template;
-    usPolygonTemplate.tooltipText = "{name}";
-    usPolygonTemplate.fill = chart.colors.getIndex(1);
-    usPolygonTemplate.nonScalingStroke = true;
-
-    hs = usPolygonTemplate.states.create("hover");
-    hs.properties.fill = am4core.color("#367B25");
+    hs.properties.fill = am4core.color("#9CADF3");
 
     return () => {
       if (chart) {
