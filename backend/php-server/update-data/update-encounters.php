@@ -30,14 +30,15 @@ $errors = [];
 $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/encounters");
 
 if ($res["status"] == false) {
-    $encounters = [];
-    $errors[] = [
-        "context" => "Get all encounters from the API",
-        "error" => $res["message"]
-    ];
-} else {
-    $encounters = $res["data"];
+    echo json_encode([
+        "status" => false,
+        "message" => "Error while getting all encounters from the API",
+        "errors" => $res["message"]
+    ]);
+    exit();
 }
+
+$encounters = $res["data"];
 
 
 foreach ($encounters as $i => $encounter) {

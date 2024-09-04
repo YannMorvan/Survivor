@@ -30,14 +30,15 @@ $errors = [];
 $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/customers");
 
 if ($res["status"] == false) {
-    $customers = [];
-    $errors[] = [
-        "context" => "Get all customers from the API",
-        "error" => $res["message"]
-    ];
-} else {
-    $customers = $res["data"];
+    echo json_encode([
+        "status" => false,
+        "message" => "Error while getting all customers from the API",
+        "errors" => $res["message"]
+    ]);
+    exit();
 }
+
+$customers = $res["data"];
 
 
 foreach ($customers as $i => $customer) {

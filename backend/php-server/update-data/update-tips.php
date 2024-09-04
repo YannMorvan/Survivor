@@ -30,14 +30,15 @@ $errors = [];
 $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/tips");
 
 if ($res["status"] == false) {
-    $tips = [];
-    $errors[] = [
-        "context" => "Get all tips from the API",
-        "error" => $res["message"]
-    ];
-} else {
-    $tips = $res["data"];
+    echo json_encode([
+        "status" => false,
+        "message" => "Error while getting all tips from the API",
+        "errors" => $res["message"]
+    ]);
+    exit();
 }
+
+$tips = $res["data"];
 
 
 foreach ($tips as $i => $tip) {
