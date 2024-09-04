@@ -9,6 +9,10 @@ services:
       - "80:80"
     volumes:
       - ./php-server:/var/www/html
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - API_KEY=${API_KEY}
 
   db:
     container_name: backend-db
