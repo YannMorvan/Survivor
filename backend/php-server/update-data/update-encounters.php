@@ -28,18 +28,45 @@ $errors = [];
 
 
 $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/encounters");
-check_status($res);
-$encounters = $res["data"];
+
+if ($res["status"] == false) {
+    $encounters = [];
+    $errors[] = [
+        "context" => "Get all encounters from the API",
+        "error" => $res["message"]
+    ];
+} else {
+    $encounters = $res["data"];
+}
+
 
 foreach ($encounters as $i => $encounter) {
     $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/encounters/" . $encounter["id"]);
-    check_status($res);
+
+    if ($res["status"] == false) {
+        $errors[] = [
+            "context" => "Get an encounter from the API",
+            "error" => $res["message"]
+        ];
+        continue;
+    }
+
     $encounters[$i] = $res["data"];
-    // Add the encounter to the database
+
+
+    $res = set_encounter_from_api_data($encounter);
+
+    if ($res["status"] == false) {
+        $errors[] = [
+            "context" => "Set an encounter in database from the API data",
+            "error" => $res["message"]
+        ];
+    }
 }
 
 
 echo json_encode([
     "status" => true,
-    "message" => "Data updated successfully"
+    "message" => "Data updated successfully",
+    "errors" => $errors
 ]);

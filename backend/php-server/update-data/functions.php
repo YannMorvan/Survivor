@@ -379,6 +379,52 @@ function set_cloth_image_from_api_data($id_cloth, $image)
 
 
 /**
+ * Set an event in database from the API data.
+ * @param array $encounter          Encounter data from the API
+ * @return array                    Status of the operation
+ */
+function set_encounter_from_api_data($encounter)
+{
+    require_once DB_PATH;
+
+    if (!isset($id) || !isset($encounter["customer_id"]) || !isset($encounter["date"]) || !isset($encounter["rating"]) || !isset($encounter["comment"]) || !isset($encounter["source"])) {
+        return [
+            "status" => false,
+            "message" => "Missing data"
+        ];
+    }
+
+    $sql = "INSERT INTO encounters
+            (id, id_customer, date, rating, comment, source)
+            VALUES (:id, :id_customer, :date, :rating, :comment, :source)
+            ON DUPLICATE KEY UPDATE
+            id_customer = :id_customer, date = :date, rating = :rating, comment = :comment, source = :source";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute([
+        "id" => $encounter["id"],
+        "id_customer" => $encounter["customer_id"],
+        "date" => $encounter["date"],
+        "rating" => $encounter["rating"],
+        "comment" => $encounter["comment"],
+        "source" => $encounter["source"]
+    ]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    } else {
+        return [
+            "status" => true
+        ];
+    }
+}
+
+
+
+/**
  * Set a tip in database from the API data.
  * @param array $tip            Tip data from the API
  * @return array                Status of the operation
