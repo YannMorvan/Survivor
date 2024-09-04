@@ -122,3 +122,8 @@
     white-space: nowrap;
     max-width: 200px;
   }
+
+
+  #chartdiv2 canvas + canvas {
+    display: none;
+  }
