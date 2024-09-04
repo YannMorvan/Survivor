@@ -124,6 +124,27 @@
   }
 
 
-  #chartdiv2 canvas + canvas {
+  #chartdiv canvas + canvas {
     display: none;
+  }
+
+  #chartdiv1 canvas + canvas {
+    display: none;
+  }
+
+  .event {
+    position: absolute;
+    width: 100%;
+    background-color: #6b5b95;
+    color: white;
+    border-radius: 4px;
+    padding: 4px;
+    text-align: left;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+  
+  .cell {
+    position: relative;
+    overflow: visible;
   }
