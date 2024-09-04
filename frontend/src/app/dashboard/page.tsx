@@ -59,11 +59,12 @@ export default function Dashboard() {
             <div className='md:flex md:justify-between'>
                 <div>
                     <h1 className='md:text-3xl sm:text-2xl text-xl font-bold'>Dashboard</h1>
-                    <h2 className='mt-4 text-sm text-slate-500'>Welcome!</h2>
+                    <h2 className='mt-4 text-sm text-slate-700'>Welcome!</h2>
                 </div>
                 <div className='mt-5'>
                     <button
-                        id="dropdownDefaultButton"
+                        id="Last 30 days button"
+                        aria-label="Last 30 days button"
                         type="button"
                         onClick={toggleDropdown}
                         className="text-slate-900 bg-white font-medium border border-slate-200 rounded-sm text-sm px-5 py-1.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -93,7 +94,12 @@ export default function Dashboard() {
                     </li>
                     </ul>
                 </div>
-                <button className="xs:ml-5 xs:mt-0 mt-2 text-slate-900 bg-sky-700 font-medium border border-slate-200 rounded-sm text-sm px-5 py-2 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                <button 
+                    type="button"
+                    id="reports button"
+                    aria-label='Reports button'
+                    className="xs:ml-5 xs:mt-0 mt-2 text-slate-900 bg-sky-700 font-medium border border-slate-200 rounded-sm text-sm px-5 py-2 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                >
                     <div className='flex'>
                         <ClipboardPlus size={16} color='white' className='mr-3 mt-0.5'/>
                         <p className='text-white'>Reports</p>
@@ -134,16 +140,16 @@ export default function Dashboard() {
                             <p className='text-slate-500 text-sm'>Clients</p>
                             <p className='mt-1 text-slate-900 text-xl'>932</p>
                             <div className='flex md:justify-normal justify-center'>
-                                <ArrowUp size={12} className='text-green-400 mt-1.5'/>
-                                <p className='mt-1 text-xs text-green-400'>12.37%</p>
+                                <ArrowUp size={12} className='text-green-700 mt-1.5'/>
+                                <p className='mt-1 text-xs text-green-700'>12.37%</p>
                             </div>
                         </div>
                         <div className='md:text-left text-center'>
                             <p className='text-slate-500 text-sm'>Faire des réunions</p>
                             <p className='mt-1 text-slate-900 text-xl'>28.49%</p>
                             <div className='flex md:justify-normal justify-center'>
-                                <ArrowDown size={12} className='text-red-400 mt-1.5'/>
-                                <p className='mt-1 text-xs text-red-400'>12.37%</p>
+                                <ArrowDown size={12} className='text-red-700 mt-1.5'/>
+                                <p className='mt-1 text-xs text-red-700'>12.37%</p>
                             </div>
                         </div>
                         <div className='md:text-left text-center'>
@@ -165,24 +171,24 @@ export default function Dashboard() {
                             <p className='text-slate-500 text-sm'>Mensuel</p>
                             <p className='mt-1 text-slate-900 text-xl'>83</p>
                             <div className='flex md:justify-normal justify-center'>
-                                <ArrowUp size={12} className='text-green-400 mt-1.5'/>
-                                <p className='mt-1 text-xs text-green-400'>4.63%</p>
+                                <ArrowUp size={12} className='text-green-700 mt-1.5'/>
+                                <p className='mt-1 text-xs text-green-700'>4.63%</p>
                             </div>
                         </div>
                         <div className='md:text-left text-center'>
                             <p className='text-slate-500 text-sm'>Hebdomadaire</p>
                             <p className='mt-1 text-slate-900 text-xl'>20</p>
                             <div className='flex md:justify-normal justify-center'>
-                                <ArrowDown size={12} className='text-red-400 mt-1.5'/>
-                                <p className='mt-1 text-xs text-red-400'>1.92%</p>
+                                <ArrowDown size={12} className='text-red-700 mt-1.5'/>
+                                <p className='mt-1 text-xs text-red-700'>1.92%</p>
                             </div>
                         </div>
                         <div className='md:text-left text-center'>
                             <p className='text-slate-500 text-sm'>Journalier</p>
                             <p className='mt-1 text-slate-900 text-xl'>34</p>
                             <div className='flex md:justify-normal justify-center'>
-                                <ArrowDown size={12} className='text-red-400 mt-1.5'/>
-                                <p className='mt-1 text-xs text-red-400'>3.45%</p>
+                                <ArrowDown size={12} className='text-red-700 mt-1.5'/>
+                                <p className='mt-1 text-xs text-red-700'>3.45%</p>
                             </div>
                         </div>
                     </div>
@@ -199,7 +205,8 @@ export default function Dashboard() {
                         </div>
                         <div>
                                     <button
-                                    id="dropdownDefaultButton"
+                                    id="30 days button for country of clients"
+                                    aria-label="30 days button for country of clients"
                                     type="button"
                                     onClick={toggleMapDropdown}
                                     className="text-slate-900 bg-white font-medium border border-slate-200 rounded-sm text-sm px-5 py-1.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -211,7 +218,7 @@ export default function Dashboard() {
                                 </button>
                             <div
                         id="dropdown"
-                            className={`z-10 ${mapIsDropdownOpen ? 'block' : 'hidden'} w-28 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 absolute mt-2`}
+                            className={`z-10 ${mapIsDropdownOpen ? 'block' : 'hidden'} max-w-28 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 absolute mt-2`}
                         >
                                 <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                                 <li>
@@ -231,13 +238,31 @@ export default function Dashboard() {
                         <ChartMap />
                     </div>
                     <div className='mt-5'>
-                        <div className="flex justify-between mb-1">
+                        <div className="flex justify-between mb-3">
                             <div className=''>
                                 <p className='text-sm text-slate-500'>France</p>
                             </div>
                             <div className='flex justify-between w-1/3'>
                                 <p>130</p>
                                 <p className='text-slate-500'>23.5%</p>
+                            </div>
+                        </div>
+                        <div className="flex justify-between mb-3">
+                            <div className=''>
+                                <p className='text-sm text-slate-500'>United States</p>
+                            </div>
+                            <div className='flex justify-between w-1/3'>
+                                <p>83</p>
+                                <p className='text-slate-500'>7.16%</p>
+                            </div>
+                        </div>
+                        <div className="flex justify-between">
+                            <div className=''>
+                                <p className='text-sm text-slate-500'>China</p>
+                            </div>
+                            <div className='flex justify-between w-1/3'>
+                                <p>33</p>
+                                <p className='text-slate-500'>3.49%</p>
                             </div>
                         </div>
                     </div>
@@ -249,7 +274,8 @@ export default function Dashboard() {
                         </div>
                         <div>
                                     <button
-                                    id="dropdownDefaultButton"
+                                    id="30 days button for meetings"
+                                    aria-label="30 days button for meetings"
                                     type="button"
                                     onClick={toggleMeetingsDropdown}
                                     className="text-slate-900 bg-white font-medium border border-slate-200 rounded-sm text-sm px-5 py-1.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -261,7 +287,7 @@ export default function Dashboard() {
                                 </button>
                             <div
                         id="dropdown"
-                            className={`z-10 ${isMeetingsDropdownOpen ? 'block' : 'hidden'} w-28 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 absolute mt-2`}
+                            className={`z-10 ${isMeetingsDropdownOpen ? 'block' : 'hidden'} max-w-28 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 absolute mt-2`}
                         >
                                 <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                                 <li>
