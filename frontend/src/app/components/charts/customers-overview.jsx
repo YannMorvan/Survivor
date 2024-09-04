@@ -17,6 +17,7 @@ const LineChart = () => {
       wheelX: "panX",
       wheelY: "zoomX",
       pinchZoomX: true,
+      paddingRight: 30,
     }));
 
     chart.get("colors").set("step", 3);
@@ -76,9 +77,10 @@ const LineChart = () => {
     }));
 
     xAxis.get("renderer").labels.template.setAll({
-      paddingTop: 35,
+      paddingTop: 20,
       paddingBottom: 15,
-      paddingLeft: 15,
+      paddingLeft: 20,
+      paddingRight: 30,
       fontSize: 10,
       fill: am5.color("#ACB9CA"),
     });
@@ -189,7 +191,7 @@ const LineChart = () => {
     createRange(1200, yAxis, "1200");
     createRange(new Date(2024, 7, 1).getTime(), xAxis, "01 Jul, 2024");
     createRange(new Date(2024, 7, 15).getTime(), xAxis, "15 Jul, 2024");
-    createRange(new Date(2024, 7, 30).getTime(), xAxis, "30 Jul, 2024");
+    createRange(new Date(2024, 7, 31).getTime(), xAxis, "30 Jul, 2024");
 
     yAxis.get("renderer").grid.template.set("forceHidden", true);
     xAxis.get("renderer").grid.template.set("forceHidden", true);
