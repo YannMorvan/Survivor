@@ -21,16 +21,17 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white border-gray-200 dark:bg-gray-900">
+    <div className='mb-10'>
+    <nav className="bg-white border-b border-gray-300 dark:bg-gray-900">
       <div className="max-w-screen p-4 flex items-center justify-between">
         <a className="flex items-center space-x-3 rtl:space-x-reverse">
           <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Soul Connection</span>
         </a>
         <div className="flex items-center jusitfy-end md:order-2 space-x-1 md:space-x-0 rtl:space-x-reverse">
-        <div className='md:block hidden'>
+        <div className='lg:block hidden'>
             <MessageSquareMore className='text-sky-700 cursor-pointer mt-0.5 mr-3'/>
         </div>
-        <div className='md:block hidden'>
+        <div className='lg:block hidden'>
           <button
             type="button"
             onClick={toggleDropdown}
@@ -65,7 +66,7 @@ const Navbar = () => {
           <div>
           </div>
           </div>
-          <div className='border rounded-full p-2 bg-sky-600 md:block hidden'>
+          <div className='border rounded-full p-2 bg-sky-600 lg:block hidden'>
             <UserRound size={16} color='white'/>
           </div>
           <div className="relative inline-block text-left">
@@ -73,7 +74,7 @@ const Navbar = () => {
         id="dropdownDefaultButton"
         type="button"
         onClick={toggleDropdown}
-        className="md:hidden block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        className="lg:hidden block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
       >
         <Menu />
       </button>
@@ -118,7 +119,7 @@ const Navbar = () => {
             {['Dashboard', 'Coaches', 'Customers', 'Tips', 'Events'].map(route => (
               <li className="relative inline-block" key={route}>
                 <a
-                  href={`#${route.toLowerCase()}`}
+                  href={`${route.toLowerCase()}`}
                   onClick={() => handleRouteChange(route)}
                   className={`block py-2 px-3 text-sky-700 bg-blue-700 rounded md:bg-transparent md:p-0 md:dark:dark-blue-500 inline-block relative
                       ${activeRoute === route ? 'text-sky-700' : 'md:text-slate-700'
@@ -126,7 +127,7 @@ const Navbar = () => {
                 >
                   {route}
                   {activeRoute === route && (
-                    <div className='absolute mt-5 w-full border-b-4 rounded-xl border-sky-600'></div>
+                    <div className='absolute mt-4.5 w-full border-t-4 p-0.5 rounded-xl border-sky-600'></div>
                   )}
                 </a>
               </li>
@@ -135,6 +136,7 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
+    </div>
   );
 };
 
