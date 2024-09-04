@@ -10,6 +10,9 @@
     "start:survivor": "next start -p 3000"
   },
   "dependencies": {
+    "@amcharts/amcharts5": "^5.10.4",
+    "@amcharts/amcharts5-fonts": "^5.0.1",
+    "@amcharts/amcharts5-geodata": "^5.1.4",
     "lucide-react": "^0.438.0",
     "next": "14.2.7",
     "react": "^18",
