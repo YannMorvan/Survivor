@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { MessageSquareMore, User, UserRound, Menu } from 'lucide-react'
 
@@ -8,8 +8,20 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeRoute, setActiveRoute] = useState('Dashboard');
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+  const buttonRef: React.MutableRefObject<null> = useRef(null);
+
+  const toggleDropdown: () => void = () => {
+    const button = buttonRef.current;
+
+    if (button) {
+      const isButtonHidden = window.getComputedStyle(button).display === 'none';
+
+      if (!isButtonHidden) {
+        setIsDropdownOpen(!isDropdownOpen);
+      } else {
+        console.log('Button is hidden, cannot toggle dropdown');
+      }
+    }
   };
 
   const toggleMenu = () => {
@@ -34,6 +46,8 @@ const Navbar = () => {
         <div className='lg:block hidden'>
           <button
             type="button"
+            ref={buttonRef}
+            id="dropdownDefaultButton"
             onClick={toggleDropdown}
             className="inline-flex items-center font-medium justify-center px-4 py-2 text-sm text-gray-900 dark:text-white rounded-lg cursor-pointer dark:hover:bg-gray-700 dark:hover:text-white"
           >
@@ -74,6 +88,7 @@ const Navbar = () => {
         id="dropdownDefaultButton"
         type="button"
         onClick={toggleDropdown}
+        ref={buttonRef}
         className="lg:hidden block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
       >
         <Menu />
