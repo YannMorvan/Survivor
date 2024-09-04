@@ -1,10 +1,9 @@
 "use client";
 
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Modal from 'react-modal';
 import { CloudDownload, Plus, Search, Sliders, Settings, X } from 'lucide-react';
 
-// Sample coaches list data
 const coachesList = [
   {
     id: 'c1',
@@ -62,8 +61,30 @@ const Page = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log(formData);
-    // Handle form submission logic here
     closeModal();
+  };
+
+  const exportToCSV = () => {
+    const headers = ['Name', 'Email', 'Phone', 'Number of Customers'];
+    const rows = coachesList.map((coach) => [
+      coach.name,
+      coach.email,
+      coach.phone,
+      coach.nbrCustomers,
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map((row) => row.join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'coaches_list.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -71,39 +92,49 @@ const Page = () => {
       <div className="flex justify-between items-center mb-2 flex-row">
         <h1 className="text-3xl font-semibold text-[#384B65]">Coaches List</h1>
         <div className="flex flex-row items-center">
-          <button className="bg-white text-white px-4 py-2 rounded-md flex flex-row items-center gap-4 border border-gray-200 border-2" style={{ color: '#2263B3' }}>
+          <button
+            className="bg-white text-white px-4 py-2 rounded-md flex flex-row items-center gap-4 border border-gray-200 border-2"
+            style={{ color: '#2263B3' }}
+            onClick={exportToCSV}
+          >
             <CloudDownload style={{ color: '#2263B3' }} />
             <p className="hidden sm:inline font-bold text-[#2263B3]">Export</p>
           </button>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-md ml-4" style={{ color: '2263B3' }} onClick={openModal}>
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded-md ml-4"
+            style={{ color: '2263B3' }}
+            onClick={openModal}
+          >
             <Plus />
           </button>
         </div>
       </div>
       <p className="text-gray-600 mb-4">You have total {coachesList.length} coaches.</p>
 
-    <div className="overflow-x-auto">
-      <div className="py-2 px-4 border border-gray-200">
-        <div className="my-2 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <select className="border border-gray-300 p-2 rounded-md">
-              <option>Bulk Action</option>
-            </select>
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md">Apply</button>
+      <div className="overflow-x-auto">
+        <div className="py-2 px-4 border border-gray-200">
+          <div className="my-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <select className="border border-gray-300 p-2 rounded-md">
+                <option>Bulk Action</option>
+              </select>
+              <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
+                Apply
+              </button>
+            </div>
+            <div className="flex items-center gap-4">
+              <button className="text-gray-500 hover:text-gray-700">
+                <Search className="w-5 h-5" />
+              </button>
+              <button className="text-gray-500 hover:text-gray-700">
+                <Sliders className="w-5 h-5" />
+              </button>
+              <button className="text-gray-500 hover:text-gray-700">
+                <Settings className="w-5 h-5" />
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
-            <button className="text-gray-500 hover:text-gray-700">
-              <Search className="w-5 h-5" />
-            </button>
-            <button className="text-gray-500 hover:text-gray-700">
-              <Sliders className="w-5 h-5" />
-            </button>
-            <button className="text-gray-500 hover:text-gray-700">
-              <Settings className="w-5 h-5" />
-            </button>
-          </div>
-      </div>
-      </div>
+        </div>
 
         <table className="w-full border border-gray-200 shadow-sm rounded-lg">
           <thead>
@@ -132,15 +163,13 @@ const Page = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <span className='text-l'>{coach.name}</span>
+                  <span className="text-l">{coach.name}</span>
                 </td>
                 <td className="p-4 text-[#6B83A2]">{coach.email}</td>
                 <td className="p-4 text-[#6B83A2]">{coach.phone}</td>
                 <td className="p-4 text-[#6B83A2]">{coach.nbrCustomers}</td>
                 <td className="p-4 text-[#6B83A2]">
-                  <button className="text-[#384B65] hover:text-[#6B83A2]">
-                    •••
-                  </button>
+                  <button className="text-[#384B65] hover:text-[#6B83A2]">•••</button>
                 </td>
               </tr>
             ))}
@@ -169,7 +198,7 @@ const Page = () => {
                     onChange={handleChange}
                     className="w-full px-3 py-2 border rounded-lg"
                     required
-                    />
+                  />
                 </div>
                 <div className="mb-4">
                   <label className="block text-gray-700">Surname</label>
