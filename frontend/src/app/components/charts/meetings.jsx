@@ -11,14 +11,14 @@ const PieChartComponent = () => {
     let chart = am4core.create("chartdiv4", am4charts.PieChart);
 
     if (chart.logo) {
-        chart.logo.disabled = true;
+      chart.logo.disabled = true;
     }
 
     let pieSeries = chart.series.push(new am4charts.PieSeries());
-    pieSeries.dataFields.value = "litres";
-    pieSeries.dataFields.category = "country";
+    pieSeries.dataFields.value = "meetings";
+    pieSeries.dataFields.category = "Sources";
 
-    chart.innerRadius = am4core.percent(30);
+    chart.innerRadius = am4core.percent(40);
 
     pieSeries.slices.template.stroke = am4core.color("#fff");
     pieSeries.slices.template.strokeWidth = 2;
@@ -40,16 +40,32 @@ const PieChartComponent = () => {
     hoverShadow.opacity = 0.7;
     hoverShadow.blur = 5;
 
+    pieSeries.colors.list = [
+      am4core.color("#798BFF"),
+      am4core.color("#B8ACFF"),
+      am4core.color("#FFA9CE"),
+      am4core.color("#F8D974")
+    ];
+
     chart.legend = new am4charts.Legend();
 
+    chart.legend.valueLabels.template.html = `
+    <div>
+        <span style="color: #000; font-size: 16px;"> {value}</span>
+        <span style="color: #91A3B9; font-size: 12px;">{value.percent.formatNumber('#.0')}%</span>
+    </div>
+  `;
+
+    chart.legend.labels.template.fontSize = 12;
+    chart.legend.labels.template.fill = am4core.color("#91A3B9");
+    
     chart.data = [
-      { country: "Lithuania", litres: 501.9 },
-      { country: "Germany", litres: 165.8 },
-      { country: "Australia", litres: 139.9 },
-      { country: "Austria", litres: 128.3 },
-      { country: "UK", litres: 99 },
-      { country: "Belgium", litres: 60 },
+      { Sources: "Dating app", meetings: 301 },
+      { Sources: "Social media", meetings: 165 },
+      { Sources: "Outside", meetings: 139 },
+      { Sources: "Friends", meetings: 128 }
     ];
+  
 
     return () => {
       if (chart) {
