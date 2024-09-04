@@ -53,11 +53,11 @@ const LineChart = () => {
     });
 
     xAxis.get("renderer").labels.template.setAll({
-        paddingTop: 20,
-        paddingBottom: 15,
-        paddingLeft: 10,
-        fontSize: 10,
-        fill: am5.color("#ACB9CA"),
+      paddingTop: 20,
+      paddingBottom: 15,
+      paddingLeft: 10,
+      fontSize: 10,
+      fill: am5.color("#ACB9CA"),
     });
 
     let yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
@@ -81,7 +81,10 @@ const LineChart = () => {
       })
     }));
 
-    series.columns.template.setAll({ strokeOpacity: 0 });
+    series.columns.template.setAll({
+      strokeOpacity: 0,
+      fill: am5.color("#9CAAFF")
+    });
 
     const data = [
       { date: new Date(2024, 6, 1).getTime(), value: 100 },
@@ -119,22 +122,22 @@ const LineChart = () => {
     series.data.setAll(data);
 
     function createRange(value, axis, label) {
-        let rangeDataItem = axis.makeDataItem({
-          value: value
-        });
-        
-        let range = axis.createAxisRange(rangeDataItem);
-        
-        range.get("label").setAll({
-          forceHidden: false,
-          text: label
-        });
+      let rangeDataItem = axis.makeDataItem({
+        value: value
+      });
       
-        range.get("grid").setAll({
-          forceHidden: false,
-          strokeOpacity: 0.2,
-          location: 1,
-        });
+      let range = axis.createAxisRange(rangeDataItem);
+      
+      range.get("label").setAll({
+        forceHidden: false,
+        text: label
+      });
+    
+      range.get("grid").setAll({
+        forceHidden: false,
+        strokeOpacity: 0.2,
+        location: 1,
+      });
     }
 
     createRange(new Date(2024, 6, 1).getTime(), xAxis, "01 Jul, 2024");
