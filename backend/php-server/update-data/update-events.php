@@ -42,7 +42,7 @@ $events = $res["data"];
 
 
 foreach ($events as $i => $event) {
-    if (!isset($event["id"])) {
+    if (!isset($event->id)) {
         $errors[] = [
             "context" => "Get an event from the API",
             "error" => "No id found for the event"
@@ -51,7 +51,7 @@ foreach ($events as $i => $event) {
     }
 
 
-    $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/events/" . $event["id"]);
+    $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/events/" . $event->id);
 
     if ($res["status"] == false) {
         $errors[] = [
@@ -64,7 +64,7 @@ foreach ($events as $i => $event) {
     $events[$i] = $res["data"];
 
 
-    $res = set_event_from_api_data($event);
+    $res = set_event_from_api_data($events[$i]);
 
     if ($res["status"] == false) {
         $errors[] = [
@@ -77,5 +77,6 @@ foreach ($events as $i => $event) {
 
 echo json_encode([
     "status" => true,
-    "message" => "Data updated successfully"
+    "message" => "Events updated successfully",
+    "errors" => $errors
 ]);

@@ -42,15 +42,6 @@ $tips = $res["data"];
 
 
 foreach ($tips as $i => $tip) {
-    if (!isset($tip["id"])) {
-        $errors[] = [
-            "context" => "Get a tip from the API",
-            "error" => "No id found for the tip"
-        ];
-        continue;
-    }
-
-
     $res = set_tip_from_api_data($tip);
 
     if ($res["status"] == false) {
@@ -64,6 +55,6 @@ foreach ($tips as $i => $tip) {
 
 echo json_encode([
     "status" => true,
-    "message" => "Data updated successfully",
+    "message" => "Tips updated successfully",
     "errors" => $errors
 ]);

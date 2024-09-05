@@ -42,7 +42,7 @@ $encounters = $res["data"];
 
 
 foreach ($encounters as $i => $encounter) {
-    if (!isset($encounter["id"])) {
+    if (!isset($encounter->id)) {
         $errors[] = [
             "context" => "Get an encounter from the API",
             "error" => "No id found for the encounter"
@@ -51,7 +51,7 @@ foreach ($encounters as $i => $encounter) {
     }
 
 
-    $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/encounters/" . $encounter["id"]);
+    $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/encounters/" . $encounter->id);
 
     if ($res["status"] == false) {
         $errors[] = [
@@ -64,7 +64,7 @@ foreach ($encounters as $i => $encounter) {
     $encounters[$i] = $res["data"];
 
 
-    $res = set_encounter_from_api_data($encounter);
+    $res = set_encounter_from_api_data($encounters[$i]);
 
     if ($res["status"] == false) {
         $errors[] = [
@@ -77,6 +77,6 @@ foreach ($encounters as $i => $encounter) {
 
 echo json_encode([
     "status" => true,
-    "message" => "Data updated successfully",
+    "message" => "Encounters updated successfully",
     "errors" => $errors
 ]);

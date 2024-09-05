@@ -1,6 +1,6 @@
 <?php
 
-const DB_PATH = __DIR__ . "/db_connection.php";
+const DB_PATH = __DIR__ . "/../db_connection.php";
 
 
 
@@ -35,7 +35,10 @@ function get_from_api($api_key, $token, $url, $image = false)
     curl_close($ch);
 
 
-    $response = json_decode($response);
+    if ($image == false) {
+        $response = json_decode($response);
+    }
+
 
     if ($code == 404) {
         return [
@@ -96,14 +99,14 @@ function get_image_from_api($api_key, $token, $url)
 
 /**
  * Set an employee in database from the API data.
- * @param array $employee       Employee data from the API
+ * @param object $employee      Employee data from the API
  * @return array                Status of the operation
  */
 function set_employee_from_api_data($employee)
 {
-    require_once DB_PATH;
+    require DB_PATH;
 
-    if (!isset($employee["id"]) || !isset($employee["email"]) || !isset($employee["name"]) || !isset($employee["surname"]) || !isset($employee["birth_date"]) || !isset($employee["gender"]) || !isset($employee["work"])) {
+    if (!isset($employee->id) || !isset($employee->email) || !isset($employee->name) || !isset($employee->surname) || !isset($employee->birth_date) || !isset($employee->gender) || !isset($employee->work)) {
         return [
             "status" => false,
             "message" => "Missing data"
@@ -118,13 +121,13 @@ function set_employee_from_api_data($employee)
 
     $stm = $pdo->prepare($sql);
     $res = $stm->execute([
-        "id" => $employee["id"],
-        "email" => $employee["email"],
-        "name" => $employee["name"],
-        "surname" => $employee["surname"],
-        "birth_date" => $employee["birth_date"],
-        "gender" => $employee["gender"],
-        "work" => $employee["work"]
+        "id" => $employee->id,
+        "email" => $employee->email,
+        "name" => $employee->name,
+        "surname" => $employee->surname,
+        "birth_date" => $employee->birth_date,
+        "gender" => $employee->gender,
+        "work" => $employee->work
     ]);
 
     if ($res == false) {
@@ -149,7 +152,7 @@ function set_employee_from_api_data($employee)
  */
 function set_employee_image_from_api_data($id_employee, $image)
 {
-    require_once DB_PATH;
+    require DB_PATH;
 
     $sql = "INSERT INTO employees_images (id_employee, image) VALUES (:id_employee, :image) ON DUPLICATE KEY UPDATE image = :image";
 
@@ -175,14 +178,14 @@ function set_employee_image_from_api_data($id_employee, $image)
 
 /**
  * Set a customer in database from the API data.
- * @param array $customer       Customer data from the API
+ * @param object $customer      Customer data from the API
  * @return array                Status of the operation
  */
 function set_customer_from_api_data($customer)
 {
-    require_once DB_PATH;
+    require DB_PATH;
 
-    if (!isset($customer["id"]) || !isset($customer["email"]) || !isset($customer["phone_number"]) || !isset($customer["name"]) || !isset($customer["surname"]) || !isset($customer["address"]) || !isset($customer["birth_date"]) || !isset($customer["gender"]) || !isset($customer["description"]) || !isset($customer["astrological_sign"])) {
+    if (!isset($customer->id) || !isset($customer->email) || !isset($customer->phone_number) || !isset($customer->name) || !isset($customer->surname) || !isset($customer->address) || !isset($customer->birth_date) || !isset($customer->gender) || !isset($customer->description) || !isset($customer->astrological_sign)) {
         return [
             "status" => false,
             "message" => "Missing data"
@@ -197,16 +200,16 @@ function set_customer_from_api_data($customer)
 
     $stm = $pdo->prepare($sql);
     $res = $stm->execute([
-        "id" => $customer["id"],
-        "email" => $customer["email"],
-        "phone_number" => $customer["phone_number"],
-        "name" => $customer["name"],
-        "surname" => $customer["surname"],
-        "address" => $customer["address"],
-        "birth_date" => $customer["birth_date"],
-        "gender" => $customer["gender"],
-        "description" => $customer["description"],
-        "astrological_sign" => $customer["astrological_sign"]
+        "id" => $customer->id,
+        "email" => $customer->email,
+        "phone_number" => $customer->phone_number,
+        "name" => $customer->name,
+        "surname" => $customer->surname,
+        "address" => $customer->address,
+        "birth_date" => $customer->birth_date,
+        "gender" => $customer->gender,
+        "description" => $customer->description,
+        "astrological_sign" => $customer->astrological_sign
     ]);
 
     if ($res == false) {
@@ -231,7 +234,7 @@ function set_customer_from_api_data($customer)
  */
 function set_customer_image_from_api_data($id_customer, $image)
 {
-    require_once DB_PATH;
+    require DB_PATH;
 
     $sql = "INSERT INTO customers_images (id_customer, image) VALUES (:id_customer, :image) ON DUPLICATE KEY UPDATE image = :image";
 
@@ -258,21 +261,21 @@ function set_customer_image_from_api_data($id_customer, $image)
 /**
  * Set a customer payment in database from the API data.
  * @param int $id_customer      ID of the customer
- * @param array $payment        Payment data from the API
+ * @param object $payment       Payment data from the API
  * @return array                Status of the operation
  */
 function set_customer_payment_from_api_data($id_customer, $payment)
 {
-    require_once DB_PATH;
+    require DB_PATH;
 
-    if (!isset($payment["id"]) || !isset($payment["date"]) || !isset($payment["method"]) || !isset($payment["amount"]) || !isset($payment["comment"])) {
+    if (!isset($payment->id) || !isset($payment->date) || !isset($payment->payment_method) || !isset($payment->amount) || !isset($payment->comment)) {
         return [
             "status" => false,
             "message" => "Missing data"
         ];
     }
 
-    $sql = "INSERT INTO customers_payments
+    $sql = "INSERT INTO payments
             (id, id_customer, date, method, amount, comment)
             VALUES (:id, :id_customer, :date, :method, :amount, :comment)
             ON DUPLICATE KEY UPDATE
@@ -280,12 +283,12 @@ function set_customer_payment_from_api_data($id_customer, $payment)
 
     $stm = $pdo->prepare($sql);
     $res = $stm->execute([
-        "id" => $payment["id"],
+        "id" => $payment->id,
         "id_customer" => $id_customer,
-        "date" => $payment["date"],
-        "method" => $payment["method"],
-        "amount" => $payment["amount"],
-        "comment" => $payment["comment"]
+        "date" => $payment->date,
+        "method" => $payment->payment_method,
+        "amount" => $payment->amount,
+        "comment" => $payment->comment
     ]);
 
     if ($res == false) {
@@ -303,16 +306,46 @@ function set_customer_payment_from_api_data($id_customer, $payment)
 
 
 /**
+ * Get the IDs of the customers.
+ * @return array        IDs of the customers
+ */
+function get_customers_ids()
+{
+    require DB_PATH;
+
+    $sql = "SELECT id FROM customers";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute();
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    $rows = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+    return [
+        "status" => true,
+        "data" => $rows
+    ];
+}
+
+
+
+/**
  * Set a customer cloth in database from the API data.
  * @param int $id_customer      ID of the customer
- * @param array $cloth          Cloth data from the API
+ * @param object $cloth         Cloth data from the API
  * @return array                Status of the operation
  */
 function set_cloth_from_api_data($id_customer, $cloth)
 {
-    require_once DB_PATH;
+    require DB_PATH;
 
-    if (!isset($cloth["id"]) || !isset($cloth["type"])) {
+    if (!isset($cloth->id) || !isset($cloth->type)) {
         return [
             "status" => false,
             "message" => "Missing data"
@@ -327,9 +360,9 @@ function set_cloth_from_api_data($id_customer, $cloth)
 
     $stm = $pdo->prepare($sql);
     $res = $stm->execute([
-        "id" => $cloth["id"],
+        "id" => $cloth->id,
         "id_customer" => $id_customer,
-        "type" => $cloth["type"]
+        "type" => $cloth->type
     ]);
 
     if ($res == false) {
@@ -354,7 +387,7 @@ function set_cloth_from_api_data($id_customer, $cloth)
  */
 function set_cloth_image_from_api_data($id_cloth, $image)
 {
-    require_once DB_PATH;
+    require DB_PATH;
 
     $sql = "INSERT INTO clothes_images (id_cloth, image) VALUES (:id_cloth, :image) ON DUPLICATE KEY UPDATE image = :image";
 
@@ -380,14 +413,14 @@ function set_cloth_image_from_api_data($id_cloth, $image)
 
 /**
  * Set an event in database from the API data.
- * @param array $encounter          Encounter data from the API
+ * @param object $encounter         Encounter data from the API
  * @return array                    Status of the operation
  */
 function set_encounter_from_api_data($encounter)
 {
-    require_once DB_PATH;
+    require DB_PATH;
 
-    if (!isset($id) || !isset($encounter["customer_id"]) || !isset($encounter["date"]) || !isset($encounter["rating"]) || !isset($encounter["comment"]) || !isset($encounter["source"])) {
+    if (!isset($encounter->id) || !isset($encounter->customer_id) || !isset($encounter->date) || !isset($encounter->rating) || !isset($encounter->comment) || !isset($encounter->source)) {
         return [
             "status" => false,
             "message" => "Missing data"
@@ -402,12 +435,12 @@ function set_encounter_from_api_data($encounter)
 
     $stm = $pdo->prepare($sql);
     $res = $stm->execute([
-        "id" => $encounter["id"],
-        "id_customer" => $encounter["customer_id"],
-        "date" => $encounter["date"],
-        "rating" => $encounter["rating"],
-        "comment" => $encounter["comment"],
-        "source" => $encounter["source"]
+        "id" => $encounter->id,
+        "id_customer" => $encounter->customer_id,
+        "date" => $encounter->date,
+        "rating" => $encounter->rating,
+        "comment" => $encounter->comment,
+        "source" => $encounter->source
     ]);
 
     if ($res == false) {
@@ -426,14 +459,14 @@ function set_encounter_from_api_data($encounter)
 
 /**
  * Set a tip in database from the API data.
- * @param array $tip            Tip data from the API
+ * @param object $tip           Tip data from the API
  * @return array                Status of the operation
  */
 function set_tip_from_api_data($tip)
 {
-    require_once DB_PATH;
+    require DB_PATH;
 
-    if (!isset($tip["id"]) || !isset($tip["title"]) || !isset($tip["tip"])) {
+    if (!isset($tip->id) || !isset($tip->title) || !isset($tip->tip)) {
         return [
             "status" => false,
             "message" => "Missing data"
@@ -444,9 +477,9 @@ function set_tip_from_api_data($tip)
 
     $stm = $pdo->prepare($sql);
     $res = $stm->execute([
-        "id" => $tip["id"],
-        "title" => $tip["title"],
-        "tip" => $tip["tip"]
+        "id" => $tip->id,
+        "title" => $tip->title,
+        "tip" => $tip->tip
     ]);
 
     if ($res == false) {
@@ -465,14 +498,14 @@ function set_tip_from_api_data($tip)
 
 /**
  * Set an event in database from the API data.
- * @param array $event          Event data from the API
+ * @param object $event         Event data from the API
  * @return array                Status of the operation
  */
 function set_event_from_api_data($event)
 {
-    require_once DB_PATH;
+    require DB_PATH;
 
-    if (!isset($event["id"]) || !isset($event["name"]) || !isset($event["date"]) || !isset($event["duration"]) || !isset($event["max_participants"]) || !isset($event["location_x"]) || !isset($event["location_y"]) || !isset($event["type"]) || !isset($event["employee_id"]) || !isset($event["location_name"])) {
+    if (!isset($event->id) || !isset($event->name) || !isset($event->date) || !isset($event->duration) || !isset($event->max_participants) || !isset($event->location_x) || !isset($event->location_y) || !isset($event->type) || !isset($event->employee_id) || !isset($event->location_name)) {
         return [
             "status" => false,
             "message" => "Missing data"
@@ -487,16 +520,16 @@ function set_event_from_api_data($event)
 
     $stm = $pdo->prepare($sql);
     $res = $stm->execute([
-        "id" => $event["id"],
-        "name" => $event["name"],
-        "date" => $event["date"],
-        "duration" => $event["duration"],
-        "max_participants" => $event["max_participants"],
-        "location_x" => $event["location_x"],
-        "location_y" => $event["location_y"],
-        "type" => $event["type"],
-        "id_employee" => $event["employee_id"],
-        "location_name" => $event["location_name"]
+        "id" => $event->id,
+        "name" => $event->name,
+        "date" => $event->date,
+        "duration" => $event->duration,
+        "max_participants" => $event->max_participants,
+        "location_x" => $event->location_x,
+        "location_y" => $event->location_y,
+        "type" => $event->type,
+        "id_employee" => $event->employee_id,
+        "location_name" => $event->location_name
     ]);
 
     if ($res == false) {

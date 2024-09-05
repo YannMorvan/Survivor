@@ -42,7 +42,7 @@ $customers = $res["data"];
 
 
 foreach ($customers as $i => $customer) {
-    if (!isset($customer["id"])) {
+    if (!isset($customer->id)) {
         $errors[] = [
             "context" => "Get a customer from the API",
             "error" => "No id found for the customer"
@@ -51,7 +51,7 @@ foreach ($customers as $i => $customer) {
     }
 
 
-    $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/customers/" . $customer["id"]);
+    $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/customers/" . $customer->id);
 
     if ($res["status"] == false) {
         $errors[] = [
@@ -71,7 +71,7 @@ foreach ($customers as $i => $customer) {
     }
 
 
-    $res = get_image_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/customers/" . $customer["id"] . "/image");
+    $res = get_image_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/customers/" . $customer->id . "/image");
 
     if ($res["status"] == false) {
         $errors[] = [
@@ -79,7 +79,7 @@ foreach ($customers as $i => $customer) {
             "error" => $res["message"]
         ];
     } else {
-        $res = set_customer_image_from_api_data($customer["id"], $res["data"]);
+        $res = set_customer_image_from_api_data($customer->id, $res["data"]);
 
         if ($res["status"] == false) {
             $errors[] = [
@@ -90,7 +90,7 @@ foreach ($customers as $i => $customer) {
     }
 
 
-    $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/customers/" . $customer["id"] . "/payments_history");
+    $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/customers/" . $customer->id . "/payments_history");
 
     if ($res["status"] == false) {
         $errors[] = [
@@ -101,7 +101,7 @@ foreach ($customers as $i => $customer) {
         $payments = $res["data"];
 
         foreach ($payments as $j => $payment) {
-            $res = set_customer_payment_from_api_data($customer["id"], $payment);
+            $res = set_customer_payment_from_api_data($customer->id, $payment);
 
             if ($res["status"] == false) {
                 $errors[] = [
@@ -111,62 +111,11 @@ foreach ($customers as $i => $customer) {
             }
         }
     }
-
-
-    $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/customers/" . $customer["id"] . "/clothes");
-
-    if ($res["status"] == false) {
-        $errors[] = [
-            "context" => "Get clothes from the API",
-            "error" => $res["message"]
-        ];
-    } else {
-        $clothes = $res["data"];
-
-        foreach ($clothes as $j => $cloth) {
-            if (!isset($cloth["id"])) {
-                $errors[] = [
-                    "context" => "Get a cloth from the API",
-                    "error" => "No id found for the cloth"
-                ];
-                continue;
-            }
-
-
-            $res = set_cloth_from_api_data($id_customer, $cloth);
-
-            if ($res["status"] == false) {
-                $errors[] = [
-                    "context" => "Set a cloth in database from the API data",
-                    "error" => $res["message"]
-                ];
-            }
-
-
-            $res = get_image_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/clothes/" . $cloth["id"] . "/image");
-
-            if ($res["status"] == false) {
-                $errors[] = [
-                    "context" => "Get a cloth image from the API",
-                    "error" => $res["message"]
-                ];
-            } else {
-                $res = set_cloth_image_from_api_data($cloth["id"], $res["data"]);
-
-                if ($res["status"] == false) {
-                    $errors[] = [
-                        "context" => "Set a cloth image in database from the API data",
-                        "error" => $res["message"]
-                    ];
-                }
-            }
-        }
-    }
 }
 
 
 echo json_encode([
     "status" => true,
-    "message" => "Data updated successfully",
+    "message" => "Customers updated successfully",
     "errors" => $errors
 ]);

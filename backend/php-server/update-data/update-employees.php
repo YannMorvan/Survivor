@@ -42,7 +42,7 @@ $employees = $res["data"];
 
 
 foreach ($employees as $i => $employee) {
-    if (!isset($employee["id"])) {
+    if (!isset($employee->id)) {
         $errors[] = [
             "context" => "Get an employee from the API",
             "error" => "No id found for the employee"
@@ -51,7 +51,7 @@ foreach ($employees as $i => $employee) {
     }
 
 
-    $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/employees/" . $employee["id"]);
+    $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/employees/" . $employee->id);
 
     if ($res["status"] == false) {
         $errors[] = [
@@ -71,7 +71,7 @@ foreach ($employees as $i => $employee) {
     }
 
 
-    $res = get_image_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/employees/" . $employee["id"] . "/image");
+    $res = get_image_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/employees/" . $employee->id . "/image");
 
     if ($res["status"] == false) {
         $errors[] = [
@@ -79,7 +79,7 @@ foreach ($employees as $i => $employee) {
             "error" => $res["message"]
         ];
     } else {
-        $res = set_employee_image_from_api_data($employee["id"], $res["data"]);
+        $res = set_employee_image_from_api_data($employee->id, $res["data"]);
 
         if ($res["status"] == false) {
             $errors[] = [
@@ -93,6 +93,6 @@ foreach ($employees as $i => $employee) {
 
 echo json_encode([
     "status" => true,
-    "message" => "Data updated successfully",
+    "message" => "Employees updated successfully",
     "errors" => $errors
 ]);
