@@ -8,7 +8,7 @@ require_once __DIR__ . "/db_connection.php";
 
 // TODO: add phone number and amount of customer for each employee
 
-$query = "SELECT * FROM employes";
+$query = "SELECT * FROM employees";
 $stmt = $pdo->prepare($query);
 $stmt->execute();
 $employes = $stmt->fetchAll(PDO::FETCH_ASSOC);
