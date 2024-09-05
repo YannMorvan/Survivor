@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db
--- Generation Time: Sep 03, 2024 at 01:00 PM
+-- Generation Time: Sep 05, 2024 at 08:58 AM
 -- Server version: 8.0.35
 -- PHP Version: 8.2.8
 
@@ -130,6 +130,7 @@ CREATE TABLE `events` (
   `id_employee` int NOT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `date` date NOT NULL,
+  `duration` int NOT NULL,
   `type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `max_participants` int NOT NULL,
   `location_x` float NOT NULL,
@@ -180,6 +181,7 @@ ALTER TABLE `clothes`
 --
 ALTER TABLE `clothes_images`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id_cloth` (`id_cloth`),
   ADD KEY `id_cloth_for_images` (`id_cloth`);
 
 --
@@ -193,6 +195,7 @@ ALTER TABLE `customers`
 --
 ALTER TABLE `customers_images`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id_customer` (`id_customer`),
   ADD KEY `id_customer_for_images` (`id_customer`);
 
 --
@@ -206,6 +209,7 @@ ALTER TABLE `employees`
 --
 ALTER TABLE `employees_images`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `id_employee` (`id_employee`),
   ADD KEY `id_employee_for_images` (`id_employee`);
 
 --
