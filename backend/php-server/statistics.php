@@ -8,52 +8,61 @@ session_start();
 require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/db_connection.php';
 
-$query = "SELECT * FROM events";
+try {
 
-$stm = $pdo->prepare($query);
-$stm->execute();
-$events = $stm->fetchAll(PDO::FETCH_ASSOC);
+    $query = "SELECT * FROM events";
 
-if (empty($events)) {
+    $stm = $pdo->prepare($query);
+    $stm->execute();
+    $events = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+    if (empty($events)) {
+        echo json_encode([
+            "status" => false,
+            "message" => "No events found"
+        ]);
+        exit();
+    }
+
+    $query = "SELECT * FROM encounters";
+
+    $stm = $pdo->prepare($query);
+    $stm->execute();
+    $encounters = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+    if (empty($encounters)) {
+        echo json_encode([
+            "status" => false,
+            "message" => "No encounters found"
+        ]);
+        exit();
+    }
+
+    foreach ($encounters as $key => $encounter) {
+        $encounters[$key] = $encounter["source"];
+    }
+
+    $query = "SELECT address FROM customers";
+
+    $stm = $pdo->prepare($query);
+    $stm->execute();
+    $adresses = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+    // TODO: implement the missing graph's data
+
+
+    echo json_encode([
+        "status" => true,
+        "data" => [
+            "encounters" => $encounters,
+            "events" => $events,
+            "addresses" => $adresses
+        ]
+    ]);
+
+} catch (PDOException $e) {
     echo json_encode([
         "status" => false,
-        "message" => "No events found"
+        "message" => "Database error: " . $e->getMessage()
     ]);
-    exit();
 }
-
-$query = "SELECT * FROM encounters";
-
-$stm = $pdo->prepare($query);
-$stm->execute();
-$encounters = $stm->fetchAll(PDO::FETCH_ASSOC);
-
-if (empty($encounters)) {
-    echo json_encode([
-        "status" => false,
-        "message" => "No encounters found"
-    ]);
-    exit();
-}
-
-foreach ($encounters as $key => $encounter) {
-    $encounters[$key] = $encounter["source"];
-}
-
-$query = "SELECT address FROM customers";
-
-$stm = $pdo->prepare($query);
-$stm->execute();
-$adresses = $stm->fetchAll(PDO::FETCH_ASSOC);
-
-// TODO: implement the missing graph's data
-
-
-echo json_encode([
-    "status" => true,
-    "data" =>  [
-        "encounters" => $encounters,
-        "events" => $events,
-        "addresses" => $adresses
-    ]
-]);

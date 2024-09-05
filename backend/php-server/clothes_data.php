@@ -16,25 +16,34 @@ if (!isset($_POST['type'])) {
     exit();
 }
 
-$query = "SELECT ci.image FROM clothes c LEFT JOIN clothes_images ci ON c.id = ci.id_cloth WHERE c.type = :type";
+try {
 
-$stm = $pdo->prepare($query);
-$stm->execute(["type" => $_POST['type']]);
-$clothes = $stm->fetchAll(PDO::FETCH_ASSOC);
+    $query = "SELECT ci.image FROM clothes c LEFT JOIN clothes_images ci ON c.id = ci.id_cloth WHERE c.type = :type";
 
-if (empty($clothes)) {
+    $stm = $pdo->prepare($query);
+    $stm->execute(["type" => $_POST['type']]);
+    $clothes = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+    if (empty($clothes)) {
+        echo json_encode([
+            "status" => false,
+            "message" => "No clothes found"
+        ]);
+        exit();
+    }
+
+    foreach ($clothes as $key => $cloth) {
+        $clothes[$key] = base64_encode($cloth['image']);
+    }
+
+    echo json_encode([
+        "status" => true,
+        "data" => $clothes
+    ]);
+
+} catch (PDOException $e) {
     echo json_encode([
         "status" => false,
-        "message" => "No clothes found"
+        "message" => "Database error: " . $e->getMessage()
     ]);
-    exit();
 }
-
-foreach ($clothes as $key => $cloth) {
-    $clothes[$key] = base64_encode($cloth['image']);
-}
-
-echo json_encode([
-    "status" => true,
-    "data" => $clothes
-]);
