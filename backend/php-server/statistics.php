@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 
 session_start();
 
-require_once __DIR__ . '/fuctions.php';
+require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/db_connection.php';
 
 $query = "SELECT * FROM events";
@@ -40,6 +40,12 @@ foreach ($encounters as $key => $encounter) {
     $encounters[$key] = $encounter["source"];
 }
 
+$query = "SELECT address FROM customers";
+
+$stm = $pdo->prepare($query);
+$stm->execute();
+$adresses = $stm->fetchAll(PDO::FETCH_ASSOC);
+
 // TODO: implement the missing graph's data
 
 
@@ -47,6 +53,7 @@ echo json_encode([
     "status" => true,
     "data" =>  [
         "encounters" => $encounters,
-        "events" => $events
+        "events" => $events,
+        "addresses" => $adresses
     ]
 ]);
