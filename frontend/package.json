@@ -15,11 +15,13 @@
     "@amcharts/amcharts5": "^5.10.4",
     "@amcharts/amcharts5-fonts": "^5.0.1",
     "@amcharts/amcharts5-geodata": "^5.1.4",
+    "date-fns": "^3.6.0",
     "dayjs": "^1.11.13",
     "google-map-react": "^2.2.1",
     "lucide-react": "^0.438.0",
     "next": "14.2.7",
     "react": "^18",
+    "react-datepicker": "^7.3.0",
     "react-dom": "^18",
     "tailwindcss-animate": "^1.0.7"
   },

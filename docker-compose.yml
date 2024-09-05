@@ -1,25 +1,40 @@
 version: "3.8"
 
 services:
+  nextjs-app:
+    container_name: nextjs-app
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/nextjs-app
+    environment:
+      - NODE_ENV=production
+
   php-server:
     container_name: backend-php-server
     build:
-      context: ./php-server
+      context: ./backend/php-server
     ports:
       - "80:80"
     volumes:
-      - ./php-server:/var/www/html
+      - ./backend/php-server:/var/www/html
+      - ./backend/php.ini:/usr/local/etc/php/php.ini
     environment:
+      - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - API_KEY=${API_KEY}
+    depends_on:
+      - db
 
   db:
     container_name: backend-db
     image: mysql:8.0
     volumes:
       - db_data:/var/lib/mysql
-      - ./db-init:/docker-entrypoint-initdb.d
+      - ./backend/db-init:/docker-entrypoint-initdb.d
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
@@ -32,7 +47,7 @@ services:
     ports:
       - "8080:80"
     environment:
-      - PMA_HOST=db
+      - PMA_HOST=${MYSQL_HOST}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     depends_on:
       - db
@@ -40,10 +55,10 @@ services:
   cron:
     container_name: backend-cron
     build:
-      context: ./cron
+      context: ./backend/cron
     volumes:
-      - ./db-backup:/db-backup
-      - ./cron/logs:/var/log/cron
+      - ./backend/db-backup:/db-backup
+      - ./backend/cron/logs:/var/log/cron
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
