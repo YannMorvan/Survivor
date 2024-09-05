@@ -85,7 +85,7 @@ const paymentsHistory = [
   },
 ];
 
-const StarRating = ({ rating }) => {
+const StarRating = ({ rating }: { rating: number }) => {
   const totalStars = 5;
   const filledStars = Array(rating).fill("★");
   const emptyStars = Array(totalStars - rating).fill("☆");
@@ -106,7 +106,7 @@ const StarRating = ({ rating }) => {
   );
 };
 
-const getSourceColor = (source) => {
+const getSourceColor = (source: string) => {
   switch (source) {
     case "Dating App":
       return "text-orange-500";
