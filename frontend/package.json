@@ -16,7 +16,9 @@
     "@amcharts/amcharts5-fonts": "^5.0.1",
     "@amcharts/amcharts5-geodata": "^5.1.4",
     "dayjs": "^1.11.13",
+    "file-saver": "^2.0.5",
     "google-map-react": "^2.2.1",
+    "html2canvas": "^1.4.1",
     "lucide-react": "^0.438.0",
     "next": "14.2.7",
     "react": "^18",
@@ -24,6 +26,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
