@@ -13,8 +13,10 @@ export default function Clothes() {
 
   useEffect(() => {
     const fetchClothesTypes = async () => {
-      const response = await sendPostRequest("http://clothes_types.php", {
-        query: `
+      const response = await sendPostRequest(
+        "http://php-server:80/clothes_types.php",
+        {
+          query: `
         query {
           clothes {
             id
@@ -22,7 +24,8 @@ export default function Clothes() {
           }
         }
       `,
-      });
+        }
+      );
 
       console.log(response);
     };
