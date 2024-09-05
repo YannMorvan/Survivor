@@ -135,24 +135,34 @@ const Navbar = () => {
             </div>
           </div>
           <div className={`w-full lg:flex lg:w-auto ${isMenuOpen ? 'block' : 'hidden'}`}>
-            <ul className="font-medium md:static absolute flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:border-0 dark:bg-gray-800 dark:border-gray-700">
-              {['Dashboard', 'Coaches', 'Customers', 'Tips', 'Events'].map(route => (
-                <li className="relative inline-block" key={route}>
-                  <a
-                    href={`/${route.toLowerCase()}`}
-                    className={`block py-2 px-3 ${getActiveRoute(`/${route.toLowerCase()}`)} bg-blue-700 rounded md:bg-transparent md:p-0 md:dark:dark-blue-500 inline-block relative
-                      ${pathname === `/${route.toLowerCase()}` ? 'text-sky-700' : 'md:text-slate-700'
-                    }`}
-                  >
-                    {route}
-                    {pathname === `/${route.toLowerCase()}` && (
-                      <div className='absolute mt-4.5 w-full border-t-4 p-0.5 rounded-xl border-sky-600'></div>
-                    )}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+  <ul className="font-medium md:static absolute flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:border-0 dark:bg-gray-800 dark:border-gray-700">
+    {[
+      { label: 'Dashboard', path: 'dashboard' },
+      { label: 'Coaches', path: 'coaches' },
+      { label: 'Clients', path: 'customers' },
+      { label: 'Conseils', path: 'conseils' },
+      { label: 'Events', path: 'events' },
+      { label: 'Vêtements', path: 'vetements' },
+      { label: 'Compatibilité Astrologique', path: 'astro' },
+    ].map((route) => (
+      <li className="relative inline-block" key={route.path}>
+        <a
+          href={`/${route.path}`}
+          className={`block py-2 px-3 ${
+            pathname.startsWith(`/${route.path}`) ? 'text-sky-700' : 'md:text-slate-700'
+          } bg-blue-700 text-sm rounded md:bg-transparent md:p-0 md:dark:dark-blue-500 inline-block relative`}
+        >
+          {route.label}
+          {pathname.startsWith(`/${route.path}`) && (
+            <div className="absolute mt-5 w-full border-t-4 p-0.5 rounded-xl border-sky-600"></div>
+          )}
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+
         </div>
       </nav>
     </div>
