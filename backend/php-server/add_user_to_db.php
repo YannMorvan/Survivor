@@ -8,7 +8,7 @@ session_start();
 require_once __DIR__ . '/db_connection.php';
 require_once __DIR__ . '/functions.php';
 
-if (!isset($_POST['id']) || !isset($_POST['email']) || !isset($_POST['phone_number']) || !isset($_POST['name']) || !isset($_POST['surname']) || !isset($_POST['address']) || !isset($_POST['birth_date']) || !isset($_POST['gender']) || !isset($_POST['description']) || !isset($_POST['astrological_sign'])) {
+if (!isset($_POST['email']) || !isset($_POST['phone_number']) || !isset($_POST['name']) || !isset($_POST['surname']) || !isset($_POST['address']) || !isset($_POST['birth_date']) || !isset($_POST['gender']) || !isset($_POST['description']) || !isset($_POST['astrological_sign'])) {
     echo json_encode([
         "status" => false,
         "message" => "Missing required fields"
@@ -17,11 +17,10 @@ if (!isset($_POST['id']) || !isset($_POST['email']) || !isset($_POST['phone_numb
 }
 
 try {
-    $query = "INSERT INTO customers (id, email, phone_number, name, surname, address, birth_date, gender, description, astrological_sign) VALUES (:id, :email, :phone_number, :name, :surname, :address, :birth_date, :gender, :description, :astrological_sign)";
+    $query = "INSERT INTO customers (email, phone_number, name, surname, address, birth_date, gender, description, astrological_sign) VALUES (:email, :phone_number, :name, :surname, :address, :birth_date, :gender, :description, :astrological_sign)";
     
     $stm = $pdo->prepare($query);
-    
-    $stm->bindParam(':id', $_POST['id']);
+
     $stm->bindParam(':email', $_POST['email']);
     $stm->bindParam(':phone_number', $_POST['phone_number']);
     $stm->bindParam(':name', $_POST['name']);
