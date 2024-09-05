@@ -4,7 +4,7 @@
 
   @layer base {
     :root {
-      --background: #f8fcffd2;
+      --background: #F5F6FA;
       --foreground: 222.2 84% 4.9%;
 
       --card: 0 0% 100%;
@@ -121,4 +121,30 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     max-width: 200px;
+  }
+
+
+  #chartdiv canvas + canvas {
+    display: none;
+  }
+
+  #chartdiv1 canvas + canvas {
+    display: none;
+  }
+
+  .event {
+    position: absolute;
+    width: 100%;
+    background-color: #6b5b95;
+    color: white;
+    border-radius: 4px;
+    padding: 4px;
+    text-align: left;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+  
+  .cell {
+    position: relative;
+    overflow: visible;
   }

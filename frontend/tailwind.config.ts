@@ -91,6 +91,13 @@ const config = {
         '144': '36rem',
         'half': '50%',
       },
+      screens: {
+        'xs': '340px',
+      },
+      margin: {
+        '4.5': '1.125rem',
+        '5.5': '1.375rem',
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],
