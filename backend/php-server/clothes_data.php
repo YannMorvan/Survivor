@@ -13,12 +13,13 @@ if (!isset($_POST['type'])) {
         "status" => false,
         "message" => "Type is required"
     ]);
+    exit();
 }
 
 $query = "SELECT ci.image FROM clothes c LEFT JOIN clothes_images ci ON c.id = ci.id_cloth WHERE c.type = :type";
 
 $stm = $pdo->prepare($query);
-$stm->execute([":type" => $_POST['type']]);
+$stm->execute(["type" => $_POST['type']]);
 $clothes = $stm->fetchAll(PDO::FETCH_ASSOC);
 
 if (empty($clothes)) {
@@ -27,6 +28,10 @@ if (empty($clothes)) {
         "message" => "No clothes found"
     ]);
     exit();
+}
+
+foreach ($clothes as $key => $cloth) {
+    $clothes[$key] = base64_encode($cloth['image']);
 }
 
 echo json_encode([
