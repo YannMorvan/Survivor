@@ -9,10 +9,14 @@ services:
       - "80:80"
     volumes:
       - ./php-server:/var/www/html
+      - ./php.ini:/usr/local/etc/php/php.ini
     environment:
+      - MYSQL_HOST=${MYSQL_HOST}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - API_KEY=${API_KEY}
+    depends_on:
+      - db
 
   db:
     container_name: backend-db
@@ -32,7 +36,7 @@ services:
     ports:
       - "8080:80"
     environment:
-      - PMA_HOST=db
+      - PMA_HOST=${MYSQL_HOST}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
     depends_on:
       - db

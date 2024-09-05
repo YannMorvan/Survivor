@@ -28,7 +28,7 @@ if (!isset($_POST["email"]) || !isset($_POST["password"])) {
 $res = login($_ENV["API_KEY"], $_POST["email"], $_POST["password"]);
 
 if ($res["status"] == false) {
-    return json_encode($res);
+    echo json_encode($res);
 }
 
 
