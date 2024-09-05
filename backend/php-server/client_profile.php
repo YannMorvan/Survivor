@@ -23,8 +23,8 @@ $customer = $stm->fetch(PDO::FETCH_ASSOC);
 // TODO: check if user is authorized to view the payment data
 $paymentQuery = "SELECT * FROM payments WHERE id_customer = :id_customer";
 $paymentStm = $pdo->prepare($paymentQuery);
-$paymentStm->execute(["id_customer" => $customer["id"]]);
-$payments = $paymentStm->fetch(PDO::FETCH_ASSOC);
+$paymentStm->execute(["id_customer" => $_POST["id"]]);
+$payments = $paymentStm->fetchAll(PDO::FETCH_ASSOC);
 
 usort($payments, function ($a, $b) {
 
@@ -39,21 +39,23 @@ foreach ($recent_payments as $i => $payments) {
     $recent_payments[$i]["date"] = DateTime::createFromFormat("Y-m-d", $payments["date"])->format("d/m/Y");
 }
 
-$imageQuery = "SELECT * FROM images WHERE id_customer = :id_customer";
+$imageQuery = "SELECT * FROM customers_images WHERE id_customer = :id_customer";
 $imageStm = $pdo->prepare($imageQuery);
-$imageStm->execute(["id_customer" => $customer["id"]]);
+$imageStm->execute(["id_customer" => $_POST["id"]]);
 $images = $imageStm->fetch(PDO::FETCH_ASSOC);
 
 $encountersQuery = "SELECT * FROM encounters WHERE id_customer = :id_customer";
 $encountersStm = $pdo->prepare($encountersQuery);
-$encountersStm->execute(["id_customer" => $customer["id"]]);
+$encountersStm->execute(["id_customer" => $_POST["id"]]);
 $encounters = $encountersStm->fetchAll(PDO::FETCH_ASSOC);
 
-// TODO: define the rating threshold
-$rating = 3;
 
 $count_encounters = count($encounters);
 $count_positive_encounters = count(array_filter($encounters, function ($encounter) {
+
+    // TODO: define the rating threshold
+    $rating = 3;
+
     return $encounter["rating"] >= $rating;
 }));
 $count_planned_encounters = count(array_filter($encounters, function ($encounter) {

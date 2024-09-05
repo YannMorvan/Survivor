@@ -29,7 +29,7 @@ $customers_array = array_filter(array_map(function ($customer) use ($pdo) {
     $paymentStm->execute(["id_customer" => $customer["id"]]);
     $payments = $paymentStm->fetch(PDO::FETCH_ASSOC);
 
-    $imageQuery = "SELECT * FROM images WHERE id_customer = :id_customer";
+    $imageQuery = "SELECT * FROM customers_images WHERE id_customer = :id_customer";
     $imageStm = $pdo->prepare($imageQuery);
     $imageStm->execute(["id_customer" => $customer["id"]]);
     $images = $imageStm->fetch(PDO::FETCH_ASSOC);
