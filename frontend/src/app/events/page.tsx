@@ -3,6 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import Calendar from '../components/calendar';
+import Modal from '../components/modal';
 
 export default function Events() {
     return (
@@ -11,45 +12,35 @@ export default function Events() {
                 <div className=''>
                     <h1 className='md:text-3xl sm:text-2xl text-xl font-semibold'>Events</h1>
                 </div>
-                <button 
-                    type="button"
-                    id="reports button"
-                    aria-label='Reports button'
-                    className="xs:ml-5 xs:mt-0 mt-2 text-slate-900 bg-sky-700 font-medium border border-slate-200 rounded-sm text-sm px-5 py-2 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                >
-                    <div className='flex'>
-                        <Plus size={16} color='white' className='mr-3 mt-0.5'/>
-                        <p className='text-white'>Add Event</p>
-                    </div>
-                </button>
+                <Modal />
             </div>
             <div className='mt-5 border border-slate-300 bg-white'>
                 <div>
-                    <div className='flex justify-between'>
+                    <div className='md:flex justify-between'>
                         <div className='flex'>
                             <p className='ml-10 mt-5 text-xl font-semibold'>July 2024</p>
                             <ChevronLeft size={22} className='text-slate-400 cursor-pointer ml-5 mt-6'/>
                             <ChevronRight size={22} className='text-slate-400 cursor-pointer ml-5 mt-6'/>
                         </div>
-                        <div className='flex mt-5'>
+                        <div className='flex mt-5 md:ml-0 ml-10'>
                             <div>
                                 <div className='mr-5 flex border rounded overflow-hidden'>
-                                    <p className={`text-xs text-slate-400 border px-4 py-2 cursor-pointer`}>
+                                    <p className={`text-xs font-semibold text-slate-400 border px-4 py-2 cursor-pointer`}>
                                         Today
                                     </p>
                                 </div>
                             </div>
                             <div className='mr-10 flex border rounded overflow-hidden'>
-                                <p className={`text-xs border px-4 py-2 cursor-pointer bg-slate-100`}>
+                                <p className={`text-xs font-semibold border px-4 py-2 cursor-pointer bg-slate-100`}>
                                     Month
                                 </p>
-                                <p className={`text-xs border px-4 py-2 cursor-pointer`}>
+                                <p className={`text-xs font-semibold border px-4 py-2 cursor-pointer`}>
                                     Week
                                 </p>
-                                <p className={`text-xs border px-4 py-2 cursor-pointer`}>
+                                <p className={`text-xs font-semibold border px-4 py-2 cursor-pointer`}>
                                     Day
                                 </p>
-                                <p className={`text-xs border px-4 py-2 cursor-pointer`}>
+                                <p className={`text-xs font-semibold border px-4 py-2 cursor-pointer`}>
                                     List
                                 </p>
                             </div>
