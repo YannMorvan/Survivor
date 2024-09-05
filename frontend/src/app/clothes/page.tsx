@@ -1,8 +1,34 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-const Page = () => {
+import { sendPostRequest } from "../utils/utils.js";
+import { Inder } from "next/font/google";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+
+export default function Clothes() {
   const [activeTabs, setActiveTabs] = useState<string[]>([]);
+  const [tops, setTops] = useState([]);
+  const [bottoms, setBottoms] = useState([]);
+  const [shoes, setShoes] = useState([]);
+
+  useEffect(() => {
+    const fetchClothesTypes = async () => {
+      const response = await sendPostRequest("http://clothes_types.php", {
+        query: `
+        query {
+          clothes {
+            id
+            type
+          }
+        }
+      `,
+      });
+
+      console.log(response);
+    };
+
+    fetchClothesTypes();
+  }, []);
 
   const handleTabClick = (tab: string) => {
     setActiveTabs((prevActiveTabs) =>
@@ -19,8 +45,8 @@ const Page = () => {
           Customers List
         </h1>
       </div>
-      <div>
-        <div className="flex flex-col border-2 bg-white border-[#E1E8F1] rounded-md w-1/2 items-center">
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-col border-2 bg-white border-[#E1E8F1] rounded-md w-1/2 items-center h-full">
           <div className="flex flex-col w-full border-b border-[#E1E8F1]">
             <button
               onClick={() => handleTabClick("Couvre-Chefs")}
@@ -127,9 +153,45 @@ const Page = () => {
             )}
           </div>
         </div>
+
+        {/*Right Part*/}
+        <div className="flex flex-row w-1/2 gap-6 justify-center">
+          <div className="flex flex-col items-center justify-around">
+            <ArrowLeft size={24} />
+            <ArrowLeft size={24} />
+            <ArrowLeft size={24} />
+            <ArrowLeft size={24} />
+          </div>
+          <div className="flex flex-col items-center justify-around">
+            <img
+              src="/path/to/hat.jpg"
+              alt="Hat"
+              className="w-[150px] h-[150px]"
+            />
+            <img
+              src="/path/to/top.jpg"
+              alt="Top"
+              className="w-[150px] h-[150px]"
+            />
+            <img
+              src="/path/to/bottom.jpg"
+              alt="Bottom"
+              className="w-[150px] h-[150px]"
+            />
+            <img
+              src="/path/to/shoes.jpg"
+              alt="Shoes"
+              className="w-[150px] h-[150px]"
+            />
+          </div>
+          <div className="flex flex-col items-center justify-around">
+            <ArrowRight size={24} />
+            <ArrowRight size={24} />
+            <ArrowRight size={24} />
+            <ArrowRight size={24} />
+          </div>
+        </div>
       </div>
     </div>
   );
-};
-
-export default Page;
+}
