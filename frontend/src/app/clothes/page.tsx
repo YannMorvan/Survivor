@@ -105,7 +105,7 @@ export default function Clothes() {
 
       setClothesTypes(parsedResponse);
 
-      if (isScreenLessThanMd()) {
+      if (isScreenLessThanLg()) {
         await fetchAllClothes();
       }
     };
@@ -176,8 +176,8 @@ export default function Clothes() {
     setIsModalOpen(false);
   };
 
-  const isScreenLessThanMd = () =>
-    window.matchMedia("(max-width: 768px)").matches;
+  const isScreenLessThanLg = () =>
+    window.matchMedia("(max-width: 1024px)").matches;
 
   return (
     <div className="mx-6 flex flex-col">
@@ -186,9 +186,9 @@ export default function Clothes() {
           Customers List
         </h1>
       </div>
-      <div className="flex flex-row md:justify-between justify-center">
+      <div className="flex flex-row lg:justify-between justify-center">
         {/*Left Part*/}
-        <div className="hidden md:flex flex-col border-2 bg-white border-[#E1E8F1] rounded-md w-1/2 items-center h-full">
+        <div className="hidden lg:flex flex-col border-2 bg-white border-[#E1E8F1] rounded-md w-1/2 items-center h-full">
           <div className="flex flex-col w-full border-b border-[#E1E8F1]">
             <button
               onClick={() => {
@@ -317,8 +317,8 @@ export default function Clothes() {
         </div>
 
         {/*Right Part*/}
-        <div className="flex flex-col w-full md:w-1/2 gap-6 items-center justify-top mb-6">
-          <div className="flex flex-row w-full md:w-1/2 gap-6 justify-center">
+        <div className="flex flex-col w-full lg:w-1/2 gap-6 items-center justify-top mb-6">
+          <div className="flex flex-row w-full lg:w-1/2 gap-6 justify-center">
             <div className="flex flex-col items-center justify-around gap-6">
               <ArrowLeft
                 size={24}
@@ -452,7 +452,7 @@ export default function Clothes() {
                     : "#2263B3",
               }}
               onClick={() => {
-                const indexValue = isScreenLessThanMd() ? 0 : -1;
+                const indexValue = isScreenLessThanLg() ? 0 : -1;
                 setCurrentHatIndex(indexValue);
                 setCurrentTopIndex(indexValue);
                 setCurrentBottomIndex(indexValue);
