@@ -9,8 +9,9 @@ import {
   Settings,
   X,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-const coachesList = [
+const customersList = [
   {
     id: "c1",
     name: "Maximilian Schwarzmüller",
@@ -18,25 +19,25 @@ const coachesList = [
     image:
       "https://cdn.pixabay.com/photo/2016/11/18/17/46/hockey-1835433_960_720.jpg",
     phone: "+123 456 7890",
-    nbrCustomers: 3,
+    paymentMethod: 3,
   },
   {
     id: "c2",
     name: "Julie Jones",
-    email: "julie@coaches.com",
+    email: "julie@customers.com",
     image:
       "https://cdn.pixabay.com/photo/2016/11/18/17/46/hockey-1835433_960_720.jpg",
     phone: "+987 654 3210",
-    nbrCustomers: 2,
+    paymentMethod: 2,
   },
   {
     id: "c3",
     name: "James Smith",
-    email: "james@coaches.com",
+    email: "james@customers.com",
     image:
       "https://cdn.pixabay.com/photo/2016/11/18/17/46/hockey-1835433_960_720.jpg",
     phone: "+456 789 0123",
-    nbrCustomers: 5,
+    paymentMethod: 5,
   },
 ];
 
@@ -51,7 +52,7 @@ const Page = () => {
     surname: "",
     email: "",
     phone: "",
-    nbrCustomers: 0,
+    paymentMethod: 0,
   });
 
   interface CheckedItems {
@@ -61,8 +62,8 @@ const Page = () => {
   const [allChecked, setAllChecked] = useState(false);
 
   const [checkedItems, setCheckedItems] = useState<CheckedItems>(
-    coachesList.reduce((acc, coach) => {
-      acc[coach.id] = false;
+    customersList.reduce((acc, customer) => {
+      acc[customer.id] = false;
       return acc;
     }, {} as CheckedItems)
   );
@@ -100,6 +101,8 @@ const Page = () => {
   const closeDeleteModal = () => {
     setIsModalDeleteOpen(false);
   };
+
+  const router = useRouter();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -212,12 +215,12 @@ const Page = () => {
   };
 
   const exportToCSV = () => {
-    const headers = ["Name", "Email", "Phone", "Number of Customers"];
-    const rows = coachesList.map((coach) => [
-      coach.name,
-      coach.email,
-      coach.phone,
-      coach.nbrCustomers,
+    const headers = ["Name", "Email", "Phone", "Payment Method"];
+    const rows = customersList.map((customer) => [
+      customer.name,
+      customer.email,
+      customer.phone,
+      customer.paymentMethod,
     ]);
 
     const csvContent = [headers, ...rows]
@@ -234,11 +237,12 @@ const Page = () => {
     document.body.removeChild(link);
   };
 
-  const filteredCoaches = coachesList.filter((coach) => {
-    const [firstName, lastName] = coach.name.split(" ");
+  const filteredCoaches = customersList.filter((customer) => {
+    const [firstName, lastName] = customer.name.split(" ");
     const search = searchQuery.toLowerCase();
     const withinRange =
-      coach.nbrCustomers >= minCustomers && coach.nbrCustomers <= maxCustomers;
+      customer.paymentMethod >= minCustomers &&
+      customer.paymentMethod <= maxCustomers;
     return (
       (firstName.toLowerCase().includes(search) ||
         lastName.toLowerCase().includes(search)) &&
@@ -267,7 +271,9 @@ const Page = () => {
   return (
     <div className="mx-6 flex flex-col">
       <div className="flex justify-between items-center mb-2 flex-row">
-        <h1 className="text-3xl font-semibold text-[#384B65]">Coaches List</h1>
+        <h1 className="text-3xl font-semibold text-[#384B65]">
+          Customers List
+        </h1>
         <div className="flex flex-row items-center">
           <button
             className="bg-white text-white px-4 py-2 rounded-md flex flex-row items-center gap-4 border border-gray-200 border-2"
@@ -287,7 +293,7 @@ const Page = () => {
         </div>
       </div>
       <p className="text-gray-600 mb-4">
-        You have total {coachesList.length} coaches.
+        You have total {customersList.length} customers.
       </p>
 
       <div className="overflow-x-auto">
@@ -337,9 +343,7 @@ const Page = () => {
 
           {filterOpen && (
             <div className="filter-dropdown absolute right-6 bg-white border border-gray-200 shadow-lg rounded-md p-4 z-10">
-              <label className="block text-gray-700 mb-2">
-                Number of Customers
-              </label>
+              <label className="block text-gray-700 mb-2">Payment Method</label>
               <div className="flex flex-row justify-between items-center">
                 <div className="flex flex-col gap-2 mr-2">
                   <span>Min:</span>
@@ -395,55 +399,71 @@ const Page = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredCoaches.map((coach) => (
+            {filteredCoaches.map((customer) => (
               <tr
-                key={coach.id}
+                key={customer.id}
                 className="border-t border-gray-200 hover:bg-gray-50 relative"
               >
                 <td className="p-4">
                   <input
                     type="checkbox"
                     className="form-checkbox size-4"
-                    checked={checkedItems[coach.id]}
-                    onChange={() => handleCheckboxChange(coach.id)}
+                    checked={checkedItems[customer.id]}
+                    onChange={(e) => {
+                      handleCheckboxChange(customer.id);
+                    }}
                   />
                 </td>
                 <td className="p-4 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full overflow-hidden">
                     <img
-                      src={coach.image}
-                      alt={coach.name}
+                      src={customer.image}
+                      alt={customer.name}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <span className="text-l">{coach.name}</span>
+                  <span className="text-l">{customer.name}</span>
                 </td>
-                <td className="p-4 text-[#6B83A2]">{coach.email}</td>
-                <td className="p-4 text-[#6B83A2]">{coach.phone}</td>
-                <td className="p-4 text-[#6B83A2]">{coach.nbrCustomers}</td>
+                <td className="p-4 text-[#6B83A2]">{customer.email}</td>
+                <td className="p-4 text-[#6B83A2]">{customer.phone}</td>
+                <td className="p-4 text-[#6B83A2]">{customer.paymentMethod}</td>
                 <td className="p-4 text-[#6B83A2] relative">
                   <button
                     className="text-[#384B65] hover:text-[#6B83A2]"
-                    onClick={() => handleDropdownToggle(coach.id)}
+                    onClick={(e) => {
+                      handleDropdownToggle(customer.id);
+                    }}
                   >
                     •••
                   </button>
-                  {dropdownOpen === coach.id && (
+                  {dropdownOpen === customer.id && (
                     <div
                       ref={(el) => {
-                        dropdownRefs.current[coach.id] = el;
+                        dropdownRefs.current[customer.id] = el;
                       }}
                       className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 shadow-lg rounded-md z-10"
                     >
                       <button
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
-                        onClick={() => handleEdit(coach.id)}
+                        onClick={(e) => {
+                          router.push(`/customers/${customer.id}`);
+                        }}
+                      >
+                        Profile
+                      </button>
+                      <button
+                        className="w-full px-4 py-2 text-left hover:bg-gray-100"
+                        onClick={(e) => {
+                          handleEdit(customer.id);
+                        }}
                       >
                         Edit
                       </button>
                       <button
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
-                        onClick={() => handleDelete(coach.id)}
+                        onClick={(e) => {
+                          handleDelete(customer.id);
+                        }}
                       >
                         Delete
                       </button>
@@ -468,7 +488,7 @@ const Page = () => {
             >
               <X />
             </button>
-            <h2 className="text-2xl mb-4">Edit Coach</h2>
+            <h2 className="text-2xl mb-4">Edit Customers</h2>
             <form onSubmit={handleSubmit}>
               <div className="flex flex-row gap-4 w-full">
                 <div className="mb-4">
@@ -517,13 +537,11 @@ const Page = () => {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700">
-                  Number of Customers
-                </label>
+                <label className="block text-gray-700">Payment Method</label>
                 <input
                   type="number"
-                  name="nbrCustomers"
-                  value={formData.nbrCustomers}
+                  name="paymentMethod"
+                  value={formData.paymentMethod}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border rounded-lg"
                   required
@@ -555,7 +573,7 @@ const Page = () => {
               <X />
             </button>
             <h2 className="text-2xl mb-4">Delete Coach</h2>
-            <p>Are you sure you want to delete this coach?</p>
+            <p>Are you sure you want to delete this customer?</p>
             <div className="flex justify-center gap-4 mt-4">
               <button
                 className="bg-red-500 text-white px-4 py-2 rounded-md"
@@ -635,13 +653,11 @@ const Page = () => {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700">
-                  Number of Customers
-                </label>
+                <label className="block text-gray-700">Payment Method</label>
                 <input
                   type="number"
-                  name="nbrCustomers"
-                  value={formData.nbrCustomers}
+                  name="paymentMethod"
+                  value={formData.paymentMethod}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border rounded-lg"
                   required
