@@ -328,7 +328,7 @@ const Page = () => {
       </p>
 
       <div className="overflow-x-auto">
-        <div className="py-2 px-4 border border-gray-200">
+        <div className="py-2 px-4 border border-gray-200 bg-white">
           <div className="my-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <select className="border border-gray-300 p-2 rounded-md">
@@ -409,7 +409,7 @@ const Page = () => {
           )}
         </div>
 
-        <table className="w-full border border-gray-200 shadow-sm rounded-lg">
+        <table className="w-full border border-gray-200 shadow-sm rounded-lg bg-white">
           <thead>
             <tr>
               <th className="p-4 text-left">

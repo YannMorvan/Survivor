@@ -6,72 +6,6 @@ import { useRouter } from "next/navigation";
 
 import { sendPostRequest } from "../../utils/utils.js";
 
-const recentMeetings = [
-  {
-    date: "15 Feb, 2024",
-    rating: 5,
-    notes: "Francis is doing well, keep up the good work",
-    source: "Dating App",
-  },
-  {
-    date: "14 Feb, 2024",
-    rating: 4,
-    notes: "Good progress, needs slight improvement.",
-    source: "Friends",
-  },
-  {
-    date: "14 Feb, 2024",
-    rating: 3,
-    notes: "Good progress, needs slight improvement.",
-    source: "Social Network",
-  },
-  {
-    date: "14 Feb, 2024",
-    rating: 2,
-    notes: "Good progress, needs slight improvement.",
-    source: "Dating App",
-  },
-  {
-    date: "14 Feb, 2024",
-    rating: 0,
-    notes: "Good progress, needs slight improvement.",
-    source: "Dating App",
-  },
-];
-
-const paymentsHistory = [
-  {
-    date: "15 Feb, 2024",
-    paymentHistory: "Visa",
-    amount: "$50",
-    comment: "Payment for session",
-  },
-  {
-    date: "14 Feb, 2024",
-    paymentHistory: "Visa",
-    amount: "$50",
-    comment: "Payment for session",
-  },
-  {
-    date: "14 Feb, 2024",
-    paymentHistory: "Visa",
-    amount: "$50",
-    comment: "Payment for session",
-  },
-  {
-    date: "14 Feb, 2024",
-    paymentHistory: "Visa",
-    amount: "$50",
-    comment: "Payment for session",
-  },
-  {
-    date: "14 Feb, 2024",
-    paymentHistory: "Visa",
-    amount: "$50",
-    comment: "Payment for session",
-  },
-];
-
 const StarRating = ({ rating }: { rating: number }) => {
   const totalStars = 5;
   const filledStars = Array(rating).fill("★");
@@ -93,33 +27,43 @@ const StarRating = ({ rating }: { rating: number }) => {
   );
 };
 
-const getSourceColor = (source: string) => {
-  switch (source) {
-    case "Dating App":
-      return "text-orange-500";
-    case "Social Network":
-      return "text-blue-500";
-    case "Friends":
-      return "text-green-500";
-    default:
-      return "text-[#384B65]";
-  }
+const getRandomColor = () => {
+  const colors = ["text-orange-500", "text-blue-500", "text-green-500"];
+  const randomIndex = Math.floor(Math.random() * colors.length);
+  return colors[randomIndex];
 };
 
 interface Customer {
   address: string;
   email: string;
-  encounters: [];
+  encounters: Encounter[];
   id: string;
   image: string;
   name: string;
-  payment: string;
+  payment: Payment[];
   plannedEncounters: number;
   positiveEncounters: number;
   surname: string;
   totalEncounters: number;
   coachName: string;
   lastActivity: string;
+}
+
+interface Encounter {
+  comment: string;
+  date: string;
+  id: number;
+  idCustomer: number;
+  rating: number;
+  source: string;
+}
+
+interface Payment {
+  id: number;
+  idCustomer: number;
+  date: string;
+  method: string;
+  amount: string;
 }
 
 const ProfileDetails = ({ params }: { params: { id: string } }) => {
@@ -132,7 +76,7 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
     id: "",
     image: "",
     name: "",
-    payment: "",
+    payment: [],
     plannedEncounters: 0,
     positiveEncounters: 0,
     surname: "",
@@ -140,6 +84,12 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
     coachName: "",
     lastActivity: "",
   });
+
+  const [recentEncounters, setRecentEncounters] = React.useState<Encounter[]>(
+    []
+  );
+
+  const [payment, setPayments] = React.useState<Payment[]>([]);
 
   useEffect(() => {
     const fetchCustomerData = async () => {
@@ -158,11 +108,7 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
           return;
         }
 
-        console.log(parsedResponse);
-
         const customer = parsedResponse.data;
-
-        console.log(customer);
 
         setCustomerData({
           address: customer.address,
@@ -171,16 +117,16 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
           id: customer.id,
           image: customer.image,
           name: customer.name,
-          payment: customer.payment || "Visa",
+          payment: Array.isArray(customer.payment) ? customer.payment : [],
           plannedEncounters: customer.plannedEncounters || 0,
           positiveEncounters: customer.positiveEncounters || 0,
           surname: customer.surname,
           totalEncounters: customer.totalEncounters || 0,
-          coachName: customer.coachName || "Coach Carter",
-          lastActivity: customer.lastActivity || "15 Feb, 2024",
+          coachName: customer.coachName || "No coach assigned",
+          lastActivity: customer.lastActivity || "No activity",
         });
 
-        console.log(customerData);
+        console.log(customer.payment);
       } catch (error) {
         console.error(error);
       }
@@ -292,15 +238,15 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
                 </tr>
               </thead>
               <tbody>
-                {recentMeetings.map((meeting, index) => (
+                {customerData.encounters.map((encounter, index) => (
                   <tr key={index} className="border-b border-[#E1E8F1]">
-                    <td className="p-2 text-[#0369A1]">{meeting.date}</td>
+                    <td className="p-2 text-[#0369A1]">{encounter.date}</td>
                     <td className="p-2 text-[#384B65]">
-                      <StarRating rating={meeting.rating} />
+                      <StarRating rating={encounter.rating} />
                     </td>
-                    <td className="p-2 text-[#384B65]">{meeting.notes}</td>
-                    <td className={`p-2 ${getSourceColor(meeting.source)}`}>
-                      {meeting.source}
+                    <td className="p-2 text-[#384B65]">{encounter.comment}</td>
+                    <td className={`p-2 ${getRandomColor()}`}>
+                      {encounter.source}
                     </td>
                   </tr>
                 ))}
@@ -329,28 +275,22 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
                 </tr>
               </thead>
               <tbody>
-                {paymentsHistory.map((paymentHistory, index) => (
+                {customerData.payment.map((pay, index) => (
                   <tr key={index} className="border-b border-[#E1E8F1]">
-                    <td className="p-2 text-[#0369A1]">
-                      {paymentHistory.date}
-                    </td>
+                    <td className="p-2 text-[#0369A1]">{pay.date}</td>
                     <td className="p-2 text-[#384B65]">
-                      {paymentHistory.paymentHistory === "Visa" ? (
+                      {pay.method === "Visa" ? (
                         <img
                           src="/images/visa-logo.png"
                           alt="Visa Logo"
                           className="w-9 h-3"
                         />
                       ) : (
-                        paymentHistory.paymentHistory
+                        pay.method
                       )}
                     </td>
-                    <td className="p-2 text-[#384B65]">
-                      {paymentHistory.amount}
-                    </td>
-                    <td className="p-2 text-[#384B65]">
-                      {paymentHistory.comment}
-                    </td>
+                    <td className="p-2 text-[#384B65]">{pay.amount}</td>
+                    <td className="p-2 text-[#384B65]">{"No comment"}</td>
                   </tr>
                 ))}
               </tbody>
