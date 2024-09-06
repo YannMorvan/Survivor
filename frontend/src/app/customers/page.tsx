@@ -11,35 +11,8 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const customersList = [
-  {
-    id: "c1",
-    name: "Maximilian Schwarzmüller",
-    email: "max@code.com",
-    image:
-      "https://cdn.pixabay.com/photo/2016/11/18/17/46/hockey-1835433_960_720.jpg",
-    phone: "+123 456 7890",
-    paymentMethod: 3,
-  },
-  {
-    id: "c2",
-    name: "Julie Jones",
-    email: "julie@customers.com",
-    image:
-      "https://cdn.pixabay.com/photo/2016/11/18/17/46/hockey-1835433_960_720.jpg",
-    phone: "+987 654 3210",
-    paymentMethod: 2,
-  },
-  {
-    id: "c3",
-    name: "James Smith",
-    email: "james@customers.com",
-    image:
-      "https://cdn.pixabay.com/photo/2016/11/18/17/46/hockey-1835433_960_720.jpg",
-    phone: "+456 789 0123",
-    paymentMethod: 5,
-  },
-];
+import { sendPostRequest } from "../utils/utils.js";
+import ProfileDetails from "./[id]/page";
 
 const Page = () => {
   const [isModalAddOpen, setIsModalAddOpen] = useState(false);
@@ -59,14 +32,64 @@ const Page = () => {
     [key: string]: boolean;
   }
 
+  interface Customers {
+    id: string;
+    name: string;
+    email: string;
+    image: string;
+    surname: string;
+    phone: string;
+    paymentMethod: string;
+  }
+
+  const [customersData, setCustomersData] = useState<Customers[]>([]);
+
   const [allChecked, setAllChecked] = useState(false);
 
   const [checkedItems, setCheckedItems] = useState<CheckedItems>(
-    customersList.reduce((acc, customer) => {
+    customersData.reduce((acc, customer) => {
       acc[customer.id] = false;
       return acc;
     }, {} as CheckedItems)
   );
+
+  useEffect(() => {
+    const fetchCustomersData = async () => {
+      try {
+        const response = await sendPostRequest(
+          "http://localhost/table_clients.php",
+          {}
+        );
+
+        const parsedResponse = JSON.parse(response);
+
+        if (
+          parsedResponse.status === true &&
+          Array.isArray(parsedResponse.data)
+        ) {
+          const formattedData: Customers[] = parsedResponse.data.map(
+            (item: any) => ({
+              id: item.id.toString(),
+              name: item.name,
+              email: item.email,
+              image: item.image,
+              surname: item.surname,
+              phone: item.phone || "555",
+              paymentMethod: item.paymentMethod || "Visa",
+            })
+          );
+
+          setCustomersData(formattedData);
+        } else {
+          console.error("Unexpected response format:", parsedResponse);
+        }
+      } catch (error) {
+        console.error("Error fetching coaches data:", error);
+      }
+    };
+
+    fetchCustomersData();
+  }, []);
 
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -194,29 +217,41 @@ const Page = () => {
     closeAddModal();
   };
 
+  useEffect(() => {
+    const initialCheckedItems = customersData.reduce((acc, customer) => {
+      acc[customer.id] = false;
+      return acc;
+    }, {} as CheckedItems);
+
+    setCheckedItems(initialCheckedItems);
+    setAllChecked(false);
+  }, [customersData]);
+
   const handleAllCheckedChange = () => {
     const newCheckedStatus = !allChecked;
     setAllChecked(newCheckedStatus);
-    setCheckedItems(
-      Object.keys(checkedItems).reduce((acc, id) => {
-        acc[id] = newCheckedStatus;
-        return acc;
-      }, {} as CheckedItems)
+
+    const updatedCheckedItems = Object.fromEntries(
+      Object.keys(checkedItems).map((id) => [id, newCheckedStatus])
     );
+
+    setCheckedItems(updatedCheckedItems);
   };
 
   const handleCheckboxChange = (id: string) => {
     setCheckedItems((prev) => {
-      const newCheckedItems = { ...prev, [id]: !prev[id] };
-      const allChecked = Object.values(newCheckedItems).every(Boolean);
-      setAllChecked(allChecked);
-      return newCheckedItems;
+      const updatedCheckedItems = { ...prev, [id]: !prev[id] };
+
+      const areAllChecked = Object.values(updatedCheckedItems).every(Boolean);
+      setAllChecked(areAllChecked);
+
+      return updatedCheckedItems;
     });
   };
 
   const exportToCSV = () => {
     const headers = ["Name", "Email", "Phone", "Payment Method"];
-    const rows = customersList.map((customer) => [
+    const rows = customersData.map((customer) => [
       customer.name,
       customer.email,
       customer.phone,
@@ -237,16 +272,12 @@ const Page = () => {
     document.body.removeChild(link);
   };
 
-  const filteredCoaches = customersList.filter((customer) => {
+  const filteredCustomers = customersData.filter((customer) => {
     const [firstName, lastName] = customer.name.split(" ");
     const search = searchQuery.toLowerCase();
-    const withinRange =
-      customer.paymentMethod >= minCustomers &&
-      customer.paymentMethod <= maxCustomers;
     return (
-      (firstName.toLowerCase().includes(search) ||
-        lastName.toLowerCase().includes(search)) &&
-      withinRange
+      firstName.toLowerCase().includes(search) ||
+      lastName.toLowerCase().includes(search)
     );
   });
 
@@ -293,7 +324,7 @@ const Page = () => {
         </div>
       </div>
       <p className="text-gray-600 mb-4">
-        You have total {customersList.length} customers.
+        You have total {customersData.length} customers
       </p>
 
       <div className="overflow-x-auto">
@@ -392,14 +423,12 @@ const Page = () => {
               <th className="p-4 text-left text-[#6B83A2]">Coach</th>
               <th className="p-4 text-left text-[#6B83A2]">Email</th>
               <th className="p-4 text-left text-[#6B83A2]">Phone</th>
-              <th className="p-4 text-left text-[#6B83A2]">
-                Number of customers
-              </th>
+              <th className="p-4 text-left text-[#6B83A2]">Payment Method</th>
               <th className="p-4 text-left text-[#6B83A2]">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredCoaches.map((customer) => (
+            {filteredCustomers.map((customer) => (
               <tr
                 key={customer.id}
                 className="border-t border-gray-200 hover:bg-gray-50 relative"
@@ -409,15 +438,13 @@ const Page = () => {
                     type="checkbox"
                     className="form-checkbox size-4"
                     checked={checkedItems[customer.id]}
-                    onChange={(e) => {
-                      handleCheckboxChange(customer.id);
-                    }}
+                    onChange={() => handleCheckboxChange(customer.id)}
                   />
                 </td>
                 <td className="p-4 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full overflow-hidden">
                     <img
-                      src={customer.image}
+                      src={`data:image/jpeg;base64,${customer.image}`}
                       alt={customer.name}
                       className="w-full h-full object-cover"
                     />
@@ -430,9 +457,7 @@ const Page = () => {
                 <td className="p-4 text-[#6B83A2] relative">
                   <button
                     className="text-[#384B65] hover:text-[#6B83A2]"
-                    onClick={(e) => {
-                      handleDropdownToggle(customer.id);
-                    }}
+                    onClick={() => handleDropdownToggle(customer.id)}
                   >
                     •••
                   </button>
@@ -453,17 +478,13 @@ const Page = () => {
                       </button>
                       <button
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
-                        onClick={(e) => {
-                          handleEdit(customer.id);
-                        }}
+                        onClick={() => handleEdit(customer.id)}
                       >
                         Edit
                       </button>
                       <button
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
-                        onClick={(e) => {
-                          handleDelete(customer.id);
-                        }}
+                        onClick={() => handleDelete(customer.id)}
                       >
                         Delete
                       </button>

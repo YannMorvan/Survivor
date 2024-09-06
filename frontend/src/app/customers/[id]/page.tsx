@@ -1,23 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { ArrowLeft, Bookmark, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const customers = {
-  id: "UD003054",
-  surname: "Mitcham",
-  name: "Francis",
-  email: "francis.mitcham@tmail.com",
-  phone: "(555) 555-5555",
-  address: "551 Swanston Street, Melbourne Victoria 3053 Australia",
-  image: "/images/avatars/1.jpg",
-  lastActivity: "15 Feb, 2024",
-  coachName: "Gerard Depardieu",
-  totalEncounters: 23,
-  positive: 21,
-  inProgress: 2,
-};
+import { sendPostRequest } from "../../utils/utils.js";
 
 const recentMeetings = [
   {
@@ -119,8 +106,87 @@ const getSourceColor = (source: string) => {
   }
 };
 
-const Page = () => {
+interface Customer {
+  address: string;
+  email: string;
+  encounters: [];
+  id: string;
+  image: string;
+  name: string;
+  payment: string;
+  plannedEncounters: number;
+  positiveEncounters: number;
+  surname: string;
+  totalEncounters: number;
+  coachName: string;
+  lastActivity: string;
+}
+
+const ProfileDetails = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
+
+  const [customerData, setCustomerData] = React.useState<Customer>({
+    address: "",
+    email: "",
+    encounters: [],
+    id: "",
+    image: "",
+    name: "",
+    payment: "",
+    plannedEncounters: 0,
+    positiveEncounters: 0,
+    surname: "",
+    totalEncounters: 0,
+    coachName: "",
+    lastActivity: "",
+  });
+
+  useEffect(() => {
+    const fetchCustomerData = async () => {
+      try {
+        const response = await sendPostRequest(
+          "http://localhost/client_profile.php",
+          {
+            id: params.id,
+          }
+        );
+
+        const parsedResponse = JSON.parse(response);
+
+        if (parsedResponse.error) {
+          console.error(parsedResponse.error);
+          return;
+        }
+
+        console.log(parsedResponse);
+
+        const customer = parsedResponse.data;
+
+        console.log(customer);
+
+        setCustomerData({
+          address: customer.address,
+          email: customer.email,
+          encounters: customer.encounters,
+          id: customer.id,
+          image: customer.image,
+          name: customer.name,
+          payment: customer.payment || "Visa",
+          plannedEncounters: customer.plannedEncounters || 0,
+          positiveEncounters: customer.positiveEncounters || 0,
+          surname: customer.surname,
+          totalEncounters: customer.totalEncounters || 0,
+          coachName: customer.coachName || "Coach Carter",
+          lastActivity: customer.lastActivity || "15 Feb, 2024",
+        });
+
+        console.log(customerData);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchCustomerData();
+  }, []);
 
   return (
     <div className="mx-6 flex flex-col">
@@ -140,13 +206,13 @@ const Page = () => {
         <div className="flex flex-col border-2 bg-white border-[#E1E8F1] rounded-md w-1/4">
           <div className="flex flex-col items-center px-12 py-6 gap-4 justify-center">
             <img
-              src={customers.image}
+              src={`data:image/jpeg;base64,${customerData.image}`}
               alt="avatar"
               className="w-32 h-32 rounded-full border border-[#E1E8F1]"
             />
             <div>
               <p className="text-lg font-bold text-[#384B65]">
-                {customers.name} {customers.surname}
+                {customerData.name} {customerData.surname}
               </p>
             </div>
           </div>
@@ -161,10 +227,14 @@ const Page = () => {
           <div className="flex flex-col justify-around py-4 border-t-2 border-[#E1E8F1]">
             <div className="flex flex-row justify-around">
               <p className="text-lg text-[#384B65]">
-                {customers.totalEncounters}
+                {customerData.totalEncounters}
               </p>
-              <p className="text-lg text-[#384B65]">{customers.positive}</p>
-              <p className="text-lg text-[#384B65]">{customers.inProgress}</p>
+              <p className="text-lg text-[#384B65]">
+                {customerData.positiveEncounters}
+              </p>
+              <p className="text-lg text-[#384B65]">
+                {customerData.totalEncounters - customerData.positiveEncounters}
+              </p>
             </div>
             <div className="flex flex-row justify-around">
               <div className="flex flex-col items-center">
@@ -179,23 +249,23 @@ const Page = () => {
             <p>SHORT DETAILS</p>
             <div>
               <p>User ID:</p>
-              <p className="text-[#384B65]">{customers.id}</p>
+              <p className="text-[#384B65]">{customerData.id}</p>
             </div>
             <div>
               <p>Email:</p>
-              <p className="text-[#384B65]">{customers.email}</p>
+              <p className="text-[#384B65]">{customerData.email}</p>
             </div>
             <div>
               <p>Address:</p>
-              <p className="text-[#384B65]">{customers.address}</p>
+              <p className="text-[#384B65]">{customerData.address}</p>
             </div>
             <div>
               <p>Last Activity:</p>
-              <p className="text-[#384B65]">{customers.lastActivity}</p>
+              <p className="text-[#384B65]">{customerData.lastActivity}</p>
             </div>
             <div>
               <p>Coach</p>
-              <p className="text-[#384B65]">{customers.coachName}</p>
+              <p className="text-[#384B65]">{customerData.coachName}</p>
             </div>
           </div>
         </div>
@@ -292,4 +362,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default ProfileDetails;
