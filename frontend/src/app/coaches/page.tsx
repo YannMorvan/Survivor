@@ -55,7 +55,7 @@ const Page = () => {
     const fetchCoachesData = async () => {
       try {
         const response = await sendPostRequest(
-          "http://localhost/employes_table.php",
+          `http://${process.env.NEXT_PUBLIC_PHP_HOST}/employes_table.php`,
           {}
         );
 

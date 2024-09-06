@@ -26,7 +26,7 @@ export default function Events() {
                             <div>
                                 <div className='mr-5 flex border rounded overflow-hidden'>
                                     <p className={`text-xs font-semibold text-slate-400 border px-4 py-2 cursor-pointer`}>
-                                        Aujourd'hui
+                                        Aujourd&#39hui
                                     </p>
                                 </div>
                             </div>

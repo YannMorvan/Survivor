@@ -10,7 +10,9 @@ services:
     volumes:
       - ./frontend:/nextjs-app
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
+    depends_on:
+      - php-server
 
   php-server:
     container_name: backend-php-server

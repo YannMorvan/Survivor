@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { sendPostRequest } from "../../utils/utils.js";
 
-const StarRating = ({ rating }) => {
+const StarRating = ({ rating }: {rating: number}) => {
   const totalStars = 5;
   const filledStars = Array(rating).fill("★");
   const emptyStars = Array(totalStars - rating).fill("☆");
@@ -95,7 +95,7 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
     const fetchCustomerData = async () => {
       try {
         const response = await sendPostRequest(
-          "http://localhost/client_profile.php",
+          `http://${process.env.NEXT_PUBLIC_PHP_HOST}/client_profile.php`,
           {
             id: params.id,
           }

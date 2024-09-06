@@ -92,7 +92,7 @@ const CrudModal = () => {
                       htmlFor="name"
                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
-                      Titre de l'évènement
+                      Titre de l&#39évènement
                     </label>
                     <input
                       type="text"
@@ -110,7 +110,7 @@ const CrudModal = () => {
                       htmlFor="date"
                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
-                      Date de l'évènement
+                      Date de l&#39évènement
                     </label>
                     <DatePicker
                       selected={formData.date}
@@ -126,7 +126,7 @@ const CrudModal = () => {
                       htmlFor="description"
                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
-                      Description de l'évènement
+                      Description de l&#39évènement
                     </label>
                     <textarea
                       id="description"
