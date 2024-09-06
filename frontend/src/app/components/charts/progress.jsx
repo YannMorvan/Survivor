@@ -9,7 +9,8 @@ const IncomeChart = ({ data }) => {
   useEffect(() => {
     am4core.useTheme(am4themes_animated);
 
-    let chart = am4core.create("chartdiv", am4charts.XYChart3D);
+    // Créer un graphique 2D au lieu de 3D
+    let chart = am4core.create("chartdiv", am4charts.XYChart);
 
     if (chart.logo) {
       chart.logo.disabled = true;
@@ -47,14 +48,14 @@ const IncomeChart = ({ data }) => {
     valueAxis.renderer.grid.template.strokeOpacity = 0.5;
     valueAxis.renderer.line.strokeOpacity = 0;
 
-    let series = chart.series.push(new am4charts.ColumnSeries3D());
+    let series = chart.series.push(new am4charts.ColumnSeries());
     series.dataFields.valueX = "income";
     series.dataFields.categoryY = "year";
     series.name = "Percentage";
     series.columns.template.propertyFields.fill = "color";
     series.columns.template.tooltipText = "{valueX}";
-    series.columns.template.column3D.stroke = am4core.color("#fff");
-    series.columns.template.column3D.strokeOpacity = 0.2;
+    series.columns.template.stroke = am4core.color("#fff");
+    series.columns.template.strokeOpacity = 0.2;
 
     chartRef.current = chart;
 
@@ -66,7 +67,7 @@ const IncomeChart = ({ data }) => {
   }, [data]);
 
   return (
-    <div style={{ width: "100%", height: "120px" }}>
+    <div style={{ width: "100%", height: "100px" }}>
       <div id="chartdiv" style={{ width: "100%", height: "100%" }}></div>
     </div>
   );
