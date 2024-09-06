@@ -143,7 +143,8 @@ const Navbar = () => {
       { label: 'Conseils', path: 'conseils' },
       { label: 'Events', path: 'events' },
       { label: 'Vêtements', path: 'vetements' },
-      { label: 'Compatibilité Astrologique', path: 'astro' },
+      { label: 'Compatibilité', path: 'astro' },
+      { label: 'Stats', path: 'statistics' },
     ].map((route) => (
       <li className="relative inline-block" key={route.path}>
         <a
