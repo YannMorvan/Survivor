@@ -5,6 +5,7 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 
 const LineChart = () => {
   useEffect(() => {
+
     let root = am5.Root.new("chartdiv");
 
     root.setThemes([
@@ -132,13 +133,13 @@ const LineChart = () => {
     series.fills.template.setAll({
       fillOpacity: 0.5,
       visible: true,
-      fill: am5.color("#FF0000") // Red fill color
+      fill: am5.color("#FF0000")
     });
 
     series2.fills.template.setAll({
       fillOpacity: 0.5,
       visible: true,
-      fill: am5.color("#FF0000") // Red fill color
+      fill: am5.color("#FF0000")
     });
 
     root.dateFormatter.setAll({

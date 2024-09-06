@@ -58,7 +58,7 @@ export default function Dashboard() {
         <div className="ml-6 sm:mr-6 mr-6 mb-5">
             <div className='md:flex md:justify-between'>
                 <div>
-                    <h1 className='md:text-3xl sm:text-2xl text-xl font-bold'>Dashboard</h1>
+                    <h1 className='md:text-3xl sm:text-2xl text-xl font-semibold'>Dashboard</h1>
                     <h2 className='mt-4 text-sm text-slate-700'>Welcome!</h2>
                 </div>
                 <div className='mt-5'>
@@ -185,10 +185,10 @@ export default function Dashboard() {
                         </div>
                         <div className='md:text-left text-center'>
                             <p className='text-slate-500 text-sm'>Journalier</p>
-                            <p className='mt-1 text-slate-900 text-xl'>34</p>
+                            <p className='mt-1 text-slate-900 text-xl'>3</p>
                             <div className='flex md:justify-normal justify-center'>
-                                <ArrowDown size={12} className='text-red-700 mt-1.5'/>
-                                <p className='mt-1 text-xs text-red-700'>3.45%</p>
+                                <ArrowUp size={12} className='text-green-700 mt-1.5'/>
+                                <p className='mt-1 text-xs text-green-700'>3.45%</p>
                             </div>
                         </div>
                     </div>

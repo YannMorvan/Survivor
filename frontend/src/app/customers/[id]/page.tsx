@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { sendPostRequest } from "../../utils/utils.js";
 
-const StarRating = ({ rating }: { rating: number }) => {
+const StarRating = ({ rating }) => {
   const totalStars = 5;
   const filledStars = Array(rating).fill("★");
   const emptyStars = Array(totalStars - rating).fill("☆");

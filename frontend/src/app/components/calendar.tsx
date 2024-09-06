@@ -57,7 +57,7 @@ const Calendar = () => {
                                     <div
                                     className="event"
                                     style={{
-                                        width: "200%",
+                                        width: "300%",
                                     }}
                                     >
                                     <span className="event-name">Meeting</span>
