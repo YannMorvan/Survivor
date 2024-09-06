@@ -2,8 +2,25 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
+import Image from "next/image";
 
-const ClientTable = ({ data }) => {
+interface Client {
+  id: number;
+  name: string;
+  surname: string;
+  email: string;
+  phone_number: string;
+  image: string;
+}
+
+interface ClientTableProps {
+  data: {
+    data: Client[];
+  };
+}
+
+
+const ClientTable: React.FC<ClientTableProps>  = ({ data }) => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("Last 30 days");
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,7 +30,7 @@ const ClientTable = ({ data }) => {
 
   const router = useRouter();
 
-  const clients = data?.data || [];
+  const clients = data.data || [];
   const totalPages = Math.ceil(clients.length / itemsPerPage);
 
   const filters = ["Last day", "Last 7 days", "Last 30 days", "Last month", "Last year"];
@@ -66,9 +83,7 @@ const ClientTable = ({ data }) => {
 
   const filteredClients = clients.filter((client) => {
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    return (
-      client.name.toLowerCase().includes(lowerCaseSearchTerm)
-    );
+    return client.name.toLowerCase().includes(lowerCaseSearchTerm);
   });
 
   const paginatedClients = filteredClients.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -161,7 +176,7 @@ const ClientTable = ({ data }) => {
                 </div>
               </td>
               <th scope="row" className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                <img className="w-10 h-10 rounded-full" src={`data:image/png;base64,${client.image}`} alt="Client" />
+                <Image width={10} height={10} className="w-10 h-10 rounded-full" src={`data:image/png;base64,${client.image}`} alt="Client" />
                 <div className="ps-3">
                   <div className="text-base font-semibold">{client.name}</div>
                 </div>

@@ -7,6 +7,7 @@ import PriceChart from '../../../components/charts/price';
 import { sendPostRequest } from '../../../utils/api';
 import { useParams } from 'next/navigation';
 import Heartbeat from '@/app/components/heartbeat';
+import Image from 'next/image';
 
 interface AstrologicalSign {
     Aries: number;
@@ -263,7 +264,7 @@ export default function Astro() {
         fetchData1();
         fetchData2();
 
-    }, []);
+    }, [id1, id2]);
 
     useEffect(() => {
         if (client1 && client2) {
@@ -331,7 +332,7 @@ export default function Astro() {
                         <div>
                             <div className='md:flex justify-between pb-5 border-b'>
                                 <div className='flex'>
-                                    <img className="w-20 h-20 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src={client1.image} alt="Bordered avatar" />
+                                    <Image width={10} height={10} className="w-20 h-20 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src={`data:image/png;base64,${client1.image}`} alt="Bordered avatar" />
                                     <div className='ml-5 mt-3'>
                                         <p className=''>{client1.name}</p>
                                         <p className='text-slate-400'>{client1.birth_date}</p>
@@ -413,7 +414,7 @@ export default function Astro() {
                         <div>
                             <div className='md:flex justify-between pb-5 border-b'>
                                 <div className='flex'>
-                                    <img className="w-20 h-20 p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src={client2.image} alt="Bordered avatar" />
+                                    <Image width={10} height={10} className="w-20 h-20  p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src={`data:image/png;base64,${client2.image}`} alt="Bordered avatar" />
                                     <div className='ml-5 mt-3'>
                                         <p className=''>{client2.name}</p>
                                         <p className='text-slate-400'>{client2.birth_date}</p>

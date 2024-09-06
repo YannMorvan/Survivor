@@ -2,6 +2,7 @@
 import React, {useState} from 'react';
 import Price from '../components/charts/price';
 import Meetings from '../components/charts/meetings-coach';
+import Image from 'next/image';
 
 export default function Page() {
 
@@ -106,7 +107,7 @@ export default function Page() {
                 <div className='mt-8'>
                     <div className="h-[250px] z-50 left-24 absolute bg-slate-300 w-[4px]"></div>
                     <div className='flex'>
-                    <img className="w-[150px] h-[100px] p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/docs/images/people/profile-picture-5.jpg" alt="Bordered avatar"/>
+                    <Image height={100} width={100} className="p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/docs/images/people/profile-picture-5.jpg" alt="Bordered avatar"/>
                         <div>
                             <p className='font-semibold ml-6'>Deena Timmon</p>
                             <div className="flex items-center ml-5 mt-1">
@@ -128,14 +129,14 @@ export default function Page() {
                                 <p className='ml-3 text-sm text-slate-400'>5 hours ago</p>
                             </div>
                             <p className='mt-5 ml-6 text-slate-500'>
-                            J’ai eu une séance de coaching hier avec Sarah, et c’était incroyablement utile. Elle a su tout de suite comprendre mes objectifs et m’a donné des conseils très pertinents pour améliorer mon organisation professionnelle.
+                            J&apos;ai eu une séance de coaching hier avec Sarah, et c&apos;était incroyablement utile. Elle a su tout de suite comprendre mes objectifs et m’a donné des conseils très pertinents pour améliorer mon organisation professionnelle.
                             </p>
                         </div>   
                     </div>
                 </div>
                 <div className='mt-8'>
                     <div className='flex'>
-                    <img className="w-[150px] h-[100px] p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/docs/images/people/profile-picture-5.jpg" alt="Bordered avatar"/>
+                    <Image width={100} height={100} className="p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/docs/images/people/profile-picture-5.jpg" alt="Bordered avatar"/>
                         <div>
                             <p className='font-semibold ml-6'>Deena Timmon</p>
                             <div className="flex items-center ml-5 mt-1">
@@ -157,7 +158,7 @@ export default function Page() {
                                 <p className='ml-3 text-sm text-slate-400'>5 hours ago</p>
                             </div>
                             <p className='mt-5 ml-6 text-slate-500'>
-                            J’ai eu une séance de coaching hier avec Sarah, et c’était incroyablement utile. Elle a su tout de suite comprendre mes objectifs et m’a donné des conseils très pertinents pour améliorer mon organisation professionnelle.
+                            J&apos;ai eu une séance de coaching hier avec Sarah, et c&apos;était incroyablement utile. Elle a su tout de suite comprendre mes objectifs et m’a donné des conseils très pertinents pour améliorer mon organisation professionnelle.
                             </p>
                         </div>   
                     </div>
@@ -170,21 +171,21 @@ export default function Page() {
                 <div className='mt-10'>
                     <div className='border p-3 rounded-lg border-slate-300'>
                         <div className='flex'>
-                            <img className="w-[75px] h-[75px] p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/docs/images/people/profile-picture-5.jpg" alt="Bordered avatar"/>
+                            <Image height={100} width={100} className="p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/docs/images/people/profile-picture-5.jpg" alt="Bordered avatar"/>
                             <div>
                                 <p className='font-semibold ml-6'>Deena Timmon</p>
                                 <p className='text-sm ml-6 text-slate-400'>Tuesday, 12 2024</p>
-                                <p className='ml-6 text-sm'>Je recherche quelqu'un qui a les même gout musicaux</p>
+                                <p className='ml-6 text-sm'>Je recherche quelqu&apos;un qui a les même gout musicaux</p>
                             </div>   
                         </div>
                     </div>
                     <div className='border p-3 mt-5 rounded-lg border-slate-300'>
                         <div className='flex'>
-                            <img className="w-[75px] h-[75px] p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/docs/images/people/profile-picture-5.jpg" alt="Bordered avatar"/>
+                            <Image height={100} width={100} className="p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/docs/images/people/profile-picture-5.jpg" alt="Bordered avatar"/>
                             <div>
                                 <p className='font-semibold ml-6'>Deena Timmon</p>
                                 <p className='text-sm ml-6 text-slate-400'>Tuesday, 12 2024</p>
-                                <p className='ml-6 text-sm'>Je recherche quelqu'un qui a les même gout musicaux</p>
+                                <p className='ml-6 text-sm'>Je recherche quelqu&apos;un qui a les même gout musicaux</p>
                             </div>   
                         </div>
                     </div>

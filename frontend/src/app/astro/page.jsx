@@ -3,19 +3,9 @@ import React, { useEffect, useState } from 'react';
 import Table from '../components/table';
 import { sendPostRequest } from '../utils/api';
 
-interface Client {
-  id: number;
-  name: string;
-  surname: string;
-  image: string;
-  payement_method: string;
-  phone_number: string;
-  email: string;
-}
-
 export default function Astro() {
 
-  const [data, setData] = useState<Client[]>([]);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     const fetchClientsData = async () => {

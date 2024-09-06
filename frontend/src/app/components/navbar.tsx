@@ -107,6 +107,9 @@ const Navbar = () => {
                     <a href="/dashboard" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/dashboard')}`}>Dashboard</a>
                   </li>
                   <li>
+                    <a href="/coaches" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/events')}`}>Coaches</a>
+                  </li>
+                  <li>
                     <a href="/customers" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/customers')}`}>Customers</a>
                   </li>
                   <li>
@@ -114,6 +117,12 @@ const Navbar = () => {
                   </li>
                   <li>
                     <a href="/events" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/events')}`}>Events</a>
+                  </li>
+                  <li>
+                    <a href="/clothes" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/events')}`}>Clothes</a>
+                  </li>
+                  <li>
+                    <a href="/statistics" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/events')}`}>Statistiques</a>
                   </li>
                   <div className='border'></div>
                   <li>

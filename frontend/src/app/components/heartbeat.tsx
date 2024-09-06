@@ -1,6 +1,10 @@
 import React from 'react';
 
-const Heartbeat = ({ compatibility }) => {
+interface HeartbeatProps {
+  compatibility: number;
+}
+
+const Heartbeat: React.FC<HeartbeatProps> = ({ compatibility }) => {
   let animationClass = '';
 
   if (compatibility < 60) {
