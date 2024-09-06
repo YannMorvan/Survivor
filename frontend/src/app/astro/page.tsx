@@ -1,7 +1,41 @@
-import React from 'react';
+"use client";
+import React, { useEffect, useState } from 'react';
 import Table from '../components/table';
+import { sendPostRequest } from '../utils/api';
+
+interface Client {
+  id: number;
+  name: string;
+  surname: string;
+  image: string;
+  payement_method: string;
+  phone_number: string;
+  email: string;
+}
 
 export default function Astro() {
+
+  const [data, setData] = useState<Client[]>([]);
+
+  useEffect(() => {
+    const fetchClientsData = async () => {
+      try {
+        const response = await sendPostRequest(
+          "http://localhost/table_clients.php",
+          {}
+        );
+        
+        const data = JSON.parse(response);
+        setData(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Erreur lors de la requête : ", error);
+      }
+    };
+  
+    fetchClientsData();
+  }, []);
+
   return (
     <div className="ml-6 sm:mr-6 mr-6 mb-5">
       <div>
@@ -10,7 +44,7 @@ export default function Astro() {
       </div>
       <div className='mt-10'>
         <div>
-          <Table />
+          <Table data={data} />
         </div>
       </div>
     </div>
