@@ -1,10 +1,46 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { CalendarDays, ChevronRight, ChevronDown, ClipboardPlus, ArrowUp, ArrowDown } from 'lucide-react';
 import CustomersOverView from '../components/charts/customers-overview';
 import ChartEvents from '../components/charts/events';
 import ChartMap from '../components/charts/map';
+import { sendPostRequest } from '../utils/utils';
 import ChartMeetings from '../components/charts/meetings';
+import { set } from 'date-fns';
+
+interface Event {
+    date: string,
+    id: number,
+    duration: number,
+    id_employee: number,
+    location_name: string,
+    location_x: number,
+    location_y: number,
+    max_participants: number,
+    name: string,
+    type: string,
+}
+
+interface Encounters {
+    encounters: string,
+}
+
+interface Address {
+    address: string,
+}
+
+interface Data {
+    data: Event[],
+    encounters: Encounters[],
+    address: Address[],
+}
+
+const getWeekNumber = (date: Date) => {
+    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+    const dayOfWeek = firstDayOfYear.getDay() || 7;
+    const diff = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
+    return Math.ceil((diff + dayOfWeek) / 7);
+};
 
 export default function Dashboard() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -14,7 +50,106 @@ export default function Dashboard() {
     const [selectedMapPeriod, setSelectedMapPeriod] = useState("30 jours");
     const [isMeetingsDropdownOpen, setIsMeetingsDropdownOpen] = useState(false);
     const [selectedMeetingsPeriod, setSelectedMeetingsPeriod] = useState("30 jours");
+    const [events, setEvents] = useState<Event[]>([]);
+    const [meetings, setMeetings] = useState<Encounters[]>([]);
+    const [augustEvents, setAugustEvents] = useState<Event[]>([]);
+    const [weeklyEvents, setWeeklyEvents] = useState<Event[]>([]);
+    const [dailyAverage, setDailyAverage] = useState<number>(0);
+    const [weeklyAverage, setWeeklyAverage] = useState<number>(0);
+    const [progressionPercentage, setProgressionPercentage] = useState<number>(0);
+    const [progressionDaily, setProgressionDaily] = useState<number>(0);
+    const [progressionWeekly, setProgressionWeekly] = useState<number>(0);
+    const [clients, setClients] = useState<number>(0);
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await sendPostRequest('http://localhost/statistics.php', {});
+                const data = JSON.parse(response);
+ 
+                const events = data.data.events;
+
+                setMeetings(data.data.encounters);
+    
+                if (!Array.isArray(events)) {
+                    throw new Error("La réponse ne contient pas un tableau d'événements");
+                }
+    
+                setEvents(events);
+                console.log(events);
+
+                const august = events.filter((event: Event) => {
+                    const eventDate = new Date(event.date);
+                    if (isNaN(eventDate.getTime())) {
+                        console.warn(`Date invalide pour l'événement : ${event.date}`);
+                        return false;
+                    }
+                    return eventDate.getMonth() === 6 && eventDate.getFullYear() === 2024;
+                });
+                
+                let lastAugustDay = august[august.length - 1];
+
+                console.log(lastAugustDay);
+
+                if (lastAugustDay.date != "2024-07-31")
+                    lastAugustDay = 0;
+                else 
+                    lastAugustDay = 1;
+
+                let compareDay = august[august.length - 2];
+
+                if (compareDay.date != "2024-07-31")
+                    compareDay = 0;
+                else 
+                    compareDay = 1;
+
+                const progressionDay = ((lastAugustDay - compareDay) / compareDay) * 100;
+
+                const dailyAvg = august.length / 31;
+
+                const july = events.filter((event: Event) => {
+                    const eventDate = new Date(event.date);
+                    if (isNaN(eventDate.getTime())) {
+                        console.warn(`Date invalide pour l'événement : ${event.date}`);
+                        return false;
+                    }
+                    return eventDate.getMonth() === 5 && eventDate.getFullYear() === 2024;
+                });
+
+                const dailyAvgJuly = july.length / 31;
+
+                const progression = july.length > 0 ? ((august.length - july.length) / july.length) * 100 : 0;
+    
+                setAugustEvents(august);
+                setDailyAverage(lastAugustDay);
+                setProgressionPercentage(progression);
+                setProgressionDaily(progressionDay);
+            } catch (error) {
+                console.error('Erreur lors de la requête : ', error);
+            }
+        };
+    
+        fetchData();
+    }, []);
+
+    useEffect(() => {
+        const fetchClientsData = async () => {
+            try {
+              const response = await sendPostRequest(
+                `http://localhost/table_clients.php`,
+                {}
+              );
+              
+              const data = JSON.parse(response);
+              setClients(data.data.length);
+            } catch (error) {
+              console.error("Erreur lors de la requête : ", error);
+            }
+          };
+
+          fetchClientsData();
+    } , []);
+    
 
     const handlePeriodClick: (period: string) => void = (period: string) => {
         setSelectedPeriod(period);
@@ -138,7 +273,7 @@ export default function Dashboard() {
                     <div className='mt-7 flex justify-between lg:w-8/12'>
                         <div className='md:text-left text-center'>
                             <p className='text-slate-500 text-sm'>Clients</p>
-                            <p className='mt-1 text-slate-900 text-xl'>932</p>
+                            <p className='mt-1 text-slate-900 text-xl'>{clients}</p>
                             <div className='flex md:justify-normal justify-center'>
                                 <ArrowUp size={12} className='text-green-700 mt-1.5'/>
                                 <p className='mt-1 text-xs text-green-700'>12.37%</p>
@@ -169,31 +304,40 @@ export default function Dashboard() {
                     <div className='mt-7 flex justify-between lg:w-8/12'>
                         <div className='md:text-left text-center'>
                             <p className='text-slate-500 text-sm'>Mensuel</p>
-                            <p className='mt-1 text-slate-900 text-xl'>83</p>
+                            <p className='mt-1 text-slate-900 text-xl'>{augustEvents.length}</p>
                             <div className='flex md:justify-normal justify-center'>
-                                <ArrowUp size={12} className='text-green-700 mt-1.5'/>
-                                <p className='mt-1 text-xs text-green-700'>4.63%</p>
+                                {progressionPercentage < 0 ? (
+                                    <>
+                                        <ArrowDown size={12} className='text-red-700 mt-1.5'/>
+                                        <p className='mt-1 text-xs text-red-700'>{progressionPercentage}%</p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <ArrowUp size={12} className='text-green-700 mt-1.5'/>
+                                        <p className='mt-1 text-xs text-green-700'>{progressionPercentage}%</p>
+                                    </>
+                                )}
                             </div>
                         </div>
                         <div className='md:text-left text-center'>
                             <p className='text-slate-500 text-sm'>Hebdomadaire</p>
-                            <p className='mt-1 text-slate-900 text-xl'>20</p>
+                            <p className='mt-1 text-slate-900 text-xl'>{weeklyAverage}</p>
                             <div className='flex md:justify-normal justify-center'>
                                 <ArrowDown size={12} className='text-red-700 mt-1.5'/>
-                                <p className='mt-1 text-xs text-red-700'>1.92%</p>
+                                <p className='mt-1 text-xs text-red-700'>{progressionWeekly}</p>
                             </div>
                         </div>
                         <div className='md:text-left text-center'>
                             <p className='text-slate-500 text-sm'>Journalier</p>
-                            <p className='mt-1 text-slate-900 text-xl'>3</p>
+                            <p className='mt-1 text-slate-900 text-xl'>{dailyAverage}</p>
                             <div className='flex md:justify-normal justify-center'>
                                 <ArrowUp size={12} className='text-green-700 mt-1.5'/>
-                                <p className='mt-1 text-xs text-green-700'>3.45%</p>
+                                <p className='mt-1 text-xs text-green-700'>0%</p>
                             </div>
                         </div>
                     </div>
                     <div className='mt-5'>
-                        <ChartEvents />
+                        <ChartEvents data={events}/>
                     </div>
                 </div>
             </div>
@@ -304,7 +448,7 @@ export default function Dashboard() {
                         </div>
                     </div>
                     <div className='flex justify-center'>
-                        <ChartMeetings />
+                        <ChartMeetings data={meetings}/>
                     </div>
                 </div>
             </div>
