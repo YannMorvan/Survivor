@@ -37,7 +37,10 @@ if (empty($encounters)) {
 }
 
 foreach ($encounters as $key => $encounter) {
-    $encounters[$key] = $encounter["source"];
+    $encounters[$key] = [
+        "source" => $encounter["source"],
+        "date" => DateTime::createFromFormat("Y-m-d", $encounter["date"])->format("d/m/Y"),
+    ];
 }
 
 $query = "SELECT address FROM customers";
