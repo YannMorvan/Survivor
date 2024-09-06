@@ -1,89 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { ArrowLeft, Bookmark, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const customers = {
-  id: "UD003054",
-  surname: "Mitcham",
-  name: "Francis",
-  email: "francis.mitcham@tmail.com",
-  phone: "(555) 555-5555",
-  address: "551 Swanston Street, Melbourne Victoria 3053 Australia",
-  image: "/images/avatars/1.jpg",
-  lastActivity: "15 Feb, 2024",
-  coachName: "Gerard Depardieu",
-  totalEncounters: 23,
-  positive: 21,
-  inProgress: 2,
-};
-
-const recentMeetings = [
-  {
-    date: "15 Feb, 2024",
-    rating: 5,
-    notes: "Francis is doing well, keep up the good work",
-    source: "Dating App",
-  },
-  {
-    date: "14 Feb, 2024",
-    rating: 4,
-    notes: "Good progress, needs slight improvement.",
-    source: "Friends",
-  },
-  {
-    date: "14 Feb, 2024",
-    rating: 3,
-    notes: "Good progress, needs slight improvement.",
-    source: "Social Network",
-  },
-  {
-    date: "14 Feb, 2024",
-    rating: 2,
-    notes: "Good progress, needs slight improvement.",
-    source: "Dating App",
-  },
-  {
-    date: "14 Feb, 2024",
-    rating: 0,
-    notes: "Good progress, needs slight improvement.",
-    source: "Dating App",
-  },
-];
-
-const paymentsHistory = [
-  {
-    date: "15 Feb, 2024",
-    paymentHistory: "Visa",
-    amount: "$50",
-    comment: "Payment for session",
-  },
-  {
-    date: "14 Feb, 2024",
-    paymentHistory: "Visa",
-    amount: "$50",
-    comment: "Payment for session",
-  },
-  {
-    date: "14 Feb, 2024",
-    paymentHistory: "Visa",
-    amount: "$50",
-    comment: "Payment for session",
-  },
-  {
-    date: "14 Feb, 2024",
-    paymentHistory: "Visa",
-    amount: "$50",
-    comment: "Payment for session",
-  },
-  {
-    date: "14 Feb, 2024",
-    paymentHistory: "Visa",
-    amount: "$50",
-    comment: "Payment for session",
-  },
-];
+import { sendPostRequest } from "../../utils/utils.js";
 
 const StarRating = ({ rating }: { rating: number }) => {
   const totalStars = 5;
@@ -106,21 +27,112 @@ const StarRating = ({ rating }: { rating: number }) => {
   );
 };
 
-const getSourceColor = (source: string) => {
-  switch (source) {
-    case "Dating App":
-      return "text-orange-500";
-    case "Social Network":
-      return "text-blue-500";
-    case "Friends":
-      return "text-green-500";
-    default:
-      return "text-[#384B65]";
-  }
+const getRandomColor = () => {
+  const colors = ["text-orange-500", "text-blue-500", "text-green-500"];
+  const randomIndex = Math.floor(Math.random() * colors.length);
+  return colors[randomIndex];
 };
 
-const Page = () => {
+interface Customer {
+  address: string;
+  email: string;
+  encounters: Encounter[];
+  id: string;
+  image: string;
+  name: string;
+  payment: Payment[];
+  plannedEncounters: number;
+  positiveEncounters: number;
+  surname: string;
+  totalEncounters: number;
+  coachName: string;
+  lastActivity: string;
+}
+
+interface Encounter {
+  comment: string;
+  date: string;
+  id: number;
+  idCustomer: number;
+  rating: number;
+  source: string;
+}
+
+interface Payment {
+  id: number;
+  idCustomer: number;
+  date: string;
+  method: string;
+  amount: string;
+}
+
+const ProfileDetails = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
+
+  const [customerData, setCustomerData] = React.useState<Customer>({
+    address: "",
+    email: "",
+    encounters: [],
+    id: "",
+    image: "",
+    name: "",
+    payment: [],
+    plannedEncounters: 0,
+    positiveEncounters: 0,
+    surname: "",
+    totalEncounters: 0,
+    coachName: "",
+    lastActivity: "",
+  });
+
+  const [recentEncounters, setRecentEncounters] = React.useState<Encounter[]>(
+    []
+  );
+
+  const [payment, setPayments] = React.useState<Payment[]>([]);
+
+  useEffect(() => {
+    const fetchCustomerData = async () => {
+      try {
+        const response = await sendPostRequest(
+          "http://localhost/client_profile.php",
+          {
+            id: params.id,
+          }
+        );
+
+        const parsedResponse = JSON.parse(response);
+
+        if (parsedResponse.error) {
+          console.error(parsedResponse.error);
+          return;
+        }
+
+        const customer = parsedResponse.data;
+
+        setCustomerData({
+          address: customer.address,
+          email: customer.email,
+          encounters: customer.encounters,
+          id: customer.id,
+          image: customer.image,
+          name: customer.name,
+          payment: Array.isArray(customer.payment) ? customer.payment : [],
+          plannedEncounters: customer.plannedEncounters || 0,
+          positiveEncounters: customer.positiveEncounters || 0,
+          surname: customer.surname,
+          totalEncounters: customer.totalEncounters || 0,
+          coachName: customer.coachName || "No coach assigned",
+          lastActivity: customer.lastActivity || "No activity",
+        });
+
+        console.log(customer.payment);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchCustomerData();
+  }, []);
 
   return (
     <div className="mx-6 flex flex-col">
@@ -140,13 +152,13 @@ const Page = () => {
         <div className="flex flex-col border-2 bg-white border-[#E1E8F1] rounded-md w-1/4">
           <div className="flex flex-col items-center px-12 py-6 gap-4 justify-center">
             <img
-              src={customers.image}
+              src={`data:image/jpeg;base64,${customerData.image}`}
               alt="avatar"
               className="w-32 h-32 rounded-full border border-[#E1E8F1]"
             />
             <div>
               <p className="text-lg font-bold text-[#384B65]">
-                {customers.name} {customers.surname}
+                {customerData.name} {customerData.surname}
               </p>
             </div>
           </div>
@@ -161,10 +173,14 @@ const Page = () => {
           <div className="flex flex-col justify-around py-4 border-t-2 border-[#E1E8F1]">
             <div className="flex flex-row justify-around">
               <p className="text-lg text-[#384B65]">
-                {customers.totalEncounters}
+                {customerData.totalEncounters}
               </p>
-              <p className="text-lg text-[#384B65]">{customers.positive}</p>
-              <p className="text-lg text-[#384B65]">{customers.inProgress}</p>
+              <p className="text-lg text-[#384B65]">
+                {customerData.positiveEncounters}
+              </p>
+              <p className="text-lg text-[#384B65]">
+                {customerData.totalEncounters - customerData.positiveEncounters}
+              </p>
             </div>
             <div className="flex flex-row justify-around">
               <div className="flex flex-col items-center">
@@ -179,23 +195,23 @@ const Page = () => {
             <p>SHORT DETAILS</p>
             <div>
               <p>User ID:</p>
-              <p className="text-[#384B65]">{customers.id}</p>
+              <p className="text-[#384B65]">{customerData.id}</p>
             </div>
             <div>
               <p>Email:</p>
-              <p className="text-[#384B65]">{customers.email}</p>
+              <p className="text-[#384B65]">{customerData.email}</p>
             </div>
             <div>
               <p>Address:</p>
-              <p className="text-[#384B65]">{customers.address}</p>
+              <p className="text-[#384B65]">{customerData.address}</p>
             </div>
             <div>
               <p>Last Activity:</p>
-              <p className="text-[#384B65]">{customers.lastActivity}</p>
+              <p className="text-[#384B65]">{customerData.lastActivity}</p>
             </div>
             <div>
               <p>Coach</p>
-              <p className="text-[#384B65]">{customers.coachName}</p>
+              <p className="text-[#384B65]">{customerData.coachName}</p>
             </div>
           </div>
         </div>
@@ -222,15 +238,15 @@ const Page = () => {
                 </tr>
               </thead>
               <tbody>
-                {recentMeetings.map((meeting, index) => (
+                {customerData.encounters.map((encounter, index) => (
                   <tr key={index} className="border-b border-[#E1E8F1]">
-                    <td className="p-2 text-[#0369A1]">{meeting.date}</td>
+                    <td className="p-2 text-[#0369A1]">{encounter.date}</td>
                     <td className="p-2 text-[#384B65]">
-                      <StarRating rating={meeting.rating} />
+                      <StarRating rating={encounter.rating} />
                     </td>
-                    <td className="p-2 text-[#384B65]">{meeting.notes}</td>
-                    <td className={`p-2 ${getSourceColor(meeting.source)}`}>
-                      {meeting.source}
+                    <td className="p-2 text-[#384B65]">{encounter.comment}</td>
+                    <td className={`p-2 ${getRandomColor()}`}>
+                      {encounter.source}
                     </td>
                   </tr>
                 ))}
@@ -259,28 +275,22 @@ const Page = () => {
                 </tr>
               </thead>
               <tbody>
-                {paymentsHistory.map((paymentHistory, index) => (
+                {customerData.payment.map((pay, index) => (
                   <tr key={index} className="border-b border-[#E1E8F1]">
-                    <td className="p-2 text-[#0369A1]">
-                      {paymentHistory.date}
-                    </td>
+                    <td className="p-2 text-[#0369A1]">{pay.date}</td>
                     <td className="p-2 text-[#384B65]">
-                      {paymentHistory.paymentHistory === "Visa" ? (
+                      {pay.method === "Visa" ? (
                         <img
                           src="/images/visa-logo.png"
                           alt="Visa Logo"
                           className="w-9 h-3"
                         />
                       ) : (
-                        paymentHistory.paymentHistory
+                        pay.method
                       )}
                     </td>
-                    <td className="p-2 text-[#384B65]">
-                      {paymentHistory.amount}
-                    </td>
-                    <td className="p-2 text-[#384B65]">
-                      {paymentHistory.comment}
-                    </td>
+                    <td className="p-2 text-[#384B65]">{pay.amount}</td>
+                    <td className="p-2 text-[#384B65]">{"No comment"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -292,4 +302,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default ProfileDetails;

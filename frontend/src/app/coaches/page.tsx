@@ -10,35 +10,7 @@ import {
   X,
 } from "lucide-react";
 
-const coachesList = [
-  {
-    id: "c1",
-    name: "Maximilian Schwarzmüller",
-    email: "max@code.com",
-    image:
-      "https://cdn.pixabay.com/photo/2016/11/18/17/46/hockey-1835433_960_720.jpg",
-    phone: "+123 456 7890",
-    nbrCustomers: 3,
-  },
-  {
-    id: "c2",
-    name: "Julie Jones",
-    email: "julie@coaches.com",
-    image:
-      "https://cdn.pixabay.com/photo/2016/11/18/17/46/hockey-1835433_960_720.jpg",
-    phone: "+987 654 3210",
-    nbrCustomers: 2,
-  },
-  {
-    id: "c3",
-    name: "James Smith",
-    email: "james@coaches.com",
-    image:
-      "https://cdn.pixabay.com/photo/2016/11/18/17/46/hockey-1835433_960_720.jpg",
-    phone: "+456 789 0123",
-    nbrCustomers: 5,
-  },
-];
+import { sendPostRequest } from "../utils/utils.js";
 
 const Page = () => {
   const [isModalAddOpen, setIsModalAddOpen] = useState(false);
@@ -47,6 +19,7 @@ const Page = () => {
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [formData, setFormData] = useState({
+    id: "",
     name: "",
     surname: "",
     email: "",
@@ -58,14 +31,63 @@ const Page = () => {
     [key: string]: boolean;
   }
 
+  interface Coach {
+    email: string;
+    id: string;
+    image: string;
+    name: string;
+    surname: string;
+    phone: string;
+    nbrCustomers: number;
+  }
+
   const [allChecked, setAllChecked] = useState(false);
+  const [coachesData, setCoachesData] = useState<Coach[]>([]);
 
   const [checkedItems, setCheckedItems] = useState<CheckedItems>(
-    coachesList.reduce((acc, coach) => {
+    coachesData.reduce((acc, coach) => {
       acc[coach.id] = false;
       return acc;
     }, {} as CheckedItems)
   );
+
+  useEffect(() => {
+    const fetchCoachesData = async () => {
+      try {
+        const response = await sendPostRequest(
+          "http://localhost/employes_table.php",
+          {}
+        );
+
+        const parsedResponse = JSON.parse(response);
+
+        if (
+          parsedResponse.status === true &&
+          Array.isArray(parsedResponse.data)
+        ) {
+          const formattedData: Coach[] = parsedResponse.data.map(
+            (item: any) => ({
+              id: item.id.toString(),
+              name: item.name,
+              email: item.email,
+              image: item.image,
+              surname: item.surname,
+              phone: item.phone || "555",
+              nbrCustomers: item.nbrCustomers || 0,
+            })
+          );
+
+          setCoachesData(formattedData);
+        } else {
+          console.error("Unexpected response format:", parsedResponse);
+        }
+      } catch (error) {
+        console.error("Error fetching coaches data:", error);
+      }
+    };
+
+    fetchCoachesData();
+  }, []);
 
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -191,29 +213,41 @@ const Page = () => {
     closeAddModal();
   };
 
+  useEffect(() => {
+    const initialCheckedItems = coachesData.reduce((acc, coach) => {
+      acc[coach.id] = false;
+      return acc;
+    }, {} as CheckedItems);
+
+    setCheckedItems(initialCheckedItems);
+    setAllChecked(false);
+  }, [coachesData]);
+
   const handleAllCheckedChange = () => {
     const newCheckedStatus = !allChecked;
     setAllChecked(newCheckedStatus);
-    setCheckedItems(
-      Object.keys(checkedItems).reduce((acc, id) => {
-        acc[id] = newCheckedStatus;
-        return acc;
-      }, {} as CheckedItems)
+
+    const updatedCheckedItems = Object.fromEntries(
+      Object.keys(checkedItems).map((id) => [id, newCheckedStatus])
     );
+
+    setCheckedItems(updatedCheckedItems);
   };
 
   const handleCheckboxChange = (id: string) => {
     setCheckedItems((prev) => {
-      const newCheckedItems = { ...prev, [id]: !prev[id] };
-      const allChecked = Object.values(newCheckedItems).every(Boolean);
-      setAllChecked(allChecked);
-      return newCheckedItems;
+      const updatedCheckedItems = { ...prev, [id]: !prev[id] };
+
+      const areAllChecked = Object.values(updatedCheckedItems).every(Boolean);
+      setAllChecked(areAllChecked);
+
+      return updatedCheckedItems;
     });
   };
 
   const exportToCSV = () => {
     const headers = ["Name", "Email", "Phone", "Number of Customers"];
-    const rows = coachesList.map((coach) => [
+    const rows = coachesData.map((coach) => [
       coach.name,
       coach.email,
       coach.phone,
@@ -234,7 +268,7 @@ const Page = () => {
     document.body.removeChild(link);
   };
 
-  const filteredCoaches = coachesList.filter((coach) => {
+  const filteredCoaches = coachesData.filter((coach) => {
     const [firstName, lastName] = coach.name.split(" ");
     const search = searchQuery.toLowerCase();
     const withinRange =
@@ -287,11 +321,11 @@ const Page = () => {
         </div>
       </div>
       <p className="text-gray-600 mb-4">
-        You have total {coachesList.length} coaches.
+        You have total {coachesData.length} coaches
       </p>
 
       <div className="overflow-x-auto">
-        <div className="py-2 px-4 border border-gray-200">
+        <div className="py-2 px-4 border border-gray-200 bg-white">
           <div className="my-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <select className="border border-gray-300 p-2 rounded-md">
@@ -374,7 +408,7 @@ const Page = () => {
           )}
         </div>
 
-        <table className="w-full border border-gray-200 shadow-sm rounded-lg">
+        <table className="w-full border border-gray-200 shadow-sm rounded-lg bg-white">
           <thead>
             <tr>
               <th className="p-4 text-left">
@@ -411,7 +445,7 @@ const Page = () => {
                 <td className="p-4 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full overflow-hidden">
                     <img
-                      src={coach.image}
+                      src={`data:image/jpeg;base64,${coach.image}`}
                       alt={coach.name}
                       className="w-full h-full object-cover"
                     />
