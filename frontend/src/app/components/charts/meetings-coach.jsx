@@ -9,7 +9,7 @@ const ChartComponent = () => {
   useEffect(() => {
     am4core.useTheme(am4themes_animated);
 
-    const chart = am4core.create('chartdiv', am4charts.XYChart3D);
+    const chart = am4core.create('chartdiv', am4charts.XYChart);
 
     if (chart.logo) {
       chart.logo.disabled = true;
@@ -48,9 +48,9 @@ const ChartComponent = () => {
     valueAxis.renderer.labels.template.fill = am4core.color('#808080');
     valueAxis.renderer.labels.template.fontSize = 12;
 
-    valueAxis.renderer.minGridDistance = 50; 
+    valueAxis.renderer.minGridDistance = 50;
 
-    const series = chart.series.push(new am4charts.ColumnSeries3D());
+    const series = chart.series.push(new am4charts.ColumnSeries());
     series.dataFields.valueY = 'visits';
     series.dataFields.categoryX = 'country';
     series.name = 'Visits';
@@ -61,6 +61,10 @@ const ChartComponent = () => {
     columnTemplate.strokeWidth = 2;
     columnTemplate.strokeOpacity = 1;
     columnTemplate.stroke = am4core.color('#FFFFFF');
+  
+    series.columns.template.width = am4core.percent(40);
+
+    categoryAxis.renderer.minGridDistance = 20;
 
     columnTemplate.adapter.add('fill', (fill, target) => {
       return chart.colors.getIndex(target.dataItem.index);
