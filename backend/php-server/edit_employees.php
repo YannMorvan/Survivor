@@ -17,7 +17,7 @@ if (!isset($_POST['id']) || !isset($_POST['name']) || !isset($_POST['surname']) 
 
 try {
     if (!isset($_POST['password']) ||  empty($_POST['password'])) {
-        $query = "UPDATE customers SET name = :name, surname = :surname, email = :email, phone_number = :phone_number  WHERE id = :id";
+        $query = "UPDATE employees SET name = :name, surname = :surname, email = :email, phone_number = :phone_number  WHERE id = :id";
         $stmt = $pdo->prepare($query);
         $stmt->execute([
             'id' => $_POST['id'],
@@ -27,7 +27,7 @@ try {
             'phone_number' => $_POST['phone_number']
         ]);
     } else {
-        $query = "UPDATE customers SET name = :name, surname = :surname, email = :email, phone_number = :phone_number, password = :password WHERE id = :id";
+        $query = "UPDATE employees SET name = :name, surname = :surname, email = :email, phone_number = :phone_number, password = :password WHERE id = :id";
         $stmt = $pdo->prepare($query);
         $stmt->execute([
             'id' => $_POST['id'],
@@ -38,6 +38,12 @@ try {
             'phone_number' => $_POST['phone_number']
         ]);
     }
+
+    echo json_encode([
+        "status" => true,
+        "message" => "Employee updated successfully"
+    ]);
+
 } catch (PDOException $e) {
     echo json_encode([
         "status" => false,
