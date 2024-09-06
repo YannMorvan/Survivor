@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface ExpandableRow {
-  data: { title: string; content: string };
+    data: { title: string; tip: string };
 }
 
 const ExpandableRow: React.FC<ExpandableRow> = ({ data }) => {
@@ -19,12 +19,11 @@ const ExpandableRow: React.FC<ExpandableRow> = ({ data }) => {
       style={{
         border: "1px solid gray",
         padding: "10px",
-        margin: "10px 0",
         cursor: "pointer",
         width: "calc(100% - 40px)",
         marginLeft: "20px",
         marginRight: "20px",
-        backgroundColor: isExpanded ? "#f0f0f0" : "#fff",
+        backgroundColor: "#fff",
         boxSizing: "border-box",
       }}
     >
@@ -41,7 +40,7 @@ const ExpandableRow: React.FC<ExpandableRow> = ({ data }) => {
       {isExpanded && (
         <>
           <hr style={{ width: "100%", color: "black" }} />
-          <div style={{ marginTop: "10px", color: "gray" }}>{data.content}</div>
+          <div style={{ height: "fit-content", color: "black", marginTop: "15px" }}>{data.tip}</div>
         </>
       )}
     </div>

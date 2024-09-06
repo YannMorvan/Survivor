@@ -5,23 +5,11 @@ import { sendPostRequest } from "../utils/utils";
 
 interface Tip {
   title: string;
-  content: string;
+  tip: string;
 }
-
-const initialData: Tip[] = [
-  { title: "", content: "" },
-  { title: "", content: "" },
-  { title: "", content: "" },
-  { title: "", content: "" },
-  { title: "", content: "" },
-];
 
 export default function TipsPage() {
   const [data, setData] = useState<Tip[]>([]);
-
-  useEffect(() => {
-    setData(initialData);
-  }, []);
 
   useEffect(() => {
     const fetchTips = async () => {
@@ -32,11 +20,10 @@ export default function TipsPage() {
         );
 
         try {
-            console.log(response);
-          const parsedData: Tip[] = JSON.parse(response);
-          const shuffledData = parsedData.sort(() => Math.random() - 0.5);
-          const selectedTips = shuffledData.slice(0, 5);
-          setData(selectedTips);
+          const parsedData: { status: boolean; data: Tip[]} = JSON.parse(response);
+          if (parsedData.status === true) {
+            setData(parsedData.data);
+          }
         } catch (error) {
           console.error("Error parsing tips data: ", error);
         }

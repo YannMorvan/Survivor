@@ -2,7 +2,7 @@ import React from "react";
 import ExpandableRow from "./expandable-row";
 
 interface ExpandableTableProps {
-    data: { title: string; content: string }[];
+    data: { title: string; tip: string }[];
 }
 
 const ExpandableTable: React.FC<ExpandableTableProps> = ({ data }) => {
