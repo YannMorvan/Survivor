@@ -1,19 +1,19 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
 import ExpandableTable from "../components/expandable-table";
 import { sendPostRequest } from "../utils/utils";
 
 interface Tip {
-    title: string;
-    content: string;
+  title: string;
+  content: string;
 }
 
 const initialData: Tip[] = [
-  { title: "Tip 1", content: "This is the content of tip 1" },
-  { title: "Tip 2", content: "This is the content of tip 2" },
-  { title: "Tip 3", content: "This is the content of tip 3" },
-  { title: "Tip 4", content: "This is the content of tip 4" },
-  { title: "Tip 5", content: "This is the content of tip 5" },
+  { title: "", content: "" },
+  { title: "", content: "" },
+  { title: "", content: "" },
+  { title: "", content: "" },
+  { title: "", content: "" },
 ];
 
 export default function TipsPage() {
@@ -25,17 +25,27 @@ export default function TipsPage() {
 
   useEffect(() => {
     const fetchTips = async () => {
+      try {
         const response = await sendPostRequest(
-            "http://localhost/tips_data.php", {});
-            
-            const parsedData: Tip[] = JSON.parse(response);
+          "http://localhost/tips_data.php",
+          {}
+        );
 
-            const shuffledData = parsedData.sort(() => Math.random() - 0.5);            
-            const selectedTips = shuffledData.slice(0, 5);
-            setData(selectedTips);
+        try {
+            console.log(response);
+          const parsedData: Tip[] = JSON.parse(response);
+          const shuffledData = parsedData.sort(() => Math.random() - 0.5);
+          const selectedTips = shuffledData.slice(0, 5);
+          setData(selectedTips);
+        } catch (error) {
+          console.error("Error parsing tips data: ", error);
         }
-        fetchTips();
-    }, []);
+      } catch (error) {
+        console.error("Error fetching tips", error);
+      }
+    };
+    fetchTips();
+  }, []);
 
   return (
     <div>
