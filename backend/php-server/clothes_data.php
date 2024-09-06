@@ -13,18 +13,21 @@ if (!isset($_POST['type'])) {
     exit();
 }
 
-$query = "SELECT ci.image FROM clothes c LEFT JOIN clothes_images ci ON c.id = ci.id_cloth WHERE c.type = :type";
-$stm = $pdo->prepare($query);
-$stm->execute(["type" => $_POST['type']]);
-$clothes = $stm->fetchAll(PDO::FETCH_ASSOC);
+try {
 
-if (empty($clothes)) {
-    echo json_encode([
-        "status" => false,
-        "message" => "No clothes found"
-    ]);
-    exit();
-}
+    $query = "SELECT ci.image FROM clothes c LEFT JOIN clothes_images ci ON c.id = ci.id_cloth WHERE c.type = :type";
+
+    $stm = $pdo->prepare($query);
+    $stm->execute(["type" => $_POST['type']]);
+    $clothes = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+    if (empty($clothes)) {
+        echo json_encode([
+            "status" => false,
+            "message" => "No clothes found"
+        ]);
+        exit();
+    }
 
 foreach ($clothes as $key => $cloth) {
     $clothes[$key]['image'] = base64_encode($cloth['image']);
@@ -33,7 +36,14 @@ foreach ($clothes as $key => $cloth) {
 // Log memory usage
 error_log("Memory usage: " . memory_get_usage());
 
-echo json_encode([
-    "status" => true,
-    "data" => $clothes
-]);
+    echo json_encode([
+        "status" => true,
+        "data" => $clothes
+    ]);
+
+} catch (PDOException $e) {
+    echo json_encode([
+        "status" => false,
+        "message" => "Database error: " . $e->getMessage()
+    ]);
+}

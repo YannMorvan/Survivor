@@ -8,33 +8,35 @@ session_start();
 require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/db_connection.php';
 
-$query = "SELECT * FROM events";
+try {
 
-$stm = $pdo->prepare($query);
-$stm->execute();
-$events = $stm->fetchAll(PDO::FETCH_ASSOC);
+    $query = "SELECT * FROM events";
 
-if (empty($events)) {
-    echo json_encode([
-        "status" => false,
-        "message" => "No events found"
-    ]);
-    exit();
-}
+    $stm = $pdo->prepare($query);
+    $stm->execute();
+    $events = $stm->fetchAll(PDO::FETCH_ASSOC);
 
-$query = "SELECT * FROM encounters";
+    if (empty($events)) {
+        echo json_encode([
+            "status" => false,
+            "message" => "No events found"
+        ]);
+        exit();
+    }
 
-$stm = $pdo->prepare($query);
-$stm->execute();
-$encounters = $stm->fetchAll(PDO::FETCH_ASSOC);
+    $query = "SELECT * FROM encounters";
 
-if (empty($encounters)) {
-    echo json_encode([
-        "status" => false,
-        "message" => "No encounters found"
-    ]);
-    exit();
-}
+    $stm = $pdo->prepare($query);
+    $stm->execute();
+    $encounters = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+    if (empty($encounters)) {
+        echo json_encode([
+            "status" => false,
+            "message" => "No encounters found"
+        ]);
+        exit();
+    }
 
 foreach ($encounters as $key => $encounter) {
     $encounters[$key] = [
@@ -43,20 +45,27 @@ foreach ($encounters as $key => $encounter) {
     ];
 }
 
-$query = "SELECT address FROM customers";
+    $query = "SELECT address FROM customers";
 
-$stm = $pdo->prepare($query);
-$stm->execute();
-$adresses = $stm->fetchAll(PDO::FETCH_ASSOC);
+    $stm = $pdo->prepare($query);
+    $stm->execute();
+    $adresses = $stm->fetchAll(PDO::FETCH_ASSOC);
 
-// TODO: implement the missing graph's data
+    // TODO: implement the missing graph's data
 
 
-echo json_encode([
-    "status" => true,
-    "data" =>  [
-        "encounters" => $encounters,
-        "events" => $events,
-        "addresses" => $adresses
-    ]
-]);
+    echo json_encode([
+        "status" => true,
+        "data" => [
+            "encounters" => $encounters,
+            "events" => $events,
+            "addresses" => $adresses
+        ]
+    ]);
+
+} catch (PDOException $e) {
+    echo json_encode([
+        "status" => false,
+        "message" => "Database error: " . $e->getMessage()
+    ]);
+}

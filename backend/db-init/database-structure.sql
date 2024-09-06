@@ -3,10 +3,11 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db
--- Generation Time: Sep 05, 2024 at 08:58 AM
--- Server version: 8.0.35
+-- Generation Time: Sep 06, 2024 at 02:32 PM
+-- Server version: 8.0.39
 -- PHP Version: 8.2.8
 
+SET FOREIGN_KEY_CHECKS=0;
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
@@ -53,11 +54,13 @@ CREATE TABLE `clothes_images` (
 
 CREATE TABLE `customers` (
   `id` int NOT NULL,
+  `id_coach` int DEFAULT NULL,
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `phone_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `surname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `country` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `birth_date` date NOT NULL,
   `gender` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
@@ -85,11 +88,13 @@ CREATE TABLE `customers_images` (
 CREATE TABLE `employees` (
   `id` int NOT NULL,
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `surname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `birth_date` date NOT NULL,
   `gender` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `work` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+  `work` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `phone_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -141,6 +146,18 @@ CREATE TABLE `events` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `events_customers`
+--
+
+CREATE TABLE `events_customers` (
+  `id` int NOT NULL,
+  `id_event` int NOT NULL,
+  `id_customer` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `payments`
 --
 
@@ -188,7 +205,8 @@ ALTER TABLE `clothes_images`
 -- Indexes for table `customers`
 --
 ALTER TABLE `customers`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_coach` (`id_coach`);
 
 --
 -- Indexes for table `customers_images`
@@ -225,6 +243,14 @@ ALTER TABLE `encounters`
 ALTER TABLE `events`
   ADD PRIMARY KEY (`id`),
   ADD KEY `id_employee_for_events` (`id_employee`);
+
+--
+-- Indexes for table `events_customers`
+--
+ALTER TABLE `events_customers`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_customer` (`id_customer`),
+  ADD KEY `id_event` (`id_event`);
 
 --
 -- Indexes for table `payments`
@@ -292,6 +318,12 @@ ALTER TABLE `events`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `events_customers`
+--
+ALTER TABLE `events_customers`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
@@ -320,6 +352,12 @@ ALTER TABLE `clothes_images`
   ADD CONSTRAINT `id_cloth_for_images` FOREIGN KEY (`id_cloth`) REFERENCES `clothes` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
+-- Constraints for table `customers`
+--
+ALTER TABLE `customers`
+  ADD CONSTRAINT `customers_ibfk_1` FOREIGN KEY (`id_coach`) REFERENCES `employees` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
 -- Constraints for table `customers_images`
 --
 ALTER TABLE `customers_images`
@@ -344,10 +382,18 @@ ALTER TABLE `events`
   ADD CONSTRAINT `id_employee_for_events` FOREIGN KEY (`id_employee`) REFERENCES `employees` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
+-- Constraints for table `events_customers`
+--
+ALTER TABLE `events_customers`
+  ADD CONSTRAINT `events_customers_ibfk_1` FOREIGN KEY (`id_customer`) REFERENCES `customers` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  ADD CONSTRAINT `events_customers_ibfk_2` FOREIGN KEY (`id_event`) REFERENCES `events` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
 -- Constraints for table `payments`
 --
 ALTER TABLE `payments`
   ADD CONSTRAINT `id_customer_for_payments` FOREIGN KEY (`id_customer`) REFERENCES `customers` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+SET FOREIGN_KEY_CHECKS=1;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -17,15 +17,16 @@ if (!isset($_POST['email']) || !isset($_POST['name']) || !isset($_POST['surname'
 }
 
 try {
-    $query = "INSERT INTO employees (email, name, surname, birth_date, gender, work) VALUES (:email, :name, :surname, :birth_date, :gender, :work)";
+    $query = "INSERT INTO employees (email, password, name, surname, birth_date, gender, work) VALUES (:email, :password, :name, :surname, :birth_date, :gender, :work)";
     $stmt = $pdo->prepare($query);
     $stmt->execute([
-        'email' => $_POST['email'],
-        'name' => $_POST['name'],
-        'surname' => $_POST['surname'],
-        'birth_date' => $_POST['birth_date'],
-        'gender' => $_POST['gender'],
-        'work' => $_POST['work']
+        "email" => $_POST["email"],
+        "password" => isset($_POST["password"]) ? password_hash($_POST["password"], PASSWORD_DEFAULT) : null,
+        "name" => $_POST["name"],
+        "surname" => $_POST["surname"],
+        "birth_date" => $_POST["birth_date"],
+        "gender" => $_POST["gender"],
+        "work" => $_POST["work"]
     ]);
 
     echo json_encode([
