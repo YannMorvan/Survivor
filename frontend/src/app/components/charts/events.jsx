@@ -4,7 +4,7 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import am5themes_Responsive from "@amcharts/amcharts5/themes/Responsive";
 
-const LineChart = () => {
+const LineChart = ({ data }) => {
   useEffect(() => {
     let root = am5.Root.new("chartdiv1");
 
@@ -68,7 +68,7 @@ const LineChart = () => {
     rendererY.labels.template.set("forceHidden", true);
     var rendererX = xAxis.get("renderer");
     rendererX.grid.template.set("forceHidden", true);
-    rendererX.labels.template.set("forceHidden", true);
+    rendererX.labels.template.set("forceHidden", false);
 
     let series = chart.series.push(am5xy.ColumnSeries.new(root, {
       name: "Series",
@@ -85,41 +85,6 @@ const LineChart = () => {
       strokeOpacity: 0,
       fill: am5.color("#9CAAFF")
     });
-
-    const data = [
-      { date: new Date(2024, 6, 1).getTime(), value: 100 },
-      { date: new Date(2024, 6, 2).getTime(), value: 105 },
-      { date: new Date(2024, 6, 3).getTime(), value: 110 },
-      { date: new Date(2024, 6, 4).getTime(), value: 95 },
-      { date: new Date(2024, 6, 5).getTime(), value: 120 },
-      { date: new Date(2024, 6, 6).getTime(), value: 90 },
-      { date: new Date(2024, 6, 7).getTime(), value: 115 },
-      { date: new Date(2024, 6, 8).getTime(), value: 105 },
-      { date: new Date(2024, 6, 9).getTime(), value: 95 },
-      { date: new Date(2024, 6, 10).getTime(), value: 95 },
-      { date: new Date(2024, 6, 11).getTime(), value: 95 },
-      { date: new Date(2024, 6, 12).getTime(), value: 95 },
-      { date: new Date(2024, 6, 13).getTime(), value: 95 },
-      { date: new Date(2024, 6, 14).getTime(), value: 95 },
-      { date: new Date(2024, 6, 15).getTime(), value: 95 },
-      { date: new Date(2024, 6, 16).getTime(), value: 95 },
-      { date: new Date(2024, 6, 17).getTime(), value: 95 },
-      { date: new Date(2024, 6, 18).getTime(), value: 95 },
-      { date: new Date(2024, 6, 19).getTime(), value: 95 },
-      { date: new Date(2024, 6, 20).getTime(), value: 95 },
-      { date: new Date(2024, 6, 21).getTime(), value: 95 },
-      { date: new Date(2024, 6, 22).getTime(), value: 95 },
-      { date: new Date(2024, 6, 23).getTime(), value: 95 },
-      { date: new Date(2024, 6, 24).getTime(), value: 95 },
-      { date: new Date(2024, 6, 25).getTime(), value: 95 },
-      { date: new Date(2024, 6, 26).getTime(), value: 95 },
-      { date: new Date(2024, 6, 27).getTime(), value: 95 },
-      { date: new Date(2024, 6, 28).getTime(), value: 95 },
-      { date: new Date(2024, 6, 29).getTime(), value: 95 },
-      { date: new Date(2024, 6, 30).getTime(), value: 110 },
-    ];
-
-    series.data.setAll(data);
 
     function createRange(value, axis, label) {
       let rangeDataItem = axis.makeDataItem({
@@ -140,10 +105,28 @@ const LineChart = () => {
       });
     }
 
-    createRange(new Date(2024, 6, 1).getTime(), xAxis, "01 Jul, 2024");
-    createRange(new Date(2024, 6, 31).getTime(), xAxis, "30 Jul, 2024");
+    createRange(new Date(2024, 7, 1).getTime(), xAxis, "01 Aug, 2024");
+    createRange(new Date(2024, 7, 31).getTime(), xAxis, "31 Aug, 2024");
 
     xAxis.get("renderer").grid.template.set("forceHidden", true);
+
+    const eventsInAugust = data.filter((event) => {
+      const eventDate = new Date(event.date);
+      return eventDate.getMonth() === 6 && eventDate.getFullYear() === 2024;
+    });
+
+    const dateCounts = eventsInAugust.reduce((acc, event) => {
+      const date = new Date(event.date).toDateString();
+      acc[date] = (acc[date] || 0) + 1;
+      return acc;
+    }, {});
+
+    const chartData = Object.keys(dateCounts).map(date => ({
+      date: new Date(date).getTime(),
+      value: dateCounts[date]
+    }));
+
+    series.data.setAll(chartData);
 
     series.appear(1000);
     chart.appear(1000, 100);
@@ -151,7 +134,7 @@ const LineChart = () => {
     return () => {
       root.dispose();
     };
-  }, []);
+  }, [data]);
 
   return (
     <div id="chartdiv1" style={{ width: "100%", height: "250px" }}></div>
