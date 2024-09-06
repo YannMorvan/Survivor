@@ -104,10 +104,10 @@ const Navbar = () => {
               >
                 <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                   <li>
-                    <a href="/dashboard" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/dashboard')}`}>Dashboard</a>
+                    <a href="/dashboard" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/dashboard')}`}>Tableau</a>
                   </li>
                   <li>
-                    <a href="/coaches" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/events')}`}>Coaches</a>
+                    <a href="/coaches" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/coaches')}`}>Coachs</a>
                   </li>
                   <li>
                     <a href="/customers" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/customers')}`}>Customers</a>
@@ -119,10 +119,13 @@ const Navbar = () => {
                     <a href="/events" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/events')}`}>Events</a>
                   </li>
                   <li>
-                    <a href="/clothes" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/events')}`}>Clothes</a>
+                    <a href="/clothes" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/clothes')}`}>Clothes</a>
                   </li>
                   <li>
-                    <a href="/statistics" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/events')}`}>Statistiques</a>
+                    <a href="/astro" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/astro')}`}>Compatibilité</a>
+                  </li>
+                  <li>
+                    <a href="/statistics" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/stats')}`}>Statistiques</a>
                   </li>
                   <div className='border'></div>
                   <li>
@@ -146,12 +149,12 @@ const Navbar = () => {
           <div className={`w-full lg:flex lg:w-auto ${isMenuOpen ? 'block' : 'hidden'}`}>
   <ul className="font-medium md:static absolute flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:border-0 dark:bg-gray-800 dark:border-gray-700">
     {[
-      { label: 'Dashboard', path: 'dashboard' },
-      { label: 'Coaches', path: 'coaches' },
+      { label: 'Tableau', path: 'dashboard' },
+      { label: 'Coachs', path: 'coaches' },
       { label: 'Clients', path: 'customers' },
       { label: 'Conseils', path: 'conseils' },
-      { label: 'Events', path: 'events' },
-      { label: 'Vêtements', path: 'vetements' },
+      { label: 'Evènement', path: 'events' },
+      { label: 'Vêtements', path: 'clothes' },
       { label: 'Compatibilité', path: 'astro' },
       { label: 'Stats', path: 'statistics' },
     ].map((route) => (

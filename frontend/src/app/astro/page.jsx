@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Table from '../components/table';
-import { sendPostRequest } from '../utils/api';
+import { sendPostRequest } from '../utils/utils';
 
 export default function Astro() {
 

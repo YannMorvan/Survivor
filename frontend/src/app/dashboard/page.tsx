@@ -9,11 +9,11 @@ import ChartMeetings from '../components/charts/meetings';
 export default function Dashboard() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [mapIsDropdownOpen, setMapIsDropdownOpen] = useState(false);
-    const [lastDays, setLastDays] = useState("Last 30 days");
+    const [lastDays, setLastDays] = useState("30 derniers jours");
     const [selectedPeriod, setSelectedPeriod] = useState('7J');
-    const [selectedMapPeriod, setSelectedMapPeriod] = useState("30 days");
+    const [selectedMapPeriod, setSelectedMapPeriod] = useState("30 jours");
     const [isMeetingsDropdownOpen, setIsMeetingsDropdownOpen] = useState(false);
-    const [selectedMeetingsPeriod, setSelectedMeetingsPeriod] = useState("30 days");
+    const [selectedMeetingsPeriod, setSelectedMeetingsPeriod] = useState("30 jours");
 
 
     const handlePeriodClick: (period: string) => void = (period: string) => {
@@ -58,13 +58,13 @@ export default function Dashboard() {
         <div className="ml-6 sm:mr-6 mr-6 mb-5">
             <div className='md:flex md:justify-between'>
                 <div>
-                    <h1 className='md:text-3xl sm:text-2xl text-xl font-semibold'>Dashboard</h1>
-                    <h2 className='mt-4 text-sm text-slate-700'>Welcome!</h2>
+                    <h1 className='md:text-3xl sm:text-2xl text-xl font-semibold'>Tableau de bord</h1>
+                    <h2 className='mt-4 text-sm text-slate-700'>Bienvenue !</h2>
                 </div>
                 <div className='mt-5'>
                     <button
-                        id="Last 30 days button"
-                        aria-label="Last 30 days button"
+                        id="Last 30 jours button"
+                        aria-label="Last 30 jours button"
                         type="button"
                         onClick={toggleDropdown}
                         className="text-slate-900 bg-white font-medium border border-slate-200 rounded-sm text-sm px-5 py-1.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -81,16 +81,16 @@ export default function Dashboard() {
             >
                     <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                     <li>
-                        <p onClick={() => setLastDays('Last 30 days')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 30 days</p>
+                        <p onClick={() => setLastDays('30 derniers jours')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">30 derniers jours</p>
                     </li>
                     <li>
-                        <p onClick={() => setLastDays('Last 10 days')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 10 days</p>
+                        <p onClick={() => setLastDays('10 derniers jours')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">10 derniers jours</p>
                     </li>
                     <li>
-                        <p onClick={() => setLastDays('Last 5 days')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 5 days</p>
+                        <p onClick={() => setLastDays('5 derniers jours')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">5 derniers jours</p>
                     </li>
                     <li>
-                        <p onClick={() => setLastDays('Last 1 day')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last 1 day</p>
+                        <p onClick={() => setLastDays('dernier jour')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">dernier jour</p>
                     </li>
                     </ul>
                 </div>
@@ -102,7 +102,7 @@ export default function Dashboard() {
                 >
                     <div className='flex'>
                         <ClipboardPlus size={16} color='white' className='mr-3 mt-0.5'/>
-                        <p className='text-white'>Reports</p>
+                        <p className='text-white'>Rapports</p>
                     </div>
                 </button>
                 </div>
@@ -205,8 +205,8 @@ export default function Dashboard() {
                         </div>
                         <div>
                                     <button
-                                    id="30 days button for country of clients"
-                                    aria-label="30 days button for country of clients"
+                                    id="30 jours button for country of clients"
+                                    aria-label="30 jours button for country of clients"
                                     type="button"
                                     onClick={toggleMapDropdown}
                                     className="text-slate-900 bg-white font-medium border border-slate-200 rounded-sm text-sm px-5 py-1.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -222,13 +222,13 @@ export default function Dashboard() {
                         >
                                 <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                                 <li>
-                                    <p onClick={() => setSelectedMapPeriod('30 days')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">30 days</p>
+                                    <p onClick={() => setSelectedMapPeriod('30 jours')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">30 jours</p>
                                 </li>
                                 <li>
-                                    <p onClick={() => setSelectedMapPeriod('7 days')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">7 days</p>
+                                    <p onClick={() => setSelectedMapPeriod('7 jours')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">7 jours</p>
                                 </li>
                                 <li>
-                                    <p onClick={() => setSelectedMapPeriod('1 day')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">1 day</p>
+                                    <p onClick={() => setSelectedMapPeriod('1 jour')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">1 jour</p>
                                 </li>
                                 </ul>
                             </div>
@@ -274,8 +274,8 @@ export default function Dashboard() {
                         </div>
                         <div>
                                     <button
-                                    id="30 days button for meetings"
-                                    aria-label="30 days button for meetings"
+                                    id="30 jours button for meetings"
+                                    aria-label="30 jours button for meetings"
                                     type="button"
                                     onClick={toggleMeetingsDropdown}
                                     className="text-slate-900 bg-white font-medium border border-slate-200 rounded-sm text-sm px-5 py-1.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -291,13 +291,13 @@ export default function Dashboard() {
                         >
                                 <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                                 <li>
-                                    <p onClick={() => setSelectedMeetingsPeriod('30 days')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">30 days</p>
+                                    <p onClick={() => setSelectedMeetingsPeriod('30 jours')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">30 jours</p>
                                 </li>
                                 <li>
-                                    <p onClick={() => setSelectedMeetingsPeriod('7 days')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">7 days</p>
+                                    <p onClick={() => setSelectedMeetingsPeriod('7 jours')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">7 jours</p>
                                 </li>
                                 <li>
-                                    <p onClick={() => setSelectedMeetingsPeriod('1 day')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">1 day</p>
+                                    <p onClick={() => setSelectedMeetingsPeriod('1 jour')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">1 jour</p>
                                 </li>
                                 </ul>
                             </div>
