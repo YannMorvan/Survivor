@@ -183,7 +183,7 @@ export default function Clothes() {
     <div className="mx-6 flex flex-col">
       <div className="flex justify-between items-center mb-6 flex-row">
         <h1 className="text-3xl font-semibold text-[#384B65]">
-          Customers List
+          Gestion des Vêtements
         </h1>
       </div>
       <div className="flex flex-row lg:justify-between justify-center">
@@ -486,7 +486,7 @@ export default function Clothes() {
                     : "text-[#2263B3]"
                 }`}
               >
-                Clear
+                Vider
               </p>
             </button>
             <button
@@ -536,7 +536,7 @@ export default function Clothes() {
                     : "text-[#2263B3]"
                 }`}
               >
-                Export
+                Exporter
               </p>
             </button>
           </div>

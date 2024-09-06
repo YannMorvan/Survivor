@@ -303,7 +303,7 @@ const Page = () => {
     <div className="mx-6 flex flex-col">
       <div className="flex justify-between items-center mb-2 flex-row">
         <h1 className="text-3xl font-semibold text-[#384B65]">
-          Customers List
+          Liste des clients
         </h1>
         <div className="flex flex-row items-center">
           <button
@@ -312,7 +312,9 @@ const Page = () => {
             onClick={exportToCSV}
           >
             <CloudDownload style={{ color: "#2263B3" }} />
-            <p className="hidden sm:inline font-bold text-[#2263B3]">Export</p>
+            <p className="hidden sm:inline font-bold text-[#2263B3]">
+              Exporter
+            </p>
           </button>
           <button
             className="bg-blue-500 text-white px-4 py-2 rounded-md ml-4"
@@ -324,21 +326,21 @@ const Page = () => {
         </div>
       </div>
       <p className="text-gray-600 mb-4">
-        You have total {customersData.length} customers
+        Vous avez {customersData.length} clients
       </p>
 
       <div className="overflow-x-auto">
         <div className="py-2 px-4 border border-gray-200 bg-white">
           <div className="my-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <select className="border border-gray-300 p-2 rounded-md">
-                <option>Bulk Action</option>
+              <select className="border border-gray-300 p-2 rounded-md bg-white">
+                <option>Action Groupée</option>
               </select>
               <button
-                className="bg-blue-500 text-white px-4 py-2 rounded-md  disabled:bg-[#EBEBE4]"
+                className="bg-blue-500 text-white px-4 py-2 rounded-md  disabled:bg-slate-200"
                 disabled
               >
-                Apply
+                <p className="text-slate-600">Appliquer</p>
               </button>
             </div>
             <div className="flex items-center gap-4">
@@ -374,7 +376,9 @@ const Page = () => {
 
           {filterOpen && (
             <div className="filter-dropdown absolute right-6 bg-white border border-gray-200 shadow-lg rounded-md p-4 z-10">
-              <label className="block text-gray-700 mb-2">Payment Method</label>
+              <label className="block text-gray-700 mb-2">
+                Methode de Paiement
+              </label>
               <div className="flex flex-row justify-between items-center">
                 <div className="flex flex-col gap-2 mr-2">
                   <span>Min:</span>
@@ -422,8 +426,10 @@ const Page = () => {
               </th>
               <th className="p-4 text-left text-[#6B83A2]">Coach</th>
               <th className="p-4 text-left text-[#6B83A2]">Email</th>
-              <th className="p-4 text-left text-[#6B83A2]">Phone</th>
-              <th className="p-4 text-left text-[#6B83A2]">Payment Method</th>
+              <th className="p-4 text-left text-[#6B83A2]">Tel</th>
+              <th className="p-4 text-left text-[#6B83A2]">
+                Méthode de Paiement
+              </th>
               <th className="p-4 text-left text-[#6B83A2]">Actions</th>
             </tr>
           </thead>
@@ -480,13 +486,13 @@ const Page = () => {
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
                         onClick={() => handleEdit(customer.id)}
                       >
-                        Edit
+                        Editer
                       </button>
                       <button
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
                         onClick={() => handleDelete(customer.id)}
                       >
-                        Delete
+                        Supprimer
                       </button>
                     </div>
                   )}
@@ -509,11 +515,11 @@ const Page = () => {
             >
               <X />
             </button>
-            <h2 className="text-2xl mb-4">Edit Customers</h2>
+            <h2 className="text-2xl mb-4">Editer Customers</h2>
             <form onSubmit={handleSubmit}>
               <div className="flex flex-row gap-4 w-full">
                 <div className="mb-4">
-                  <label className="block text-gray-700">Name</label>
+                  <label className="block text-gray-700">Nom</label>
                   <input
                     type="text"
                     name="name"
@@ -524,7 +530,7 @@ const Page = () => {
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-gray-700">Surname</label>
+                  <label className="block text-gray-700">Prénom</label>
                   <input
                     type="text"
                     name="surname"
@@ -547,7 +553,7 @@ const Page = () => {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700">Phone</label>
+                <label className="block text-gray-700">Tel</label>
                 <input
                   type="text"
                   name="phone"
@@ -558,7 +564,9 @@ const Page = () => {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700">Payment Method</label>
+                <label className="block text-gray-700">
+                  Methode de Paiement
+                </label>
                 <input
                   type="number"
                   name="paymentMethod"
@@ -573,7 +581,7 @@ const Page = () => {
                   type="submit"
                   className="bg-blue-500 text-white px-4 py-2 rounded-md"
                 >
-                  Save
+                  Sauvegarder
                 </button>
               </div>
             </form>
@@ -593,20 +601,20 @@ const Page = () => {
             >
               <X />
             </button>
-            <h2 className="text-2xl mb-4">Delete Coach</h2>
-            <p>Are you sure you want to delete this customer?</p>
+            <h2 className="text-2xl mb-4">Supprimer Le Client</h2>
+            <p>Etes vous sur de supprimer ce client?</p>
             <div className="flex justify-center gap-4 mt-4">
               <button
                 className="bg-red-500 text-white px-4 py-2 rounded-md"
                 onClick={closeDeleteModal}
               >
-                Delete
+                Supprimer
               </button>
               <button
                 className="bg-gray-200 text-gray-600 px-4 py-2 rounded-md"
                 onClick={closeDeleteModal}
               >
-                Cancel
+                Annuler
               </button>
             </div>
           </div>
@@ -625,11 +633,11 @@ const Page = () => {
             >
               <X />
             </button>
-            <h2 className="text-2xl mb-4">Add New Coach</h2>
+            <h2 className="text-2xl mb-4">Ajouter un Client</h2>
             <form onSubmit={handleSubmit}>
               <div className="flex flex-row gap-4 w-full">
                 <div className="mb-4">
-                  <label className="block text-gray-700">Name</label>
+                  <label className="block text-gray-700">Nom</label>
                   <input
                     type="text"
                     name="name"
@@ -640,7 +648,7 @@ const Page = () => {
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-gray-700">Surname</label>
+                  <label className="block text-gray-700">Prénom</label>
                   <input
                     type="text"
                     name="surname"
@@ -663,7 +671,7 @@ const Page = () => {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700">Phone</label>
+                <label className="block text-gray-700">Tel</label>
                 <input
                   type="text"
                   name="phone"
@@ -674,7 +682,9 @@ const Page = () => {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700">Payment Method</label>
+                <label className="block text-gray-700">
+                  Methode de paiement
+                </label>
                 <input
                   type="number"
                   name="paymentMethod"
@@ -689,7 +699,7 @@ const Page = () => {
                   type="submit"
                   className="bg-blue-500 text-white px-4 py-2 rounded-md"
                 >
-                  Save
+                  Sauvegarder
                 </button>
               </div>
             </form>

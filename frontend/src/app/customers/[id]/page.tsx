@@ -122,8 +122,8 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
           positiveEncounters: customer.positiveEncounters || 0,
           surname: customer.surname,
           totalEncounters: customer.totalEncounters || 0,
-          coachName: customer.coachName || "No coach assigned",
-          lastActivity: customer.lastActivity || "No activity",
+          coachName: customer.coachName || "Pas de Coach assigné",
+          lastActivity: customer.lastActivity || "Aucune activité",
         });
 
         console.log(customer.payment);
@@ -145,7 +145,7 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
           onClick={() => router.back()}
         >
           <ArrowLeft size={24} className="mr-2" />
-          <p className="text-lg">Back</p>
+          <p className="text-lg">Retour</p>
         </button>
       </div>
       <div className="flex flex-row justify-between items-start mb-4 gap-10">
@@ -185,16 +185,16 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
             <div className="flex flex-row justify-around">
               <div className="flex flex-col items-center">
                 <p className="text-sm text-[#384B65]">Total</p>
-                <p className="text-sm text-[#384B65]">Encounters</p>
+                <p className="text-sm text-[#384B65]">Rencontres</p>
               </div>
-              <p className="text-sm text-[#384B65]">Positive</p>
-              <p className="text-sm text-[#384B65]">In Progress</p>
+              <p className="text-sm text-[#384B65]">Positives</p>
+              <p className="text-sm text-[#384B65]">En Cours</p>
             </div>
           </div>
           <div className="flex flex-col py-4 px-4 border-t-2 border-[#E1E8F1] gap-4 text-sm font-semibold text-gray-600">
-            <p>SHORT DETAILS</p>
+            <p>DETAILS</p>
             <div>
-              <p>User ID:</p>
+              <p>Identifiant:</p>
               <p className="text-[#384B65]">{customerData.id}</p>
             </div>
             <div>
@@ -202,11 +202,11 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
               <p className="text-[#384B65]">{customerData.email}</p>
             </div>
             <div>
-              <p>Address:</p>
+              <p>Adresse:</p>
               <p className="text-[#384B65]">{customerData.address}</p>
             </div>
             <div>
-              <p>Last Activity:</p>
+              <p>Dernière Activité:</p>
               <p className="text-[#384B65]">{customerData.lastActivity}</p>
             </div>
             <div>
@@ -218,7 +218,7 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
         <div className="flex flex-col bg-white w-3/4 p-4 rounded-md border border-[#E1E8F1] gap-6 max-h-fit">
           <div>
             <h2 className="text-xl font-semibold text-[#384B65] mb-4">
-              Recent Meetings
+              Rencontres Récentes
             </h2>
             <table className="min-w-full bg-white border-collapse border border-[#E1E8F1] overflow-x-auto">
               <thead>
@@ -227,10 +227,10 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
                     Date
                   </th>
                   <th className="text-left p-2 font-medium text-[#384B65]">
-                    Rating
+                    Note
                   </th>
                   <th className="text-left p-2 font-medium text-[#384B65]">
-                    Notes
+                    Commentaire
                   </th>
                   <th className="text-left p-2 font-medium text-[#384B65]">
                     Source
@@ -255,7 +255,7 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
           </div>
           <div>
             <h2 className="text-xl font-semibold text-[#384B65] mb-4">
-              Payments history
+              Historique de Paiement
             </h2>
             <table className="min-w-full bg-white border-collapse border border-[#E1E8F1] overflow-x-auto">
               <thead>
@@ -264,13 +264,13 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
                     Date
                   </th>
                   <th className="text-left p-2 font-medium text-[#384B65]">
-                    Payment Method
+                    Method de Paiement
                   </th>
                   <th className="text-left p-2 font-medium text-[#384B65]">
-                    Amount
+                    Montant
                   </th>
                   <th className="text-left p-2 font-medium text-[#384B65]">
-                    Comment
+                    Commentaire
                   </th>
                 </tr>
               </thead>
