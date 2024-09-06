@@ -16,7 +16,7 @@ const Calendar = () => {
             <table className="w-full">
                 <thead>
                 <tr>
-                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                    {['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'].map(day => (
                     <th key={day} className="p-2 border-r border-l h-10 xl:w-40 lg:w-30 md:w-30 sm:w-20 w-10 xl:text-sm text-xs">
                         <span className="xl:block lg:block md:block sm:block hidden">{day}</span>
                         <span className="xl:hidden lg:hidden md:hidden sm:hidden block">{day.slice(0, 3)}</span>
@@ -47,7 +47,7 @@ const Calendar = () => {
                                         backgroundColor: "red"
                                     }}
                                     >
-                                    <span className="event-name">Meeting</span>
+                                    <span className="event-name">Rendez-vous</span>
                                     <span className="ml-2">12:00~14:00</span>
                                     </div>
                                 )}
@@ -60,7 +60,7 @@ const Calendar = () => {
                                         width: "300%",
                                     }}
                                     >
-                                    <span className="event-name">Meeting</span>
+                                    <span className="event-name">Rendez-vous</span>
                                     <span className="ml-2">17:00~19:00</span>
                                     </div>
                                 )}

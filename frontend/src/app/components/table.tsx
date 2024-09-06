@@ -92,7 +92,7 @@ const ClientTable: React.FC<ClientTableProps>  = ({ data }) => {
     <div className="relative overflow-x-auto sm:rounded-lg">
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
         <div>
-          <button
+          {/*<button
             id="dropdownRadioButton"
             onClick={handleDropdownToggle}
             className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
@@ -124,7 +124,7 @@ const ClientTable: React.FC<ClientTableProps>  = ({ data }) => {
                 ))}
               </ul>
             </div>
-          )}
+          )} */}
         </div>
         <label htmlFor="table-search" className="sr-only">Search</label>
         <div className="relative">
@@ -139,7 +139,7 @@ const ClientTable: React.FC<ClientTableProps>  = ({ data }) => {
             value={searchTerm}
             onChange={handleSearchChange}
             className="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="Search for clients"
+            placeholder="Chercher des clients"
           />
         </div>
       </div>
@@ -156,10 +156,10 @@ const ClientTable: React.FC<ClientTableProps>  = ({ data }) => {
                 />
               </div>
             </th>
-            <th className="px-6 py-3">Name</th>
-            <th className="px-6 py-3">Surname</th>
+            <th className="px-6 py-3">Prenom</th>
+            <th className="px-6 py-3">Nom de famille</th>
             <th className="px-6 py-3">Email</th>
-            <th className="px-6 py-3">Phone number</th>
+            <th className="px-6 py-3">Téléphone</th>
           </tr>
         </thead>
         <tbody>
@@ -198,7 +198,7 @@ const ClientTable: React.FC<ClientTableProps>  = ({ data }) => {
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
             >
-              Previous
+              Précédent
             </button>
           </li>
           {[...Array(totalPages)].map((_, index) => (
@@ -216,7 +216,7 @@ const ClientTable: React.FC<ClientTableProps>  = ({ data }) => {
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
               className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
             >
-              Next
+              Suivant
             </button>
           </li>
         </ul>

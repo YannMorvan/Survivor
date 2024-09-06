@@ -48,7 +48,7 @@ const CrudModal = () => {
       >
         <div className='flex'>
           <Plus size={16} color='white' className='mr-3 mt-0.5'/>
-          <p className='text-white'>Add Event</p>
+          <p className='text-white'>Ajouter Evènement</p>
         </div>
       </button>
 
@@ -61,7 +61,7 @@ const CrudModal = () => {
             <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
               <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Add new Event
+                  Ajouter un nouvel évènement
                 </h3>
                 <button
                   onClick={toggleModal}
@@ -82,7 +82,7 @@ const CrudModal = () => {
                       d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
                     />
                   </svg>
-                  <span className="sr-only">Close modal</span>
+                  <span className="sr-only">Fermer</span>
                 </button>
               </div>
               <form className="p-4 md:p-5" onSubmit={handleSubmit}>
@@ -92,7 +92,7 @@ const CrudModal = () => {
                       htmlFor="name"
                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
-                      Event Title
+                      Titre de l'évènement
                     </label>
                     <input
                       type="text"
@@ -101,25 +101,23 @@ const CrudModal = () => {
                       value={formData.name}
                       onChange={handleChange}
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="Type event name"
+                      placeholder="nom événement"
                       required
                     />
                   </div>
-
-                  {/* Date Picker */}
                   <div className="col-span-2">
                     <label
                       htmlFor="date"
                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
-                      Event Date
+                      Date de l'évènement
                     </label>
                     <DatePicker
                       selected={formData.date}
                       onChange={handleDateChange}
                       className="w-full p-2.5 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
                       dateFormat="dd/MM/yyyy"
-                      placeholderText="Select event date"
+                      placeholderText="Selectionner une date"
                     />
                   </div>
 
@@ -128,7 +126,7 @@ const CrudModal = () => {
                       htmlFor="description"
                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
-                      Event Description
+                      Description de l'évènement
                     </label>
                     <textarea
                       id="description"
@@ -136,7 +134,7 @@ const CrudModal = () => {
                       value={formData.description}
                       onChange={handleChange}
                       className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      placeholder="Write event description here"
+                      placeholder="Description de l'évènement"
                     ></textarea>
                   </div>
                 </div>
@@ -156,7 +154,7 @@ const CrudModal = () => {
                       clipRule="evenodd"
                     ></path>
                   </svg>
-                  Add new event
+                  Ajouter un nouvel événement
                 </button>
               </form>
             </div>
