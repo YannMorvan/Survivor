@@ -57,7 +57,7 @@ const Page = () => {
     const fetchCustomersData = async () => {
       try {
         const response = await sendPostRequest(
-          "http://localhost/table_clients.php",
+          `http://${process.env.NEXT_PUBLIC_PHP_HOST}/table_clients.php`,
           {}
         );
 

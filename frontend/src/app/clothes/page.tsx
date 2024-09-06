@@ -32,7 +32,7 @@ export default function Clothes() {
   useEffect(() => {
     const fetchClothesTypes = async () => {
       const response = await sendPostRequest(
-        "http://localhost/clothes_types.php",
+        `http://${process.env.NEXT_PUBLIC_PHP_HOST}/clothes_types.php`,
         {}
       );
 
@@ -51,7 +51,7 @@ export default function Clothes() {
   const fetchClothes = async (type: string) => {
     try {
       const response = await sendPostRequest(
-        "http://localhost/clothes_data.php",
+        `http://${process.env.NEXT_PUBLIC_PHP_HOST}/clothes_data.php`,
         { type }
       );
 
@@ -97,7 +97,7 @@ export default function Clothes() {
   useEffect(() => {
     const fetchClothesTypes = async () => {
       const response = await sendPostRequest(
-        "http://localhost/clothes_types.php",
+        `http://${process.env.NEXT_PUBLIC_PHP_HOST}/clothes_types.php`,
         {}
       );
 

@@ -234,7 +234,7 @@ export default function Astro() {
         const fetchData1 = async () => {
             try {
                 const response = await sendPostRequest(
-                  "http://localhost/client_profile.php",
+                  `http://${process.env.NEXT_PUBLIC_PHP_HOST}/client_profile.php`,
                   {id: id1}
                 );
                 
@@ -249,7 +249,7 @@ export default function Astro() {
         const fetchData2 = async () => {
             try {
                 const response = await sendPostRequest(
-                  "http://localhost/client_profile.php",
+                  `http://${process.env.NEXT_PUBLIC_PHP_HOST}/client_profile.php`,
                   {id: id2}
                 );
                 
