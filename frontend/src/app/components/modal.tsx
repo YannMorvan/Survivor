@@ -26,16 +26,17 @@ const CrudModal = () => {
   };
 
   const handleDateChange = (date: Date | null) => {
-    setFormData({
-      ...formData,
-      date,
-    });
+    if (date) {
+      setFormData({
+        ...formData,
+      });
+    }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     toggleModal();
-    console.log(formData); // You can process form data here
+    console.log(formData);
   };
 
   return (
