@@ -15,7 +15,7 @@ export default function TipsPage() {
     const fetchTips = async () => {
       try {
         const response = await sendPostRequest(
-          "http://localhost/tips_data.php",
+          `http://${process.env.NEXT_PUBLIC_PHP_HOST}/tips_data.php`,
           {}
         );
 

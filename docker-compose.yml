@@ -1,18 +1,18 @@
 version: "3.8"
 
 services:
-#  nextjs-app:
-#    container_name: nextjs-app
-#    build:
-#      context: ./frontend
-#    ports:
-#      - "3000:3000"
-#    volumes:
-#      - ./frontend:/nextjs-app
-#    environment:
-#      - NODE_ENV=development
-#    depends_on:
-#      - php-server
+  nextjs-app:
+    container_name: nextjs-app
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/nextjs-app
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - php-server
 
   php-server:
     container_name: backend-php-server
