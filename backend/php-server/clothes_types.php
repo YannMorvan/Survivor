@@ -1,7 +1,6 @@
 <?php
 
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Origin: *');
 
 session_start();
 
@@ -21,6 +20,16 @@ if (empty($clothes)) {
     ]);
     exit();
 }
+
+$types = [];
+
+foreach ($clothes as $clothe) {
+    if (!in_array($clothe['type'], $types)) {
+        $types[] = $clothe['type'];
+    }
+}
+
+$clothes = array_values($types);
 
 echo json_encode([
     "status" => true,
