@@ -90,13 +90,18 @@ echo json_encode([
         "id" => $customer["id"],
         "name" => $customer["name"],
         "surname" => $customer["surname"],
+        "birth_date" => $customer["birth_date"],
+        "gender" => $customer["gender"],
+        "phone" => $customer["phone_number"],
         "email" => $customer["email"],
         "address" => $customer["address"],
+        "description" => $customer["description"],
         "image" => base64_encode($images["image"]),
         "total_encounters" => $count_encounters,
         "positive_encounters" => $count_positive_encounters,
         "planned_encounters" => $count_planned_encounters,
         "encounters" => $recent_encounters,
-        "payment" => $recent_payments
+        "payment" => $recent_payments,
+        "astrological_sign" => $customer["astrological_sign"]
     ]
 ]);
