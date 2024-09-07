@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "start:survivor": "next start -p 3000"
+    "start:survivor": "next start -p 3000",
+    "test": "playwright test"
   },
   "dependencies": {
     "@amcharts/amcharts4": "^4.10.39",
@@ -28,6 +29,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.47.0",
     "@types/file-saver": "^2.0.7",
     "@types/node": "^20",
     "@types/react": "^18",
