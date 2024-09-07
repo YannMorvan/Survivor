@@ -67,6 +67,8 @@ jobs:
 
     - name: Release
       if: github.ref == 'refs/heads/main'
-      run: npm run release
+      run: |
+        cd frontend
+        npm run release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
