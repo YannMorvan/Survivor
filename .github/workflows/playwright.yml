@@ -30,6 +30,22 @@ jobs:
           cd frontend && npm i
         fi
 
+    - name: Start server
+      run: |
+        cd frontend
+        npm start &
+      env:
+        NODE_ENV: test
+
+    - name: Wait for server to be ready
+      run: |
+        cd frontend
+        for i in {1..60}; do curl -s http://localhost:3000 && break || sleep 5; done
+
+    - name: Check server status
+      run: |
+        curl -I http://localhost:3000
+
     - name: Install Playwright browsers
       run: cd frontend && npx playwright install --with-deps
 
