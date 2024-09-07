@@ -30,6 +30,11 @@ jobs:
           cd frontend && npm i
         fi
 
+    - name: Build application
+      run: |
+        cd frontend
+        npm run build
+
     - name: Start server
       run: |
         cd frontend
