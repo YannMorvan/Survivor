@@ -1,4 +1,4 @@
-name: Playwright Tests
+name: CI/CD Pipeline
 
 on:
   push:
@@ -64,3 +64,9 @@ jobs:
         name: playwright-report
         path: tests/web-application/playwright-report
         retention-days: 5
+
+    - name: Release
+      if: github.ref == 'refs/heads/main'
+      run: npm run release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
