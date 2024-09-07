@@ -1,0 +1,66 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [ main, master, feat/dashboard ]
+  pull_request:
+    branches: [ main, master, feat/dashboard ]
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install dependencies
+      run: |
+        if [ -e yarn.lock ]; then
+          cd frontend && yarn install --frozen-lockfile
+        elif [ -e package-lock.json ]; then
+          cd frontend && npm ci
+        else
+          cd frontend && npm i
+        fi
+
+    - name: Build application
+      run: |
+        cd frontend
+        npm run build
+
+    - name: Start server
+      run: |
+        cd frontend
+        npm start &
+      env:
+        NODE_ENV: test
+
+    - name: Wait for server to be ready
+      run: |
+        cd frontend
+        for i in {1..60}; do curl -s http://localhost:3000 && break || sleep 5; done
+
+    - name: Check server status
+      run: |
+        curl -I http://localhost:3000
+
+    - name: Install Playwright browsers
+      run: cd frontend && npx playwright install --with-deps
+
+    - name: Run Playwright tests
+      run: cd frontend && npx playwright test
+    
+    - name: Upload Playwright report
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: playwright-report
+        path: tests/web-application/playwright-report
+        retention-days: 5
