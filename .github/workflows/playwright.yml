@@ -29,9 +29,10 @@ jobs:
     - name: Run Playwright tests
       run: cd frontend && npx playwright test
     
-    - uses: actions/upload-artifact@v3
-        if: ${{ failure() }}
-        with:
-          name: playwright-report
-          path: tests/web-application/playwright-report
+    - name: Upload Playwright report
+      if: ${{ failure() }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: playwright-report
+        path: tests/web-application/playwright-report
         retention-days: 5
