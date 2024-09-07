@@ -21,10 +21,15 @@ jobs:
         node-version: '16'
 
     - name: Install dependencies
-      run: cd frontend && npm install
+      run: npm install
 
-    - name: Install Playwright browsers
-      run: cd frontend && npx playwright install --with-deps
+    - name: Start server
+      run: npm start &
+      env:
+        NODE_ENV: test
+
+    - name: Wait for server to be ready
+      run: npx wait-on http://localhost:3000
 
     - name: Run Playwright tests
-      run: cd frontend && npx playwright test
+      run: npx playwright test
