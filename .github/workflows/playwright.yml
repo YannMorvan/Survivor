@@ -21,15 +21,23 @@ jobs:
         node-version: '16'
 
     - name: Install dependencies
-      run: npm install
+      run: |
+        cd frontend
+        npm install
 
     - name: Start server
-      run: npm start &
+      run: |
+        cd frontend
+        npm start &
       env:
         NODE_ENV: test
 
     - name: Wait for server to be ready
-      run: npx wait-on http://localhost:3000
+      run: |
+        cd frontend
+        npx wait-on http://localhost:3000
 
     - name: Run Playwright tests
-      run: npx playwright test
+      run: |
+        cd frontend
+        npx playwright test
