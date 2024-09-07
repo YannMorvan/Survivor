@@ -21,7 +21,15 @@ jobs:
         node-version: '18'
 
     - name: Install dependencies
-      run: cd frontend && npm ci
+        run: |
+          if [ -e yarn.lock ]; then
+          cd frontend && yarn install --frozen-lockfile
+          elif [ -e package-lock.json ]; then
+          cd frontend && npm ci
+          else
+          cd frontend && npm i
+          fi
+
 
     - name: Install Playwright browsers
       run: cd frontend && npx playwright install --with-deps
