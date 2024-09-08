@@ -11,8 +11,6 @@ const Navbar = () => {
     setPathname(window.location.pathname);
   }, []);
 
-  console.log(pathname);
-
   const buttonRef: React.MutableRefObject<null> = useRef(null);
 
   const toggleDropdown: () => void = () => {
@@ -23,8 +21,6 @@ const Navbar = () => {
 
       if (!isButtonHidden) {
         setIsDropdownOpen(!isDropdownOpen);
-      } else {
-        console.log('Button is hidden, cannot toggle dropdown');
       }
     }
   };
