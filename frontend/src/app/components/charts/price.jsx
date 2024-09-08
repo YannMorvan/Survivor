@@ -17,13 +17,13 @@ const LineChart = () => {
     }
 
     chart.data = [
-      { date: new Date(2019, 1, 12), value1: 50, value2: 48, previousDate: new Date(2019, 5, 5) },
-      { date: new Date(2019, 2, 13), value1: 53, value2: 51, previousDate: new Date(2019, 5, 6) },
-      { date: new Date(2019, 3, 14), value1: 56, value2: 58, previousDate: new Date(2019, 5, 7) },
-      { date: new Date(2019, 4, 15), value1: 52, value2: 53, previousDate: new Date(2019, 5, 8) },
-      { date: new Date(2019, 5, 16), value1: 48, value2: 44, previousDate: new Date(2019, 5, 9) },
-      { date: new Date(2019, 6, 17), value1: 47, value2: 42, previousDate: new Date(2019, 5, 10) },
-      { date: new Date(2019, 7, 18), value1: 59, value2: 55, previousDate: new Date(2019, 5, 11) }
+      { date: new Date(2019, 1, 12), value1: 50, previousDate: new Date(2019, 5, 5) },
+      { date: new Date(2019, 2, 13), value1: 53, previousDate: new Date(2019, 5, 6) },
+      { date: new Date(2019, 3, 14), value1: 56, previousDate: new Date(2019, 5, 7) },
+      { date: new Date(2019, 4, 15), value1: 52, previousDate: new Date(2019, 5, 8) },
+      { date: new Date(2019, 5, 16), value1: 48, previousDate: new Date(2019, 5, 9) },
+      { date: new Date(2019, 6, 17), value1: 47, previousDate: new Date(2019, 5, 10) },
+      { date: new Date(2019, 7, 18), value1: 59, previousDate: new Date(2019, 5, 11) }
     ];
 
     let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
