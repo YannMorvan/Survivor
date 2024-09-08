@@ -30,7 +30,7 @@ Meet the dedicated team behind **Survivor Pool**:
 
 | Name                 | Role                 | GitHub Profile                           |
 |----------------------|----------------------|------------------------------------------|
-| **Quentin BOLLORE**  | Frontend Developer   | [GitHub](https://github.com/quentinbol) |
+| **Quentin BOLLORE**  | Frontend / DevOps Developer   | [GitHub](https://github.com/quentinbol) |
 | **Yann MORVAN**      | Frontend Developer   | [GitHub](https://github.com/YannMorvan) |
 | **Hugues LEJEUNE**   | Backend Developer    | [GitHub](https://github.com/HuguesLej)  |
 | **Yann PERENNES**    | Backend Developer    | [GitHub](https://github.com/Yarin35)    |
