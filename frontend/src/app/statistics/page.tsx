@@ -27,12 +27,12 @@ export default function Page() {
         setToggleDropdown(!isDropdownOpen);
     }
 
-    const handleCoachSelect = (coach) => {
+    const handleCoachSelect = (coach: Coach) => {
         setSelectedCoach(coach.name);
         setIsOpen(false);
     };
 
-    const handleCoachSelect2 = (coach) => {
+    const handleCoachSelect2 = (coach: Coach) => {
         setSelectedCoach2(coach.name);
         setIsOpen2(false);
     }
