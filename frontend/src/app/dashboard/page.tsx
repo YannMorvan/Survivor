@@ -8,6 +8,8 @@ import ChartMap from '../components/charts/map';
 import { sendPostRequest } from '../utils/utils';
 import ChartMeetings from '../components/charts/meetings';
 import { set } from 'date-fns';
+import { cp } from 'fs';
+import { get } from 'http';
 
 interface Event {
     date: string,
@@ -36,12 +38,15 @@ interface Data {
     address: Address[],
 }
 
-const getWeekNumber = (date: Date) => {
-    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-    const dayOfWeek = firstDayOfYear.getDay() || 7;
-    const diff = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
-    return Math.ceil((diff + dayOfWeek) / 7);
+const getWeekNumber = (date: Date): number => {
+    const target = new Date(date.valueOf());
+    const dayNumber = (date.getUTCDay() + 6) % 7;
+    target.setUTCDate(target.getUTCDate() - dayNumber + 3);
+    const firstThursday = new Date(target.getUTCFullYear(), 0, 4);
+    const diff = target.getTime() - firstThursday.getTime();
+    return 1 + Math.round(diff / (7 * 24 * 60 * 60 * 1000));
 };
+
 
 export default function Dashboard() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -62,7 +67,55 @@ export default function Dashboard() {
     const [progressionWeekly, setProgressionWeekly] = useState<number>(0);
     const [clients, setClients] = useState<number>(0);
 
+    const getEventsByMonth = (events: Event[], month: number, year: number): Event[] => {
+        return events.filter((event: Event) => {
+            const eventDate = new Date(event.date);
+            if (isNaN(eventDate.getTime())) {
+                console.warn(`Date invalide pour l'événement : ${event.date}`);
+                return false;
+            }
+            return eventDate.getMonth() === month && eventDate.getFullYear() === year;
+        });
+    };
+
+    const getProgressionLastMonth = (events: Event[], month: number, year: number): number => {
+        const eventsByMonth = getEventsByMonth(events, month, year);
+        const previousMonth = getEventsByMonth(events, month - 1, year);
+        return previousMonth.length > 0 ? ((eventsByMonth.length - previousMonth.length) / previousMonth.length) * 100 : 0;
+    }
+
+    const getEventsByWeek = (events: Event[], month: number, week: number, year: number): Event[] => {
+        return events.filter((event: Event) => {
+            const eventDate = new Date(event.date);
+            if (isNaN(eventDate.getTime())) {
+                console.warn(`Date invalide pour l'événement : ${event.date}`);
+                return false;
+            }
+            console.log(getWeekNumber(eventDate));
+            return eventDate.getMonth() === month && getWeekNumber(eventDate) === week && eventDate.getFullYear() === year;
+        });
+    }
+
+    const getProgressionLastWeek = (events: Event[], month: number, week: number, year: number): number => {
+        const eventsByWeek = getEventsByWeek(events, month, week, year);
+        const previousWeek = getEventsByWeek(events, month, week - 1, year);
+        return previousWeek.length > 0 ? ((eventsByWeek.length - previousWeek.length) / previousWeek.length) * 100 : 0;
+    }
+
+    const getEventsAvgDay = (events: Event[], month: number, year: number): number => {
+        const eventsByMonth = getEventsByMonth(events, month, year);
+        return eventsByMonth.length / 31;
+    }
+
+    const getProgressionAvgDay: (events: Event[], month: number, year: number) => number = (events: Event[], month: number, year: number): number => {
+        const eventsByMonth: number = getEventsAvgDay(events, month, year);
+        const previousMonth: number = getEventsAvgDay(events, month - 1, year);
+        return previousMonth > 0 ? ((eventsByMonth - previousMonth) / previousMonth) * 100 : 0;
+    }
+
+
     useEffect(() => {
+
         const fetchData = async () => {
             try {
                 const response = await sendPostRequest('http://localhost/statistics.php', {});
@@ -70,61 +123,34 @@ export default function Dashboard() {
  
                 const events = data.data.events;
 
-                setMeetings(data.data.encounters);
-    
-                if (!Array.isArray(events)) {
-                    throw new Error("La réponse ne contient pas un tableau d'événements");
-                }
-    
-                setEvents(events);
                 console.log(events);
 
-                const august = events.filter((event: Event) => {
-                    const eventDate = new Date(event.date);
-                    if (isNaN(eventDate.getTime())) {
-                        console.warn(`Date invalide pour l'événement : ${event.date}`);
-                        return false;
-                    }
-                    return eventDate.getMonth() === 6 && eventDate.getFullYear() === 2024;
-                });
-                
-                let lastAugustDay = august[august.length - 1];
+                const meetings = data.data.encounters;
 
-                console.log(lastAugustDay);
+                setMeetings(data.data.encounters);
+    
+                setEvents(events);
 
-                if (lastAugustDay.date != "2024-07-31")
-                    lastAugustDay = 0;
-                else 
-                    lastAugustDay = 1;
+                const august: Event[] = getEventsByMonth(events, 6, 2024);
 
-                let compareDay = august[august.length - 2];
+                const progressionMonth: number = getProgressionLastMonth(events, 6, 2024);
 
-                if (compareDay.date != "2024-07-31")
-                    compareDay = 0;
-                else 
-                    compareDay = 1;
+                const weekly: Event[] = getEventsByWeek(events, 6, 2, 2024);
 
-                const progressionDay = ((lastAugustDay - compareDay) / compareDay) * 100;
+                console.log(weekly);
 
-                const dailyAvg = august.length / 31;
+                const progressionWeekly = getProgressionLastWeek(events, 6, 2, 2024);
 
-                const july = events.filter((event: Event) => {
-                    const eventDate = new Date(event.date);
-                    if (isNaN(eventDate.getTime())) {
-                        console.warn(`Date invalide pour l'événement : ${event.date}`);
-                        return false;
-                    }
-                    return eventDate.getMonth() === 5 && eventDate.getFullYear() === 2024;
-                });
+                const dailyAvgAug: number = getEventsAvgDay(events, 6, 2024);
 
-                const dailyAvgJuly = july.length / 31;
-
-                const progression = july.length > 0 ? ((august.length - july.length) / july.length) * 100 : 0;
+                const progressionDay = getProgressionAvgDay(events, 6, 2024);
     
                 setAugustEvents(august);
-                setDailyAverage(lastAugustDay);
-                setProgressionPercentage(progression);
+                setDailyAverage(dailyAvgAug);
+                setWeeklyEvents(weekly);
+                setProgressionPercentage(progressionMonth);
                 setProgressionDaily(progressionDay);
+                setProgressionWeekly(progressionWeekly);
             } catch (error) {
                 console.error('Erreur lors de la requête : ', error);
             }
@@ -331,10 +357,19 @@ export default function Dashboard() {
                     </div>
                     <div className='md:text-left text-center'>
                         <p className='text-slate-500 text-sm'>Journalier</p>
-                        <p className='mt-1 text-slate-900 text-xl'>{dailyAverage}</p>
+                        <p className='mt-1 text-slate-900 text-xl'>{dailyAverage.toPrecision(3)}</p>
                         <div className='flex md:justify-normal justify-center'>
-                            <ArrowUp size={12} className='text-green-700 mt-1.5'/>
-                            <p className='mt-1 text-xs text-green-700'>0%</p>
+                            {progressionDaily < 0 ? (
+                                <>
+                                    <ArrowDown size={12} className='text-red-700 mt-1.5'/>
+                                    <p className='mt-1 text-xs text-red-700'>{progressionDaily}%</p>
+                                </>
+                            ) : (
+                                <>
+                                    <ArrowUp size={12} className='text-green-700 mt-1.5'/>
+                                    <p className='mt-1 text-xs text-green-700'>{progressionDaily}%</p>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
