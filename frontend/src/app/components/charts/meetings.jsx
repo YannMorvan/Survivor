@@ -82,12 +82,9 @@ const PieChartComponent = ({ data }) => {
 
     const sortedOccurrences = Object.entries(occurrences)
       .sort((a, b) => b[1] - a[1]);
-    console.log("Sorted Occurrences:", sortedOccurrences);
 
-    const topThree = sortedOccurrences.slice(0, 3);
+    const topThree = sortedOccurrences.slice(0, 4);
     const topThreeKeys = new Set(topThree.map(([key]) => key));
-
-    console.log(topThree)
 
     const othersCount = sortedOccurrences
       .filter(([key]) => !topThreeKeys.has(key))

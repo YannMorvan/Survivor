@@ -44,7 +44,9 @@ const LineChart = ({ data }) => {
         minorGridEnabled: true,
         minorLabelsEnabled: true
       }),
-      tooltip: am5.Tooltip.new(root, {})
+      tooltip: am5.Tooltip.new(root, {}),
+      min: new Date(2024, 6, 1).getTime(),
+      max: new Date(2024, 6, 31).getTime(),
     }));
 
     xAxis.set("minorDateFormats", {
@@ -68,7 +70,7 @@ const LineChart = ({ data }) => {
     rendererY.labels.template.set("forceHidden", true);
     var rendererX = xAxis.get("renderer");
     rendererX.grid.template.set("forceHidden", true);
-    rendererX.labels.template.set("forceHidden", false);
+    rendererX.labels.template.set("forceHidden", true);
 
     let series = chart.series.push(am5xy.ColumnSeries.new(root, {
       name: "Series",
@@ -105,8 +107,8 @@ const LineChart = ({ data }) => {
       });
     }
 
-    createRange(new Date(2024, 7, 1).getTime(), xAxis, "01 Aug, 2024");
-    createRange(new Date(2024, 7, 31).getTime(), xAxis, "31 Aug, 2024");
+    createRange(new Date(2024, 6, 1).getTime(), xAxis, "01 jui, 2024");
+    createRange(new Date(2024, 6, 31).getTime(), xAxis, "31 jui, 2024");
 
     xAxis.get("renderer").grid.template.set("forceHidden", true);
 

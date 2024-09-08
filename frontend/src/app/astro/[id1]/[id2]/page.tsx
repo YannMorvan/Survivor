@@ -240,7 +240,6 @@ export default function Astro() {
                 
                 const data = JSON.parse(response);
                 setData1(data.data);
-                console.log(data);
               } catch (error) {
                 console.error("Erreur lors de la requête : ", error);
               }
@@ -255,7 +254,6 @@ export default function Astro() {
                 
                 const data = JSON.parse(response);
                 setData2(data.data);
-                console.log(data);
               } catch (error) {
                 console.error("Erreur lors de la requête : ", error);
               }

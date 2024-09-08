@@ -2,12 +2,12 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, master, feat/dashboard ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master, feat/dashboard ]
+    branches: [main, master]
 
 jobs:
-  test:
+  CI CD Pipeline:
     permissions:
       contents: write
       issues: write

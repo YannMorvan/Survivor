@@ -17,7 +17,6 @@ export default function Astro() {
         
         const data = JSON.parse(response);
         setData(data);
-        console.log(data);
       } catch (error) {
         console.error("Erreur lors de la requête : ", error);
       }

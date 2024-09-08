@@ -1,24 +1,175 @@
 "use client";
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import Price from '../components/charts/price';
 import Meetings from '../components/charts/meetings-coach';
 import Image from 'next/image';
+import { sendPostRequest } from '../utils/utils';
+import { ArrowLeftRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+
+interface Coach {
+    id: number;
+    name: string;
+    image: string;
+}
 
 export default function Page() {
 
+    const router = useRouter();
+
     const [isDropdownOpen, setToggleDropdown] = useState(false);
+    const [isDropdownOpen2, setToggleDropdown2] = useState(false);
+    const [coaches, setCoaches] = useState<Coach[]>([]);
+    const [selectedCoach, setSelectedCoach] = useState('Choisir un coach');
+    const [selectedCoach2, setSelectedCoach2] = useState('Choisir un coach');
 
     const handleDropdown = () => {
-        console.log('clicked');
         setToggleDropdown(!isDropdownOpen);
     }
 
+    const handleCoachSelect = (coach) => {
+        setSelectedCoach(coach.name);
+        setIsOpen(false);
+    };
+
+    const handleCoachSelect2 = (coach) => {
+        setSelectedCoach2(coach.name);
+        setIsOpen2(false);
+    }
+    
+    useEffect(() => {
+
+        if (selectedCoach === 'Choisir un coach' || selectedCoach2 === 'Choisir un coach') {
+            return;
+        }
+
+        router.replace(`/statistics/${selectedCoach}/${selectedCoach2}`);
+
+    }, [selectedCoach, selectedCoach2]);
+
+    const handleDropdown2 = () => {
+        setToggleDropdown2(!isDropdownOpen2);
+    }
+
+    const [isOpen, setIsOpen] = useState(false);
+    const [isOpen2, setIsOpen2] = useState(false);
+
+    const toggleDropdown = () => {
+        setIsOpen(!isOpen);
+    };
+
+    const toggleDropdown2 = () => {
+        setIsOpen2(!isOpen2);
+    };
+
+    useEffect(() => {
+        const fetchClientsData = async () => {
+          try {
+            const response = await sendPostRequest(
+              `http://localhost/employes_table.php`,
+              {}
+            );
+            
+            const data = JSON.parse(response);
+            setCoaches(data.data);
+            console.log(data);
+          } catch (error) {
+            console.error("Erreur lors de la requête : ", error);
+          }
+        };
+      
+        fetchClientsData();
+      }, []);
+
     return (
         <div className="ml-6 sm:mr-6 mr-6 mb-5">
-        <div>
-            <h1 className='md:text-2xl sm:text-1xl text-xl font-semibold'>Statistiques</h1>
-            <h2 className='mt-4 text-sm text-slate-700'>Analyser les statistiques des coachs.</h2>
+        <div className='flex justify-between'>
+            <div>
+                <h1 className='md:text-2xl sm:text-1xl text-xl font-semibold'>Statistiques</h1>
+            </div>
+            <div className='flex'>
+            <button
+                id="dropdownUsersButton"
+                onClick={toggleDropdown}
+                className="border bg-white border-slate-300 font-medium rounded-sm text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                type="button"
+            >
+                {selectedCoach}
+                <svg className="w-2.5 h-2.5 ml-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
+                </svg>
+            </button>
+
+            {isOpen && (
+                <div id="dropdownUsers" className="z-10 w-40 mt-12 max-w-full absolute bg-white rounded-lg shadow w-60 dark:bg-gray-700">
+                    <ul className="h-48 py-2 overflow-y-auto text-gray-700 dark:text-gray-200" aria-labelledby="dropdownUsersButton">
+                        {coaches.map((coach, index) => (
+                            <li key={index}>
+                               <a
+                                href="#"
+                                onClick={() => handleCoachSelect(coach)}
+                                className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                >
+
+                                    <img className="w-6 h-6 mr-2 rounded-full" src={`data:image/png;base64,${coach.image}`} alt={coach.name} />
+                                    {coach.name}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                    <a href="#" className="flex items-center p-3 text-sm font-medium text-blue-600 border-t border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-blue-500 hover:underline">
+                        <svg className="w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                            <path d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Zm11-3h-2V5a1 1 0 0 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 0 0 2 0V9h2a1 1 0 1 0 0-2Z" />
+                        </svg>
+                        Ajouter un coach
+                    </a>
+                </div>
+            )}
+            <div className="mx-3 mt-2">
+                <ArrowLeftRight size={24} />
+            </div>
+            <button
+                id="dropdownUsersButton2"
+                onClick={toggleDropdown2}
+                className="border bg-white border-slate-300 font-medium rounded-sm text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                type="button"
+            >
+                {selectedCoach2}
+                <svg className="w-2.5 h-2.5 ml-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
+                </svg>
+            </button>
+
+            {isOpen2 && (
+                <div id="dropdownUsers2" className="z-10 w-40 max-w-full right-7 mt-12 absolute bg-white rounded-lg shadow w-60 dark:bg-gray-700">
+                    <ul className="h-48 py-2 overflow-y-auto text-gray-700 dark:text-gray-200" aria-labelledby="dropdownUsersButton2">
+                        {coaches.map((coach, index) => (
+                            <li key={index}>
+                                <a
+                                    href="#"
+                                    onClick={() => handleCoachSelect2(coach)}
+                                    className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                    >
+
+                                    <img className="w-6 h-6 mr-2 rounded-full" src={`data:image/png;base64,${coach.image}`} alt={coach.name} />
+                                    {coach.name}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                    <a href="#" className="flex items-center p-3 text-sm font-medium text-blue-600 border-t border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-blue-500 hover:underline">
+                        <svg className="w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
+                            <path d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Zm11-3h-2V5a1 1 0 0 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 0 0 2 0V9h2a1 1 0 1 0 0-2Z" />
+                        </svg>
+                        Ajouter un coach
+                    </a>
+                </div>
+            )}
         </div>
+        </div>
+        <div>
+            <h2 className='mt-4 text-sm text-slate-700'>Analyser les statistiques des coachs.</h2>
+        </div> 
         <div className='mt-5'>
             <div className='lg:flex min-w-screen'>
                 <div className='lg:w-1/3 bg-white border border-slate-200 rounded-md p-5'>
