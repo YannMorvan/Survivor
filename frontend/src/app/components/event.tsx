@@ -24,7 +24,6 @@ const Event = ({ event, index, onEventClick }: any) => {
     const verticalOffset = index * 30;
 
     const handleClick = () => {
-        // When the event is clicked, pass event data to the parent
         if (onEventClick) {
             onEventClick(event);
         }
@@ -41,7 +40,7 @@ const Event = ({ event, index, onEventClick }: any) => {
                 left: '0',
                 height: '30px',
             }}
-            onClick={handleClick} // Attach the click handler
+            onClick={handleClick}
         >
             <span className="event-name p-5 font-semibold">
                 &#x2022; {name} ({getAfterComma(location_name)} )
