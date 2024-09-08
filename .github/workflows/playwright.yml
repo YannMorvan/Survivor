@@ -8,6 +8,10 @@ on:
 
 jobs:
   test:
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
     timeout-minutes: 60
     runs-on: ubuntu-latest
 
@@ -65,10 +69,7 @@ jobs:
         path: tests/web-application/playwright-report
         retention-days: 5
 
-    - name: Release
-      uses: actions/create-release@v1
+    - name: Run semantic-release
+      run: cd frontend && npx semantic-release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.run_number }}
-        release_name: Release ${{ github.run_number }}
