@@ -5,10 +5,20 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Calendar from '../components/calendar';
 import Modal from '../components/modal';
 
+interface Events {
+    id: number;
+    name: string;
+    date: string;
+    duration: number;
+    location_name: string;
+    location_x: number;
+    location_y: number;
+}
+
 export default function Events() {
 
     const [selectedMonth, setSelectedMonth] = useState('July 2024');
-    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [selectedEvent, setSelectedEvent] = useState<Events>();
 
     const changeMonth = (direction: string) => {
         const [currentMonthName, currentYear] = selectedMonth.split(' ');
@@ -25,12 +35,12 @@ export default function Events() {
         setSelectedMonth(`${newMonthName} ${newYear}`);
     };
 
-    const handleEventClick = (event) => {
+    const handleEventClick = (event: Events) => {
         console.log('Event clicked:', event);
         setSelectedEvent(event);
     };
 
-    const getMapUrl = (event) => {
+    const getMapUrl = (event: Events) => {
         if (!event) return '';
 
         const { location_x, location_y, location_name } = event;
