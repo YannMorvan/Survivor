@@ -36,7 +36,6 @@ const CrudModal = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     toggleModal();
-    console.log(formData);
   };
 
   return (
