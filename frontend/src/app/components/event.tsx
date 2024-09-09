@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 const getRandomColor: () => string = () => {
     const letters = '0123456789ABCDEF';
@@ -23,6 +23,8 @@ const Event = ({ event, index, onEventClick }: any) => {
 
     const verticalOffset = index * 30;
 
+    const color = useMemo(() => getRandomColor(), [event.id]);
+
     const handleClick = () => {
         if (onEventClick) {
             onEventClick(event);
@@ -31,10 +33,10 @@ const Event = ({ event, index, onEventClick }: any) => {
 
     return (
         <div
-            className="event ml-2 cursor-pointer"
+            className="event cursor-pointer"
             style={{
-                width: `${dayCount * 95}%`,
-                backgroundColor: getRandomColor(),
+                width: `${dayCount * 100}%`,
+                backgroundColor: color,
                 position: 'absolute',
                 top: `${verticalOffset}px`,
                 left: '0',
