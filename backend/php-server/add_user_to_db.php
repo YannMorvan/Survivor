@@ -17,8 +17,8 @@ if (!isset($_POST['email']) || !isset($_POST['phone_number']) || !isset($_POST['
 }
 
 try {
-    $query = "INSERT INTO customers (email, phone_number, name, surname, address, birth_date, gender, description, astrological_sign) VALUES (:email, :phone_number, :name, :surname, :address, :birth_date, :gender, :description, :astrological_sign)";
-
+    $query = "INSERT INTO customers (email, phone_number, name, surname, address, birth_date, gender, description, astrological_sign, id_coach) VALUES (:email, :phone_number, :name, :surname, :address, :birth_date, :gender, :description, :astrological_sign, :id_coach)";
+    
     $stm = $pdo->prepare($query);
 
     $stm->execute([
@@ -31,6 +31,7 @@ try {
         "gender" => $_POST["gender"],
         "description" => $_POST["description"],
         "astrological_sign" => $_POST["astrological_sign"],
+        "id_coach" => $_SESSION["id_coach"],
         "removed" => 0
     ]);
     echo json_encode([

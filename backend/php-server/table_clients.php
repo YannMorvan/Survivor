@@ -36,9 +36,6 @@ try {
         $imageStm->execute(["id_customer" => $customer["id"]]);
         $images = $imageStm->fetch(PDO::FETCH_ASSOC);
 
-        if (empty($payments) || empty($images))
-            return null;
-
         return [
             "id" => $customer["id"],
             "name" => $customer["name"],
