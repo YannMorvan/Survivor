@@ -8,19 +8,26 @@ session_start();
 require_once __DIR__ . '/db_connection.php';
 require_once __DIR__ . '/functions.php';
 
+if (!isset($_POST['id'])) {
+    echo json_encode([
+        "status" => false,
+        "message" => "Missing required fields"
+    ]);
+    exit();
+}
+
 try {
 
-    $query = "UPDATE employees SET removed = 1 WHERE work = :work AND work = :work2";
+    $query = "UPDATE customers SET removed = 1 WHERE id = :id";
 
     $stm = $pdo->prepare($query);
     $stm->execute([
-        "work" => "coach",
-        "work2" => "Coach"
+        "id" => $_POST["id"]
     ]);
 
     echo json_encode([
         "status" => true,
-        "message" => "Coaches deleted successfully"
+        "message" => "Employee deleted successfully"
     ]);
 
 } catch (PDOException $e) {

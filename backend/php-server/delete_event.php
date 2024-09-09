@@ -17,7 +17,7 @@ if (!isset($_POST['id'])) {
 
 try {
 
-    $query = "DELETE FROM events WHERE id = :id";
+    $query = "UPDATE events SET removed = 1 WHERE id = :id";
 
     $stm = $pdo->prepare($query);
     $stm->execute([

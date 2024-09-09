@@ -17,7 +17,7 @@ if (!isset($_POST['id'])) {
 
 try {
 
-    $query = "DELETE FROM employees WHERE id = :id";
+    $query = "UPDATE employees SET removed = 1 WHERE id = :id";
 
     $stm = $pdo->prepare($query);
     $stm->execute([
