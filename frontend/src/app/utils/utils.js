@@ -8,6 +8,7 @@ function sendPostRequest(url, data)
 
     return fetch(url, {
         method: 'POST',
+        credentials: 'include',
         body: formData
     })
     .then(response => {
