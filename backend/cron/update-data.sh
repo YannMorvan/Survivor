@@ -20,7 +20,7 @@ mkfifo $pipe_clothes
 mkfifo $pipe_encounters
 
 
-php /usr/local/bin/update-data/login.php > $pipe_login &
+php /usr/local/bin/php-scripts/login.php > $pipe_login &
 pid_login=$!
 
 output_login=$(cat $pipe_login)
@@ -41,10 +41,10 @@ token=$(echo $output_login | jq -r ".token")
 echo "$(date +"%Y-%m-%d %H:%M:%S") [Update database]: $output_login"
 
 
-php /usr/local/bin/update-data/update-tips.php token=$token > $pipe_tips &
+php /usr/local/bin/php-scripts/update-data/update-tips.php token=$token > $pipe_tips &
 
 
-php /usr/local/bin/update-data/update-employees.php token=$token > $pipe_employees &
+php /usr/local/bin/php-scripts/update-data/update-employees.php token=$token > $pipe_employees &
 pid_employees=$!
 
 output_2=$(cat $pipe_employees)
@@ -52,11 +52,11 @@ wait $pid_employees
 echo "$(date +"%Y-%m-%d %H:%M:%S") [Update database]: $output_2"
 
 
-php /usr/local/bin/update-data/update-customers.php token=$token > $pipe_customers &
+php /usr/local/bin/php-scripts/update-data/update-customers.php token=$token > $pipe_customers &
 pid_customers=$!
 
 
-php /usr/local/bin/update-data/update-events.php token=$token > $pipe_events &
+php /usr/local/bin/php-scripts/update-data/update-events.php token=$token > $pipe_events &
 
 
 output_3=$(cat $pipe_customers)
@@ -64,10 +64,10 @@ wait $pid_customers
 echo "$(date +"%Y-%m-%d %H:%M:%S") [Update database]: $output_3"
 
 
-php /usr/local/bin/update-data/update-clothes.php token=$token > $pipe_clothes &
+php /usr/local/bin/php-scripts/update-data/update-clothes.php token=$token > $pipe_clothes &
 
 
-php /usr/local/bin/update-data/update-encounters.php token=$token > $pipe_encounters &
+php /usr/local/bin/php-scripts/update-data/update-encounters.php token=$token > $pipe_encounters &
 
 
 output_1=$(cat $pipe_tips)
