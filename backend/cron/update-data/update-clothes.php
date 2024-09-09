@@ -15,7 +15,10 @@ if (!isset($_ENV["API_KEY"])) {
     exit();
 }
 
-if (!isset($_SESSION["token"])) {
+
+parse_str(implode("&", array_slice($argv, 1)), $_POST);
+
+if (!isset($_POST["token"])) {
     echo json_encode([
         "status" => false,
         "message" => "No token found. Please login"
@@ -51,7 +54,7 @@ foreach ($customers_data as $i => $customer) {
     }
 
 
-    $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/customers/" . $customer["id"] . "/clothes");
+    $res = get_data_from_api($_ENV["API_KEY"], $_POST["token"], "https://soul-connection.fr/api/customers/" . $customer["id"] . "/clothes");
 
     if ($res["status"] == false) {
         $errors[] = [
@@ -81,7 +84,7 @@ foreach ($customers_data as $i => $customer) {
             }
 
 
-            $res = get_image_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/clothes/" . $cloth->id . "/image");
+            $res = get_image_from_api($_ENV["API_KEY"], $_POST["token"], "https://soul-connection.fr/api/clothes/" . $cloth->id . "/image");
 
             if ($res["status"] == false) {
                 $errors[] = [

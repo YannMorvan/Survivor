@@ -64,6 +64,10 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_HOST=${MYSQL_HOST}
+      - API_KEY=${API_KEY}
+      - API_EMAIL=${API_EMAIL}
+      - API_PASSWORD=${API_PASSWORD}
     depends_on:
       - db
 

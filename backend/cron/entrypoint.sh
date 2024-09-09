@@ -27,5 +27,23 @@ echo "password=$MYSQL_ROOT_PASSWORD" >> /root/.my.cnf
 
 echo "$(date +"%Y-%m-%d %H:%M:%S") [Entrypoint]: Created MySQL configuration file"
 
+
+sed -i "s/^variables_order.*/variables_order = "EGPCS"/" /etc/php/8.1/cli/php.ini || echo "variables_order = \"EGPCS\"" >> /etc/php/8.1/cli/php.ini
+echo "$(date +"%Y-%m-%d %H:%M:%S") [Entrypoint]: Set PHP variables_order"
+
+
+CRON_TAB_FILE=/etc/cron.d/cronjobs
+echo "MYSQL_ROOT_PASSWORD"=$MYSQL_ROOT_PASSWORD > $CRON_TAB_FILE
+echo "MYSQL_DATABASE"=$MYSQL_DATABASE >> $CRON_TAB_FILE
+echo "MYSQL_HOST"=$MYSQL_HOST >> $CRON_TAB_FILE
+echo "API_KEY"=$API_KEY >> $CRON_TAB_FILE
+echo "API_EMAIL"=$API_EMAIL >> $CRON_TAB_FILE
+echo "API_PASSWORD"=$API_PASSWORD >> $CRON_TAB_FILE
+cat /etc/cron.d/crontab >> $CRON_TAB_FILE
+
+crontab $CRON_TAB_FILE
+echo "$(date +"%Y-%m-%d %H:%M:%S") [Entrypoint]: Installed crontab with environment variables"
+
+
 echo "$(date +"%Y-%m-%d %H:%M:%S") [Entrypoint]: Starting cron service"
 exec cron -f
