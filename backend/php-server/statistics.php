@@ -10,7 +10,7 @@ require_once __DIR__ . '/db_connection.php';
 
 try {
 
-    $query = "SELECT * FROM events";
+    $query = "SELECT * FROM events WHERE removed = 0";
 
     $stm = $pdo->prepare($query);
     $stm->execute();
@@ -24,7 +24,7 @@ try {
         exit();
     }
 
-    $query = "SELECT * FROM encounters";
+    $query = "SELECT * FROM encounters WHERE removed = 0";
 
     $stm = $pdo->prepare($query);
     $stm->execute();
@@ -45,7 +45,7 @@ foreach ($encounters as $key => $encounter) {
     ];
 }
 
-    $query = "SELECT address FROM customers";
+    $query = "SELECT address FROM customers WHERE removed = 0";
 
     $stm = $pdo->prepare($query);
     $stm->execute();

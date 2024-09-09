@@ -10,7 +10,7 @@ require_once __DIR__ . '/functions.php';
 
 try {
 
-    $query = "SELECT * FROM employees WHERE id = :id";
+    $query = "SELECT * FROM employees WHERE id = :id AND removed = 0";
 
     $stm = $pdo->prepare($query);
     $stm->execute([

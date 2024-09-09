@@ -9,7 +9,7 @@ require_once __DIR__ . "/db_connection.php";
 try {
     // TODO: add phone number and amount of customer for each employee
 
-    $query = "SELECT * FROM employees";
+    $query = "SELECT * FROM employees WHERE removed = 0";
     $stmt = $pdo->prepare($query);
     $stmt->execute();
     $employes = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -32,6 +32,7 @@ try {
         "location_x" => $_POST["location_x"],
         "location_y" => $_POST["location_y"],
         "location_name" => $_POST["location_name"],
+        "removed" => 0
     ]);
 
     echo json_encode([

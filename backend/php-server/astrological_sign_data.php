@@ -10,7 +10,7 @@ require_once __DIR__ . '/db_connection.php';
 
 try {
 
-    $query = "SELECT * FROM customers";
+    $query = "SELECT * FROM customers WHERE removed = 0";
 
     $stm = $pdo->prepare($query);
     $stm->execute();

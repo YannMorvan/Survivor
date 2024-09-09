@@ -26,7 +26,8 @@ try {
         "surname" => $_POST["surname"],
         "birth_date" => $_POST["birth_date"],
         "gender" => $_POST["gender"],
-        "work" => $_POST["work"]
+        "work" => $_POST["work"],
+        "removed" => 0
     ]);
 
     echo json_encode([
