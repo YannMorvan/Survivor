@@ -1,6 +1,6 @@
 <?php
 
-const DB_PATH = __DIR__ . "/../db_connection.php";
+const DB_PATH = __DIR__ . "/db_connection.php";
 
 
 

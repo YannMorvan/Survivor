@@ -15,7 +15,10 @@ if (!isset($_ENV["API_KEY"])) {
     exit();
 }
 
-if (!isset($_SESSION["token"])) {
+
+parse_str(implode("&", array_slice($argv, 1)), $_POST);
+
+if (!isset($_POST["token"])) {
     echo json_encode([
         "status" => false,
         "message" => "No token found. Please login"
@@ -27,7 +30,7 @@ if (!isset($_SESSION["token"])) {
 $errors = [];
 
 
-$res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/employees");
+$res = get_data_from_api($_ENV["API_KEY"], $_POST["token"], "https://soul-connection.fr/api/employees");
 
 if ($res["status"] == false) {
     echo json_encode([
@@ -51,7 +54,7 @@ foreach ($employees as $i => $employee) {
     }
 
 
-    $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/employees/" . $employee->id);
+    $res = get_data_from_api($_ENV["API_KEY"], $_POST["token"], "https://soul-connection.fr/api/employees/" . $employee->id);
 
     if ($res["status"] == false) {
         $errors[] = [
@@ -71,7 +74,7 @@ foreach ($employees as $i => $employee) {
     }
 
 
-    $res = get_image_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/employees/" . $employee->id . "/image");
+    $res = get_image_from_api($_ENV["API_KEY"], $_POST["token"], "https://soul-connection.fr/api/employees/" . $employee->id . "/image");
 
     if ($res["status"] == false) {
         $errors[] = [

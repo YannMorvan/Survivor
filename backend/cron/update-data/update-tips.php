@@ -15,7 +15,10 @@ if (!isset($_ENV["API_KEY"])) {
     exit();
 }
 
-if (!isset($_SESSION["token"])) {
+
+parse_str(implode("&", array_slice($argv, 1)), $_POST);
+
+if (!isset($_POST["token"])) {
     echo json_encode([
         "status" => false,
         "message" => "No token found. Please login"
@@ -27,7 +30,7 @@ if (!isset($_SESSION["token"])) {
 $errors = [];
 
 
-$res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/tips");
+$res = get_data_from_api($_ENV["API_KEY"], $_POST["token"], "https://soul-connection.fr/api/tips");
 
 if ($res["status"] == false) {
     echo json_encode([

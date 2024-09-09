@@ -15,7 +15,10 @@ if (!isset($_ENV["API_KEY"])) {
     exit();
 }
 
-if (!isset($_SESSION["token"])) {
+
+parse_str(implode("&", array_slice($argv, 1)), $_POST);
+
+if (!isset($_POST["token"])) {
     echo json_encode([
         "status" => false,
         "message" => "No token found. Please login"
@@ -27,48 +30,48 @@ if (!isset($_SESSION["token"])) {
 $errors = [];
 
 
-$res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/events");
+$res = get_data_from_api($_ENV["API_KEY"], $_POST["token"], "https://soul-connection.fr/api/encounters");
 
 if ($res["status"] == false) {
     echo json_encode([
         "status" => false,
-        "message" => "Error while getting all events from the API",
+        "message" => "Error while getting all encounters from the API",
         "errors" => $res["message"]
     ]);
     exit();
 }
 
-$events = $res["data"];
+$encounters = $res["data"];
 
 
-foreach ($events as $i => $event) {
-    if (!isset($event->id)) {
+foreach ($encounters as $i => $encounter) {
+    if (!isset($encounter->id)) {
         $errors[] = [
-            "context" => "Get an event from the API",
-            "error" => "No id found for the event"
+            "context" => "Get an encounter from the API",
+            "error" => "No id found for the encounter"
         ];
         continue;
     }
 
 
-    $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/events/" . $event->id);
+    $res = get_data_from_api($_ENV["API_KEY"], $_POST["token"], "https://soul-connection.fr/api/encounters/" . $encounter->id);
 
     if ($res["status"] == false) {
         $errors[] = [
-            "context" => "Get an event from the API",
+            "context" => "Get an encounter from the API",
             "error" => $res["message"]
         ];
         continue;
     }
 
-    $events[$i] = $res["data"];
+    $encounters[$i] = $res["data"];
 
 
-    $res = set_event_from_api_data($events[$i]);
+    $res = set_encounter_from_api_data($encounters[$i]);
 
     if ($res["status"] == false) {
         $errors[] = [
-            "context" => "Set an event in database from the API data",
+            "context" => "Set an encounter in database from the API data",
             "error" => $res["message"]
         ];
     }
@@ -77,6 +80,6 @@ foreach ($events as $i => $event) {
 
 echo json_encode([
     "status" => true,
-    "message" => "Events updated successfully",
+    "message" => "Encounters updated successfully",
     "errors" => $errors
 ]);
