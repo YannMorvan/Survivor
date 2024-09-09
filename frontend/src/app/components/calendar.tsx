@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { sendPostRequest } from '../utils/utils';
-import Event from './event';
 import MonthView from './calendar/monthView';
 import WeekView from './calendar/weekView';
 import DayView from './calendar/dayView';
 import ListView from './calendar/listView';
-import { get } from 'http';
 
 interface Event {
     id: number;
@@ -15,7 +13,7 @@ interface Event {
     location_name: string;
 }
 
-const getEventsByMonth: (events: Event[], month: number, year: number) => Event[] = (events: Event[], month: number, year: number): Event[] => {
+const getEventsByMonth = (events: Event[], month: number, year: number): Event[] => {
     return events.filter(event => {
         const eventDate = new Date(event.date);
         if (isNaN(eventDate.getTime())) {
@@ -26,10 +24,8 @@ const getEventsByMonth: (events: Event[], month: number, year: number) => Event[
     });
 };
 
-const Calendar = ({ month, view, onEventClick }: any) => {
-    const [events, setEvents] = useState([]);
-
-    console.log(view);
+const Calendar = ({ month, week, day, view, onEventClick }: any) => {
+    const [events, setEvents] = useState<Event[]>([]);
 
     useEffect(() => {
         const fetchClientsData = async () => {
@@ -41,7 +37,6 @@ const Calendar = ({ month, view, onEventClick }: any) => {
                 
                 const data = JSON.parse(response);
                 const fetchedEvents = data.data.events;
-                console.log(fetchedEvents);
                 setEvents(fetchedEvents);
             } catch (error) {
                 console.error("Erreur lors de la requête : ", error);
@@ -51,78 +46,68 @@ const Calendar = ({ month, view, onEventClick }: any) => {
         fetchClientsData();
     }, []);
 
-    const daysInMonth = 30;
-
     const [monthName, year] = month.split(' ');
     const monthIndex = new Date(Date.parse(monthName + " 1, 2024")).getMonth();
 
     const filteredEvents = getEventsByMonth(events, monthIndex, parseInt(year));
 
-    const getDayEvents = (dayNumber: number) => {
-        return filteredEvents.filter(event => {
+    const getEventsByWeek = (events: Event[], weekStartDate: Date) => {
+        const weekEndDate = new Date(weekStartDate);
+        weekEndDate.setDate(weekEndDate.getDate() + 7);
+
+        return events.filter(event => {
             const eventDate = new Date(event.date);
-            return eventDate.getDate() === dayNumber;
+            return eventDate >= weekStartDate && eventDate < weekEndDate;
         });
     };
 
-    useEffect(() => {
-        const getEventsByView = (events: Event[], view: string, selectedMonth: string) => {
-            const [monthName, year] = selectedMonth.split(' ');
-            const monthIndex = new Date(Date.parse(monthName + " 1, " + year)).getMonth();
-            const selectedYear = parseInt(year, 10);
-            console.log(view);
-
-            const getWeekOfMonth = (date: Date) => {
-                const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-                return Math.ceil((date.getDate() + firstDay) / 7);
-            };
-        
-            const filteredEvents = events.filter(event => {
+    const getEventsByDay = (events: Event[], selectedDay: Date) => {
+        return events.filter(event => {
             const eventDate = new Date(event.date);
-        
-                switch (view) {
-                    case 'mois':
-                        return eventDate.getMonth() === monthIndex && eventDate.getFullYear() === selectedYear;
-                    
-                    case 'semaine':
-                        const currentWeek = getWeekOfMonth(new Date());
-                        const eventWeek = getWeekOfMonth(eventDate);
-                        return eventDate.getMonth() === monthIndex && eventDate.getFullYear() === selectedYear && currentWeek === eventWeek;
-        
-                    case 'jour':
-                        const today = new Date();
-                        return eventDate.toDateString() === today.toDateString();
-                    
-                    case 'liste':
-                        return true;
-        
-                    default:
-                        return false;
-                }
-            });
-        
-            return filteredEvents;
-        };
+            return eventDate.toDateString() === selectedDay.toDateString();
+        });
+    };
 
-        getEventsByView(events, view, month);
-    }, [view]);
-    
+    const getEventsByView = (events: Event[], view: string, selectedMonth: string, selectedDay: Date) => {
+        const [monthName, year] = selectedMonth.split(' ');
+        const monthIndex = new Date(Date.parse(monthName + " 1, " + year)).getMonth();
+        const selectedYear = parseInt(year, 10);
+
+        switch (view) {
+            case 'mois':
+                return getEventsByMonth(events, monthIndex, selectedYear);
+            
+            case 'semaine':
+                return getEventsByWeek(events, week);
+            
+            case 'jour':
+                return getEventsByDay(events, selectedDay);
+            
+            case 'liste':
+                return events;
+            
+            default:
+                return [];
+        }
+    };
+
+    const viewEvents = getEventsByView(events, view, month, day);
 
     return (
         <div className="bg-white pb-5 mt-3">
             <div className="max-w-11/12 ml-10 mr-10">
                 <div className="wrapper bg-white rounded-xl w-full">
                     {view === 'mois' && (
-                        <MonthView events={filteredEvents} onEventClick={onEventClick} />
+                        <MonthView events={viewEvents} month={month} onEventClick={onEventClick} />
                     )}
                     {view === 'semaine' && (
-                        <WeekView events={filteredEvents} onEventClick={onEventClick} />
+                        <WeekView events={viewEvents} startDate={week} onEventClick={onEventClick} />
                     )}
                     {view === 'jour' && (
-                        <DayView events={filteredEvents} onEventClick={onEventClick} />
+                        <DayView events={viewEvents} day={day} onEventClick={onEventClick} />
                     )}
                     {view === 'liste' && (
-                        <ListView events={filteredEvents} onEventClick={onEventClick} />
+                        <ListView events={viewEvents} onEventClick={onEventClick} />
                     )}
                 </div>
             </div>
