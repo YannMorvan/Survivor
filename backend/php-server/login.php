@@ -74,7 +74,6 @@ if (empty($row["password"])) {
 
 $is_coach = $row["work"] == "Coach" || $row["work"] == "coach";
 
-$_SESSION["token"] = $res["token"];
 $_SESSION["id_employee"] = $row["id"];
 $_SESSION["is_coach"] = $is_coach;
 

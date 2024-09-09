@@ -5,7 +5,6 @@ header("Content-Type: application/json");
 session_start();
 
 
-$_SESSION["token"] = null;
 $_SESSION["is_coach"] = null;
 $_SESSION["id_employee"] = null;
 

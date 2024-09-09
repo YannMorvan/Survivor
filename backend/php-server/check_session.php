@@ -5,7 +5,7 @@ header("Content-Type: application/json");
 session_start();
 
 
-if (!isset($_SESSION["token"]) || !isset($_SESSION["is_coach"])) {
+if (!isset($_SESSION["id_employee"]) || !isset($_SESSION["is_coach"])) {
     echo json_encode([
         "status" => false,
         "message" => "Session not found"

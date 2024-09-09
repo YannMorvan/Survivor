@@ -13,6 +13,7 @@ if (!isset($_POST['id']) || !isset($_POST['name']) || !isset($_POST['surname']) 
         "status" => false,
         "message" => "Missing required fields"
     ]);
+    exit();
 }
 
 try {
