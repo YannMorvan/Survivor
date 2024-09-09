@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db
--- Generation Time: Sep 06, 2024 at 02:32 PM
+-- Generation Time: Sep 09, 2024 at 12:16 PM
 -- Server version: 8.0.39
 -- PHP Version: 8.2.8
 
@@ -49,6 +49,18 @@ CREATE TABLE `clothes_images` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `coach_favorites`
+--
+
+CREATE TABLE `coach_favorites` (
+  `id` int NOT NULL,
+  `id_coach` int NOT NULL,
+  `id_customer` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `customers`
 --
 
@@ -60,11 +72,14 @@ CREATE TABLE `customers` (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `surname` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `country` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `country` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `birth_date` date NOT NULL,
   `gender` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `astrological_sign` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+  `astrological_sign` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `join_date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `removed` tinyint(1) NOT NULL DEFAULT '0',
+  `remove_date` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -94,7 +109,9 @@ CREATE TABLE `employees` (
   `birth_date` date NOT NULL,
   `gender` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `work` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `phone_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
+  `phone_number` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `removed` tinyint(1) NOT NULL DEFAULT '0',
+  `remove_date` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -121,7 +138,9 @@ CREATE TABLE `encounters` (
   `date` date NOT NULL,
   `rating` int NOT NULL,
   `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+  `source` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `removed` tinyint(1) NOT NULL DEFAULT '0',
+  `remove_date` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -140,7 +159,9 @@ CREATE TABLE `events` (
   `max_participants` int NOT NULL,
   `location_x` float NOT NULL,
   `location_y` float NOT NULL,
-  `location_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+  `location_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `removed` tinyint(1) NOT NULL DEFAULT '0',
+  `remove_date` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -200,6 +221,14 @@ ALTER TABLE `clothes_images`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `id_cloth` (`id_cloth`),
   ADD KEY `id_cloth_for_images` (`id_cloth`);
+
+--
+-- Indexes for table `coach_favorites`
+--
+ALTER TABLE `coach_favorites`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_coach` (`id_coach`),
+  ADD KEY `id_customer` (`id_customer`);
 
 --
 -- Indexes for table `customers`
@@ -282,6 +311,12 @@ ALTER TABLE `clothes_images`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `coach_favorites`
+--
+ALTER TABLE `coach_favorites`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
@@ -350,6 +385,13 @@ ALTER TABLE `clothes`
 --
 ALTER TABLE `clothes_images`
   ADD CONSTRAINT `id_cloth_for_images` FOREIGN KEY (`id_cloth`) REFERENCES `clothes` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
+-- Constraints for table `coach_favorites`
+--
+ALTER TABLE `coach_favorites`
+  ADD CONSTRAINT `coach_favorites_ibfk_1` FOREIGN KEY (`id_coach`) REFERENCES `employees` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  ADD CONSTRAINT `coach_favorites_ibfk_2` FOREIGN KEY (`id_customer`) REFERENCES `customers` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
 -- Constraints for table `customers`
