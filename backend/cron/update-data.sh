@@ -38,6 +38,8 @@ fi
 
 token=$(echo $output_login | jq -r ".token")
 
+echo "$(date +"%Y-%m-%d %H:%M:%S") [Update database]: $output_login"
+
 
 php /usr/local/bin/update-data/update-tips.php token=$token > $pipe_tips &
 
