@@ -5,6 +5,35 @@ const DB_PATH = __DIR__ . "/db_connection.php";
 
 
 /**
+ * Check if the API key and the token are set.
+ * @param string $api_key       API key
+ * @param string $token         Token of the user
+ * @return array                Status of the operation
+ */
+function check_api_key_and_token($api_key, $token)
+{
+    if (!isset($api_key)) {
+        return [
+            "status" => false,
+            "message" => "Environment variable API_KEY is not set"
+        ];
+    }
+
+    if (!isset($token)) {
+        return [
+            "status" => false,
+            "message" => "No token found. Please login"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
  * Get data from the API.
  * @param string $api_key       API key
  * @param string $token         Token of the user
