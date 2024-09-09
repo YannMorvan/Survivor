@@ -8,7 +8,7 @@ session_start();
 require_once __DIR__ . '/db_connection.php';
 require_once __DIR__ . '/functions.php';
 
-if (!isset($_POST["id_employee"]) || !isset($_POST["name"]) || !isset($_POST["date"]) || !isset($_POST["duration"]) || !isset($_POST["type"]) || !isset($_POST["max_participants"]) || !isset($_POST["location_x"]) || !isset($_POST["location_y"]) || !isset($_POST["location_name"])) {
+if (!isset($_POST["name"]) || !isset($_POST["date"]) || !isset($_POST["duration"]) || !isset($_POST["type"]) || !isset($_POST["max_participants"]) || !isset($_POST["location_x"]) || !isset($_POST["location_y"]) || !isset($_POST["location_name"])) {
     echo json_encode([
         'status' => 'error',
         'message' => 'Missing mandatory fields'
@@ -22,7 +22,7 @@ try {
 
     $stm = $pdo->prepare($query);
     $stm->execute([
-        "id_employee" => $_POST["id_employee"],
+        "id_employee" => $_SESSION["id_employee"],
         "name" => $_POST["name"],
         "date" => $_POST["date"],
         "duration" => $_POST["duration"],
