@@ -17,11 +17,13 @@ COPY crontab /etc/cron.d/crontab
 COPY db-backup.sh /usr/local/bin/db-backup.sh
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY update-data.sh /usr/local/bin/update-data.sh
+COPY delete-data.sh /usr/local/bin/delete-data.sh
 COPY php-scripts/ /usr/local/bin/php-scripts/
 
 RUN chmod 0644 /etc/cron.d/crontab
 RUN chmod +x /usr/local/bin/db-backup.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/update-data.sh
+RUN chmod +x /usr/local/bin/delete-data.sh
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
