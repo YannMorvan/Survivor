@@ -89,6 +89,7 @@ try {
         "status" => true,
         "data" => [
             "id" => $customer["id"],
+            "id_coach" => $customer["id_coach"],
             "name" => $customer["name"],
             "surname" => $customer["surname"],
             "email" => $customer["email"],

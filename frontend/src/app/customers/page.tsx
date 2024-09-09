@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import Select from "react-select";
+
 import { sendPostRequest } from "../utils/utils.js";
 import ProfileDetails from "./[id]/page";
 
@@ -18,6 +20,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import { format, formatDuration } from "date-fns";
+import { SingleValue, ActionMeta } from "react-select";
 
 interface FormData {
   id: string;
@@ -30,6 +33,7 @@ interface FormData {
   astrological_sign: string;
   description: string;
   address: string;
+  id_coach: string;
 }
 
 const Page = () => {
@@ -51,7 +55,14 @@ const Page = () => {
     astrological_sign: "",
     description: "",
     address: "",
+    id_coach: "",
   });
+
+  interface CoachesNames {
+    id: string;
+    name: string;
+    surname: string;
+  }
 
   interface CheckedItems {
     [key: string]: boolean;
@@ -301,8 +312,10 @@ const Page = () => {
     const [firstName, lastName] = customer.name.split(" ");
     const search = searchQuery.toLowerCase();
     return (
-      firstName.toLowerCase().includes(search) ||
-      lastName.toLowerCase().includes(search)
+      (firstName.toLowerCase().includes(search) ||
+        lastName?.toLowerCase().includes(search)) &&
+      customer.name.length >= minCustomers &&
+      customer.name.length <= maxCustomers
     );
   });
 
@@ -350,6 +363,16 @@ const Page = () => {
     });
   };
 
+  const [selectedCoach, setSelectedCoach] = useState("");
+
+  const handleCoachChange = (selectedOption: SingleValue<any>) => {
+    setSelectedCoach(selectedOption.value);
+    setFormData({
+      ...formData,
+      id_coach: selectedOption.value || "",
+    });
+  };
+
   const [selectedAstro, setSelectedAstro] = useState("");
 
   const handleAstroChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -375,7 +398,8 @@ const Page = () => {
       !formData.gender ||
       !formData.astrological_sign ||
       !formData.description ||
-      !formData.address
+      !formData.address ||
+      !formData.id_coach
     ) {
       setError("Please fill in all fields.");
       return;
@@ -397,10 +421,9 @@ const Page = () => {
           astrological_sign: formData.astrological_sign,
           description: formData.description,
           address: formData.address,
+          id_coach: formData.id_coach,
         }
       );
-
-      console.log(response);
 
       const parsedResponse = JSON.parse(response);
 
@@ -414,6 +437,43 @@ const Page = () => {
     } finally {
       setLoading(false);
       setIsModalAddOpen(false);
+    }
+  };
+
+  const [coachesNames, setCoachesNames] = useState<CoachesNames[]>([]);
+
+  const options = coachesNames.map((coach) => ({
+    value: coach.id,
+    label: `${coach.name} ${coach.surname}`,
+  }));
+
+  const fetchCoachesData = async () => {
+    try {
+      const response = await sendPostRequest(
+        `http://localhost/get_coach_data.php`,
+        {}
+      );
+
+      const parsedResponse = JSON.parse(response);
+
+      if (
+        parsedResponse.status === true &&
+        Array.isArray(parsedResponse.coaches)
+      ) {
+        const formattedData: CoachesNames[] = parsedResponse.coaches.map(
+          (item: any) => ({
+            id: item.id.toString(),
+            name: item.name,
+            surname: item.surname,
+          })
+        );
+
+        setCoachesNames(formattedData);
+      } else {
+        console.error("Unexpected response format:", parsedResponse);
+      }
+    } catch (error) {
+      console.error("Error fetching coaches data:", error);
     }
   };
 
@@ -573,7 +633,9 @@ const Page = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <span className="text-l">{customer.name}</span>
+                  <span className="text-l">
+                    {customer.name + " " + customer.surname}
+                  </span>
                 </td>
                 <td className="p-4 text-[#6B83A2]">{customer.email}</td>
                 <td className="p-4 text-[#6B83A2]">{customer.phone}</td>
@@ -592,6 +654,14 @@ const Page = () => {
                       }}
                       className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 shadow-lg rounded-md z-10"
                     >
+                      <button
+                        className="w-full px-4 py-2 text-left hover:bg-gray-100"
+                        onClick={(e) => {
+                          router.push(`/customers/${customer.id}`);
+                        }}
+                      >
+                        Profile
+                      </button>
                       <button
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
                         onClick={() => handleEdit(customer.id)}
@@ -767,19 +837,40 @@ const Page = () => {
                   required
                 />
               </div>
+              <div className="mb-4">
+                <label className="block text-gray-700">Tel</label>
+                <input
+                  type="text"
+                  name="phone_number"
+                  value={formData.phone_number || ""}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  required
+                />
+              </div>
               <div className="flex flex-row gap-4 w-full">
-                <div className="mb-4">
-                  <label className="block text-gray-700">Tel</label>
-                  <input
-                    type="text"
-                    name="phone_number"
-                    value={formData.phone_number || ""}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-lg"
+                <div className="mb-4 w-1/2">
+                  <label className="block text-gray-700">Coach</label>
+                  <Select
+                    id="coach"
+                    value={
+                      options.find(
+                        (option) => option.value === selectedCoach
+                      ) || null
+                    }
+                    onChange={(selectedOption) =>
+                      handleCoachChange(selectedOption)
+                    }
+                    options={options}
+                    className="w-full"
+                    classNamePrefix="react-select"
+                    placeholder="Select Coach"
+                    isSearchable
+                    onMenuOpen={fetchCoachesData}
                     required
                   />
                 </div>
-                <div className="mb-4">
+                <div className="mb-4 w-1/2">
                   <label htmlFor="date" className="block text-gray-700">
                     Date d'anniversaire
                   </label>
@@ -837,17 +928,17 @@ const Page = () => {
                     <option value="" disabled hidden>
                       Signe Astrologique
                     </option>
-                    <option value="taurus">Taureau</option>
-                    <option value="aries">Bélier</option>
-                    <option value="cancer">Cancer</option>
-                    <option value="leo">Lion</option>
-                    <option value="virgo">Vierge</option>
-                    <option value="libra">Balance</option>
-                    <option value="scorpio">Scorpion</option>
-                    <option value="sagittarius">Sagittaire</option>
-                    <option value="capricorn">Capricorne</option>
-                    <option value="aquarius">Verseau</option>
-                    <option value="pisces">Poissons</option>
+                    <option value="Aquarius">Verseau</option>
+                    <option value="Aries">Bélier</option>
+                    <option value="Cancer">Cancer</option>
+                    <option value="Capricorn">Capricorne</option>
+                    <option value="Taurus">Taureau</option>
+                    <option value="Leo">Lion</option>
+                    <option value="Libra">Balance</option>
+                    <option value="Pisces">Poissons</option>
+                    <option value="Scorpio">Scorpion</option>
+                    <option value="Sagittarius">Sagittaire</option>
+                    <option value="Virgo">Vierge</option>
                   </select>
                 </div>
               </div>
