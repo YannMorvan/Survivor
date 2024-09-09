@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { ArrowLeft, MailCheck, MapPin, HeartPulse, ArrowUp01, Phone, Telescope, Heart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import ProgressBar from '../../../components/charts/progress';
-import PriceChart from '../../../components/charts/price';
+import PriceChart from '../../../components/charts/star';
 import { sendPostRequest } from '../../../utils/utils';
 import { useParams } from 'next/navigation';
 import Heartbeat from '@/app/components/heartbeat';

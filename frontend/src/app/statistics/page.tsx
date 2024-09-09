@@ -1,6 +1,6 @@
 "use client";
 import React, {useState, useEffect} from 'react';
-import Price from '../components/charts/price';
+import Price from '../components/charts/star';
 import Meetings from '../components/charts/meetings-coach';
 import Image from 'next/image';
 import { sendPostRequest } from '../utils/utils';
@@ -101,7 +101,7 @@ export default function Page() {
             </button>
 
             {isOpen && (
-                <div id="dropdownUsers" className="z-10 w-40 mt-12 max-w-full absolute bg-white rounded-lg shadow w-60 dark:bg-gray-700">
+                <div id="dropdownUsers" className="z-10 w-36 mt-12 max-w-full absolute bg-white rounded-lg shadow w-60 dark:bg-gray-700">
                     <ul className="h-48 py-2 overflow-y-auto text-gray-700 dark:text-gray-200" aria-labelledby="dropdownUsersButton">
                         {coaches.map((coach, index) => (
                             <li key={index}>
@@ -141,7 +141,7 @@ export default function Page() {
             </button>
 
             {isOpen2 && (
-                <div id="dropdownUsers2" className="z-10 w-40 max-w-full right-7 mt-12 absolute bg-white rounded-lg shadow w-60 dark:bg-gray-700">
+                <div id="dropdownUsers2" className="z-10 w-36 max-w-full right-7 mt-12 absolute bg-white rounded-lg shadow w-60 dark:bg-gray-700">
                     <ul className="h-48 py-2 overflow-y-auto text-gray-700 dark:text-gray-200" aria-labelledby="dropdownUsersButton2">
                         {coaches.map((coach, index) => (
                             <li key={index}>

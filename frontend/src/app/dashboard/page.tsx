@@ -91,7 +91,6 @@ export default function Dashboard() {
                 console.warn(`Date invalide pour l'événement : ${event.date}`);
                 return false;
             }
-            console.log(getWeekNumber(eventDate));
             return eventDate.getMonth() === month && getWeekNumber(eventDate) === week && eventDate.getFullYear() === year;
         });
     }

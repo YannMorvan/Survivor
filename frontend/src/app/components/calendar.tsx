@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { sendPostRequest } from '../utils/utils';
 import Event from './event';
+import MonthView from './calendar/monthView';
+import WeekView from './calendar/weekView';
+import DayView from './calendar/dayView';
+import ListView from './calendar/listView';
+import { get } from 'http';
 
 interface Event {
     id: number;
@@ -21,8 +26,10 @@ const getEventsByMonth: (events: Event[], month: number, year: number) => Event[
     });
 };
 
-const Calendar = ({ month, onEventClick }: any) => {
+const Calendar = ({ month, view, onEventClick }: any) => {
     const [events, setEvents] = useState([]);
+
+    console.log(view);
 
     useEffect(() => {
         const fetchClientsData = async () => {
@@ -58,57 +65,65 @@ const Calendar = ({ month, onEventClick }: any) => {
         });
     };
 
+    useEffect(() => {
+        const getEventsByView = (events: Event[], view: string, selectedMonth: string) => {
+            const [monthName, year] = selectedMonth.split(' ');
+            const monthIndex = new Date(Date.parse(monthName + " 1, " + year)).getMonth();
+            const selectedYear = parseInt(year, 10);
+            console.log(view);
+
+            const getWeekOfMonth = (date: Date) => {
+                const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+                return Math.ceil((date.getDate() + firstDay) / 7);
+            };
+        
+            const filteredEvents = events.filter(event => {
+            const eventDate = new Date(event.date);
+        
+                switch (view) {
+                    case 'mois':
+                        return eventDate.getMonth() === monthIndex && eventDate.getFullYear() === selectedYear;
+                    
+                    case 'semaine':
+                        const currentWeek = getWeekOfMonth(new Date());
+                        const eventWeek = getWeekOfMonth(eventDate);
+                        return eventDate.getMonth() === monthIndex && eventDate.getFullYear() === selectedYear && currentWeek === eventWeek;
+        
+                    case 'jour':
+                        const today = new Date();
+                        return eventDate.toDateString() === today.toDateString();
+                    
+                    case 'liste':
+                        return true;
+        
+                    default:
+                        return false;
+                }
+            });
+        
+            return filteredEvents;
+        };
+
+        getEventsByView(events, view, month);
+    }, [view]);
+    
+
     return (
         <div className="bg-white pb-5 mt-3">
             <div className="max-w-11/12 ml-10 mr-10">
                 <div className="wrapper bg-white rounded-xl w-full">
-                    <div className="header flex justify-between border-b p-2">
-                        <div className="buttons">
-                        </div>
-                    </div>
-                    <table className="w-full">
-                        <thead>
-                            <tr>
-                                {['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'].map(day => (
-                                    <th key={day} className="p-2 border-r border-l h-10 xl:w-40 lg:w-30 md:w-30 sm:w-20 w-10 xl:text-sm text-xs">
-                                        <span className="xl:block lg:block md:block sm:block hidden">{day}</span>
-                                        <span className="xl:hidden lg:hidden md:hidden sm:hidden block">{day.slice(0, 3)}</span>
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {Array.from({ length: Math.ceil(daysInMonth / 7) }).map((_, rowIndex) => (
-                                <tr key={rowIndex} className="text-right mr-0 h-20">
-                                    {Array.from({ length: 7 }).map((_, colIndex) => {
-                                        const dayNumber = rowIndex * 7 + colIndex + 1;
-                                        return dayNumber <= daysInMonth ? (
-                                            <td
-                                                key={colIndex}
-                                                className="border pt-1 h-30 xl:w-40 lg:w-30 md:w-30 sm:w-20 w-10 overflow-auto cell"
-                                            >
-                                                <div className="flex flex-col h-36 xl:w-50 lg:w-50 md:w-50 sm:w-full w-10 overflow-hidden relative">
-                                                    <div className="top h-5 w-full">
-                                                        <span className="text-gray-500">{dayNumber}</span>
-                                                    </div>
-                                                    <div className="bottom flex-grow py-1 w-full cursor-pointer flex items-start justify-start relative">
-                                                        {getDayEvents(dayNumber).map((event, index) => (
-                                                            <Event key={event.id} event={event} index={index} onEventClick={onEventClick}/>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        ) : (
-                                            <td
-                                                key={colIndex}
-                                                className="border p-1 h-30 xl:w-40 lg:w-30 md:w-30 sm:w-20 w-10 overflow-auto"
-                                            />
-                                        );
-                                    })}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    {view === 'mois' && (
+                        <MonthView events={filteredEvents} onEventClick={onEventClick} />
+                    )}
+                    {view === 'semaine' && (
+                        <WeekView events={filteredEvents} onEventClick={onEventClick} />
+                    )}
+                    {view === 'jour' && (
+                        <DayView events={filteredEvents} onEventClick={onEventClick} />
+                    )}
+                    {view === 'liste' && (
+                        <ListView events={filteredEvents} onEventClick={onEventClick} />
+                    )}
                 </div>
             </div>
         </div>
