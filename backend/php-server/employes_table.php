@@ -29,16 +29,12 @@ try {
         $imageStmt->execute(["id_employee" => $employe["id"]]);
         $image = $imageStmt->fetch(PDO::FETCH_ASSOC);
 
-        if (empty($image)) {
-            return null;
-        }
-
         return [
             "id" => $employe["id"],
             "name" => $employe["name"],
             "surname" => $employe["surname"],
             "email" => $employe["email"],
-            "image" => base64_encode($image["image"])
+            "image" => empty($image) ? null : base64_encode($image["image"])
         ];
     }, $employes));
 
