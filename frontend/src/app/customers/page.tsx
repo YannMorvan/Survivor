@@ -14,18 +14,43 @@ import { useRouter } from "next/navigation";
 import { sendPostRequest } from "../utils/utils.js";
 import ProfileDetails from "./[id]/page";
 
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+import { format, formatDuration } from "date-fns";
+
+interface FormData {
+  id: string;
+  name: string;
+  surname: string;
+  email: string;
+  phone_number: string;
+  birth_date: string | null;
+  gender: string;
+  astrological_sign: string;
+  description: string;
+  address: string;
+}
+
 const Page = () => {
   const [isModalAddOpen, setIsModalAddOpen] = useState(false);
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
   const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [formData, setFormData] = useState({
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState<FormData>({
+    id: "",
     name: "",
     surname: "",
     email: "",
-    phone: "",
-    paymentMethod: 0,
+    phone_number: "",
+    birth_date: "",
+    gender: "",
+    astrological_sign: "",
+    description: "",
+    address: "",
   });
 
   interface CheckedItems {
@@ -57,7 +82,7 @@ const Page = () => {
     const fetchCustomersData = async () => {
       try {
         const response = await sendPostRequest(
-          `http://${process.env.NEXT_PUBLIC_PHP_HOST}/table_clients.php`,
+          `http://localhost/table_clients.php`,
           {}
         );
 
@@ -299,11 +324,104 @@ const Page = () => {
     setFilterOpen(!filterOpen);
   };
 
+  const handleDateChange = (birth_date: Date | null) => {
+    if (birth_date) {
+      const formattedDate = format(birth_date, "yyyy-MM-dd");
+      setFormData({
+        ...formData,
+        birth_date: formattedDate,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        birth_date: null,
+      });
+    }
+  };
+
+  const [selectedGender, setSelectedGender] = useState("");
+
+  const handleGenderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const gender = event.target.value;
+    setSelectedGender(gender);
+    setFormData({
+      ...formData,
+      gender: gender || "",
+    });
+  };
+
+  const [selectedAstro, setSelectedAstro] = useState("");
+
+  const handleAstroChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const astro = event.target.value;
+    setSelectedAstro(astro);
+    setFormData({
+      ...formData,
+      astrological_sign: astro || "",
+    });
+  };
+
+  const handleCreateCustomer = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    console.log(formData);
+
+    if (
+      !formData.name ||
+      !formData.surname ||
+      !formData.email ||
+      !formData.phone_number ||
+      !formData.birth_date ||
+      !formData.gender ||
+      !formData.astrological_sign ||
+      !formData.description ||
+      !formData.address
+    ) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await sendPostRequest(
+        "http://localhost/add_user_to_db.php",
+        {
+          name: formData.name,
+          surname: formData.surname,
+          email: formData.email,
+          phone_number: formData.phone_number,
+          birth_date: formData.birth_date,
+          gender: formData.gender,
+          astrological_sign: formData.astrological_sign,
+          description: formData.description,
+          address: formData.address,
+        }
+      );
+
+      console.log(response);
+
+      const parsedResponse = JSON.parse(response);
+
+      if (parsedResponse.error) {
+        setError(parsedResponse.error);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      setError("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+      setIsModalAddOpen(false);
+    }
+  };
+
   return (
     <div className="mx-6 flex flex-col">
       <div className="flex justify-between items-center mb-2 flex-row">
         <h1 className="text-3xl font-semibold text-[#384B65]">
-          Liste des clients
+          Liste des Customers
         </h1>
         <div className="flex flex-row items-center">
           <button
@@ -377,7 +495,7 @@ const Page = () => {
           {filterOpen && (
             <div className="filter-dropdown absolute right-6 bg-white border border-gray-200 shadow-lg rounded-md p-4 z-10">
               <label className="block text-gray-700 mb-2">
-                Methode de Paiement
+                Nombre de Clients
               </label>
               <div className="flex flex-row justify-between items-center">
                 <div className="flex flex-col gap-2 mr-2">
@@ -424,11 +542,11 @@ const Page = () => {
                   onChange={handleAllCheckedChange}
                 />
               </th>
-              <th className="p-4 text-left text-[#6B83A2]">Coach</th>
+              <th className="p-4 text-left text-[#6B83A2]">Customer</th>
               <th className="p-4 text-left text-[#6B83A2]">Email</th>
               <th className="p-4 text-left text-[#6B83A2]">Tel</th>
               <th className="p-4 text-left text-[#6B83A2]">
-                Méthode de Paiement
+                Nombre de Clients
               </th>
               <th className="p-4 text-left text-[#6B83A2]">Actions</th>
             </tr>
@@ -443,7 +561,7 @@ const Page = () => {
                   <input
                     type="checkbox"
                     className="form-checkbox size-4"
-                    checked={checkedItems[customer.id]}
+                    checked={!!checkedItems[customer.id]}
                     onChange={() => handleCheckboxChange(customer.id)}
                   />
                 </td>
@@ -474,14 +592,6 @@ const Page = () => {
                       }}
                       className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 shadow-lg rounded-md z-10"
                     >
-                      <button
-                        className="w-full px-4 py-2 text-left hover:bg-gray-100"
-                        onClick={(e) => {
-                          router.push(`/customers/${customer.id}`);
-                        }}
-                      >
-                        Profile
-                      </button>
                       <button
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
                         onClick={() => handleEdit(customer.id)}
@@ -515,8 +625,8 @@ const Page = () => {
             >
               <X />
             </button>
-            <h2 className="text-2xl mb-4">Editer Customers</h2>
-            <form onSubmit={handleSubmit}>
+            <h2 className="text-2xl mb-4">Editer le Customer</h2>
+            <form onSubmit={handleCreateCustomer}>
               <div className="flex flex-row gap-4 w-full">
                 <div className="mb-4">
                   <label className="block text-gray-700">Nom</label>
@@ -557,20 +667,7 @@ const Page = () => {
                 <input
                   type="text"
                   name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">
-                  Methode de Paiement
-                </label>
-                <input
-                  type="number"
-                  name="paymentMethod"
-                  value={formData.paymentMethod}
+                  value={formData.phone_number}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border rounded-lg"
                   required
@@ -601,8 +698,8 @@ const Page = () => {
             >
               <X />
             </button>
-            <h2 className="text-2xl mb-4">Supprimer Le Client</h2>
-            <p>Etes vous sur de supprimer ce client?</p>
+            <h2 className="text-2xl mb-4">Supprimer le Customer</h2>
+            <p>Etes vous sur de vouloir supprimer le Customer?</p>
             <div className="flex justify-center gap-4 mt-4">
               <button
                 className="bg-red-500 text-white px-4 py-2 rounded-md"
@@ -633,26 +730,26 @@ const Page = () => {
             >
               <X />
             </button>
-            <h2 className="text-2xl mb-4">Ajouter un Client</h2>
-            <form onSubmit={handleSubmit}>
+            <h2 className="text-2xl mb-4">Ajouter un Customer</h2>
+            <form onSubmit={handleCreateCustomer}>
               <div className="flex flex-row gap-4 w-full">
                 <div className="mb-4">
-                  <label className="block text-gray-700">Nom</label>
+                  <label className="block text-gray-700">Prénom</label>
                   <input
                     type="text"
                     name="name"
-                    value={formData.name}
+                    value={formData.name || ""}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border rounded-lg"
                     required
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-gray-700">Prénom</label>
+                  <label className="block text-gray-700">Nom</label>
                   <input
                     type="text"
                     name="surname"
-                    value={formData.surname}
+                    value={formData.surname || ""}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border rounded-lg"
                     required
@@ -664,31 +761,101 @@ const Page = () => {
                 <input
                   type="email"
                   name="email"
-                  value={formData.email}
+                  value={formData.email || ""}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border rounded-lg"
                   required
                 />
               </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Tel</label>
+              <div className="flex flex-row gap-4 w-full">
+                <div className="mb-4">
+                  <label className="block text-gray-700">Tel</label>
+                  <input
+                    type="text"
+                    name="phone_number"
+                    value={formData.phone_number || ""}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded-lg"
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <label htmlFor="date" className="block text-gray-700">
+                    Date d'anniversaire
+                  </label>
+                  <DatePicker
+                    selected={
+                      formData.birth_date ? new Date(formData.birth_date) : null
+                    }
+                    onChange={handleDateChange}
+                    className="w-full px-3 py-2 border rounded-lg"
+                    dateFormat="dd/MM/yyyy"
+                    placeholderText="Selectionner une date"
+                  />
+                </div>
+              </div>
+              <div className="mb-4 w-full">
+                <label className="block text-gray-700">Adresse</label>
                 <input
-                  type="text"
-                  name="phone"
-                  value={formData.phone}
+                  name="address"
+                  value={formData.address || ""}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border rounded-lg"
                   required
                 />
               </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">
-                  Methode de paiement
-                </label>
+              <div className="flex flex-row gap-4 w-full">
+                <div className="mb-4 w-full">
+                  <label className="block text-gray-700">Genre</label>
+                  <select
+                    id="gender"
+                    value={selectedGender || ""}
+                    onChange={handleGenderChange}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
+                      !selectedGender ? "text-gray-500" : "text-gray-700"
+                    }`}
+                  >
+                    <option value="" disabled hidden>
+                      Genre
+                    </option>
+                    <option value="Male">Homme</option>
+                    <option value="Female">Femme</option>
+                  </select>
+                </div>
+                <div className="mb-4 w-full">
+                  <label className="block text-gray-700">
+                    Signe Astrologique
+                  </label>
+                  <select
+                    id="astrological_sign"
+                    value={selectedAstro || ""}
+                    onChange={handleAstroChange}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
+                      !selectedAstro ? "text-gray-500" : "text-gray-700"
+                    }`}
+                  >
+                    <option value="" disabled hidden>
+                      Signe Astrologique
+                    </option>
+                    <option value="taurus">Taureau</option>
+                    <option value="aries">Bélier</option>
+                    <option value="cancer">Cancer</option>
+                    <option value="leo">Lion</option>
+                    <option value="virgo">Vierge</option>
+                    <option value="libra">Balance</option>
+                    <option value="scorpio">Scorpion</option>
+                    <option value="sagittarius">Sagittaire</option>
+                    <option value="capricorn">Capricorne</option>
+                    <option value="aquarius">Verseau</option>
+                    <option value="pisces">Poissons</option>
+                  </select>
+                </div>
+              </div>
+              <div className="mb-4 w-full">
+                <label className="block text-gray-700">Description</label>
                 <input
-                  type="number"
-                  name="paymentMethod"
-                  value={formData.paymentMethod}
+                  name="description"
+                  value={formData.description || ""}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border rounded-lg"
                   required

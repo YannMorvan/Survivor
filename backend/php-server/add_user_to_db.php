@@ -18,21 +18,21 @@ if (!isset($_POST['email']) || !isset($_POST['phone_number']) || !isset($_POST['
 
 try {
     $query = "INSERT INTO customers (email, phone_number, name, surname, address, birth_date, gender, description, astrological_sign) VALUES (:email, :phone_number, :name, :surname, :address, :birth_date, :gender, :description, :astrological_sign)";
-    
+
     $stm = $pdo->prepare($query);
 
-    $stm->bindParam(':email', $_POST['email']);
-    $stm->bindParam(':phone_number', $_POST['phone_number']);
-    $stm->bindParam(':name', $_POST['name']);
-    $stm->bindParam(':surname', $_POST['surname']);
-    $stm->bindParam(':address', $_POST['address']);
-    $stm->bindParam(':birth_date', $_POST['birth_date']);
-    $stm->bindParam(':gender', $_POST['gender']);
-    $stm->bindParam(':description', $_POST['description']);
-    $stm->bindParam(':astrological_sign', $_POST['astrological_sign']);
-    
-    $stm->execute();
-    
+    $stm->execute([
+        "email" => $_POST["email"],
+        "phone_number" => $_POST["phone_number"],
+        "name" => $_POST["name"],
+        "surname" => $_POST["surname"],
+        "address" => $_POST["address"],
+        "birth_date" => $_POST["birth_date"],
+        "gender" => $_POST["gender"],
+        "description" => $_POST["description"],
+        "astrological_sign" => $_POST["astrological_sign"],
+        "removed" => 0
+    ]);
     echo json_encode([
         "status" => true,
         "message" => "User added successfully"

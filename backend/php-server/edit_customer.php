@@ -33,7 +33,8 @@ try {
             "gender" => $_POST["gender"],
             "birth_date" => $_POST["birth_date"],
             "description" => $_POST["description"],
-            "astrological_sign" => $_POST["astrological_sign"]
+            "astrological_sign" => $_POST["astrological_sign"],
+            "removed" => 0
         ]);
 
         echo json_encode([
@@ -58,7 +59,8 @@ try {
             "birth_date" => $_POST["birth_date"],
             "description" => $_POST["description"],
             "astrological_sign" => $_POST["astrological_sign"],
-            "id_coach" => $_POST["id_coach"]
+            "id_coach" => $_POST["id_coach"],
+            "removed" => 0
         ]);
 
         echo json_encode([

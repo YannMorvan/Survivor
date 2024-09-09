@@ -12,19 +12,39 @@ import {
 
 import { sendPostRequest } from "../utils/utils.js";
 
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+import { format, formatDuration } from "date-fns";
+
+interface FormData {
+  id: string;
+  name: string;
+  surname: string;
+  email: string;
+  phone: string;
+  birth_date: string | null;
+  gender: string;
+  work: string;
+}
+
 const Page = () => {
   const [isModalAddOpen, setIsModalAddOpen] = useState(false);
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
   const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [formData, setFormData] = useState({
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState<FormData>({
     id: "",
     name: "",
     surname: "",
     email: "",
     phone: "",
-    nbrCustomers: 0,
+    birth_date: "",
+    gender: "male",
+    work: "",
   });
 
   interface CheckedItems {
@@ -44,18 +64,30 @@ const Page = () => {
   const [allChecked, setAllChecked] = useState(false);
   const [coachesData, setCoachesData] = useState<Coach[]>([]);
 
-  const [checkedItems, setCheckedItems] = useState<CheckedItems>(
-    coachesData.reduce((acc, coach) => {
+  const [checkedItems, setCheckedItems] = useState<CheckedItems>(() => {
+    const initialCheckedItems = coachesData.reduce((acc, coach) => {
       acc[coach.id] = false;
       return acc;
-    }, {} as CheckedItems)
-  );
+    }, {} as CheckedItems);
+    return initialCheckedItems;
+  });
+
+  useEffect(() => {
+    if (coachesData.length > 0) {
+      setCheckedItems(
+        coachesData.reduce((acc, coach) => {
+          acc[coach.id] = false;
+          return acc;
+        }, {} as CheckedItems)
+      );
+    }
+  }, [coachesData]);
 
   useEffect(() => {
     const fetchCoachesData = async () => {
       try {
         const response = await sendPostRequest(
-          `http://${process.env.NEXT_PUBLIC_PHP_HOST}/employes_table.php`,
+          `http://localhost/employes_table.php`,
           {}
         );
 
@@ -73,7 +105,7 @@ const Page = () => {
               image: item.image,
               surname: item.surname,
               phone: item.phone || "555",
-              nbrCustomers: item.nbrCustomers || 0,
+              nbrCustomers: 0,
             })
           );
 
@@ -98,6 +130,12 @@ const Page = () => {
   const modalEditRef = useRef<HTMLDivElement | null>(null);
   const modalDeleteRef = useRef<HTMLDivElement | null>(null);
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  const [selectedGender, setSelectedGender] = useState("");
+
+  const handleGenderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedGender(event.target.value);
+  };
 
   const openAddModal = () => {
     setIsModalAddOpen(true);
@@ -207,10 +245,67 @@ const Page = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleDateChange = (birth_date: Date | null) => {
+    if (birth_date) {
+      const formattedDate = format(birth_date, "yyyy-MM-dd");
+      setFormData({
+        ...formData,
+        birth_date: formattedDate,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        birth_date: null,
+      });
+    }
+  };
+
+  const handleCreateCoach = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
-    closeAddModal();
+
+    if (
+      !formData.name ||
+      !formData.surname ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.birth_date ||
+      !formData.gender ||
+      !formData.work
+    ) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await sendPostRequest(
+        "http://localhost/add_employee_to_db.php",
+        {
+          name: formData.name,
+          surname: formData.surname,
+          email: formData.email,
+          phone: formData.phone,
+          birth_date: formData.birth_date,
+          gender: formData.gender,
+          work: formData.work,
+        }
+      );
+
+      const parsedResponse = JSON.parse(response);
+
+      if (parsedResponse.error) {
+        setError(parsedResponse.error);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      setError("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+      setIsModalAddOpen(false);
+    }
   };
 
   useEffect(() => {
@@ -275,7 +370,7 @@ const Page = () => {
       coach.nbrCustomers >= minCustomers && coach.nbrCustomers <= maxCustomers;
     return (
       (firstName.toLowerCase().includes(search) ||
-        lastName.toLowerCase().includes(search)) &&
+        lastName?.toLowerCase().includes(search)) &&
       withinRange
     );
   });
@@ -442,7 +537,7 @@ const Page = () => {
                   <input
                     type="checkbox"
                     className="form-checkbox size-4"
-                    checked={checkedItems[coach.id]}
+                    checked={!!checkedItems[coach.id]}
                     onChange={() => handleCheckboxChange(coach.id)}
                   />
                 </td>
@@ -507,7 +602,7 @@ const Page = () => {
               <X />
             </button>
             <h2 className="text-2xl mb-4">Editer le Coach</h2>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleCreateCoach}>
               <div className="flex flex-row gap-4 w-full">
                 <div className="mb-4">
                   <label className="block text-gray-700">Nom</label>
@@ -549,17 +644,6 @@ const Page = () => {
                   type="text"
                   name="phone"
                   value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Nombre de Clients</label>
-                <input
-                  type="number"
-                  name="nbrCustomers"
-                  value={formData.nbrCustomers}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border rounded-lg"
                   required
@@ -623,25 +707,25 @@ const Page = () => {
               <X />
             </button>
             <h2 className="text-2xl mb-4">Ajouter un Coach</h2>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleCreateCoach}>
               <div className="flex flex-row gap-4 w-full">
                 <div className="mb-4">
-                  <label className="block text-gray-700">Nom</label>
+                  <label className="block text-gray-700">Prénom</label>
                   <input
                     type="text"
                     name="name"
-                    value={formData.name}
+                    value={formData.name || ""}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border rounded-lg"
                     required
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-gray-700">Prénom</label>
+                  <label className="block text-gray-700">Nom</label>
                   <input
                     type="text"
                     name="surname"
-                    value={formData.surname}
+                    value={formData.surname || ""}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border rounded-lg"
                     required
@@ -653,33 +737,68 @@ const Page = () => {
                 <input
                   type="email"
                   name="email"
-                  value={formData.email}
+                  value={formData.email || ""}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border rounded-lg"
                   required
                 />
               </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Tel</label>
-                <input
-                  type="text"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  required
-                />
+              <div className="flex flex-row gap-4 w-full">
+                <div className="mb-4">
+                  <label className="block text-gray-700">Tel</label>
+                  <input
+                    type="text"
+                    name="phone"
+                    value={formData.phone || ""}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded-lg"
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-700">Métier</label>
+                  <input
+                    type="text"
+                    name="work"
+                    value={formData.work || ""}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded-lg"
+                    required
+                  />
+                </div>
               </div>
-              <div className="mb-4">
-                <label className="block text-gray-700">Nombre de Clients</label>
-                <input
-                  type="number"
-                  name="nbrCustomers"
-                  value={formData.nbrCustomers}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  required
-                />
+              <div className="flex flex-row gap-4 w-full">
+                <div className="mb-4 w-full">
+                  <label htmlFor="date" className="block text-gray-700">
+                    Date d'anniversaire
+                  </label>
+                  <DatePicker
+                    selected={
+                      formData.birth_date ? new Date(formData.birth_date) : null
+                    }
+                    onChange={handleDateChange}
+                    className="w-full px-3 py-2 border rounded-lg"
+                    dateFormat="dd/MM/yyyy"
+                    placeholderText="Selectionner une date"
+                  />
+                </div>
+                <div className="mb-4 w-full">
+                  <label className="block text-gray-700">Genre</label>
+                  <select
+                    id="gender"
+                    value={selectedGender || ""}
+                    onChange={handleGenderChange}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
+                      !selectedGender ? "text-gray-500" : "text-gray-700"
+                    }`}
+                  >
+                    <option value="" disabled hidden>
+                      Genre
+                    </option>
+                    <option value="male">Homme</option>
+                    <option value="female">Femme</option>
+                  </select>
+                </div>
               </div>
               <div className="flex justify-center">
                 <button
