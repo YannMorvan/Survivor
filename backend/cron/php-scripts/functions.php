@@ -5,6 +5,35 @@ const DB_PATH = __DIR__ . "/db_connection.php";
 
 
 /**
+ * Check if the API key and the token are set.
+ * @param string $api_key       API key
+ * @param string $token         Token of the user
+ * @return array                Status of the operation
+ */
+function check_api_key_and_token($api_key, $token)
+{
+    if (!isset($api_key)) {
+        return [
+            "status" => false,
+            "message" => "Environment variable API_KEY is not set"
+        ];
+    }
+
+    if (!isset($token)) {
+        return [
+            "status" => false,
+            "message" => "No token found. Please login"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
  * Get data from the API.
  * @param string $api_key       API key
  * @param string $token         Token of the user
@@ -413,8 +442,8 @@ function set_cloth_image_from_api_data($id_cloth, $image)
 
 /**
  * Set an event in database from the API data.
- * @param object $encounter         Encounter data from the API
- * @return array                    Status of the operation
+ * @param object $encounter     Encounter data from the API
+ * @return array                Status of the operation
  */
 function set_encounter_from_api_data($encounter)
 {
@@ -542,4 +571,600 @@ function set_event_from_api_data($event)
             "status" => true
         ];
     }
+}
+
+
+
+/**
+ * Get IDs of the employees removed more than three years ago.
+ * @return array                IDs of the employees
+ */
+function get_employees_removed_more_than_three_years_ago()
+{
+    require DB_PATH;
+
+    $sql = "SELECT id FROM employees WHERE remove_date <= DATE_SUB(NOW(), INTERVAL 3 YEAR)";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute();
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    $rows = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+    return [
+        "status" => true,
+        "data" => $rows
+    ];
+}
+
+
+
+/**
+ * Delete a coach favorites from the database.
+ * @param int $id_coach         ID of the coach
+ * @return array                Status of the operation
+ */
+function delete_coach_favorites($id_coach)
+{
+    require DB_PATH;
+
+    $sql = "DELETE FROM coach_favorites WHERE id_coach = :id_coach";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_coach" => $id_coach]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
+ * Remove a coach from the customers.
+ * @param mixed $id_coach       ID of the coach
+ * @return array                Status of the operation
+ */
+function remove_id_coach_from_customers($id_coach)
+{
+    require DB_PATH;
+
+    $sql = "UPDATE customers SET id_coach = NULL WHERE id_coach = :id_coach";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_coach" => $id_coach]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
+ * Delete an employee image from the database.
+ * @param int $id_employee      ID of the employee
+ * @return array                Status of the operation
+ */
+function delete_employee_image($id_employee)
+{
+    require DB_PATH;
+
+    $sql = "DELETE FROM employees_images WHERE id_employee = :id_employee";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_employee" => $id_employee]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
+ * Get the events of a coach.
+ * @param int $id_coach         ID of the coach
+ * @return array                Events of the coach
+ */
+function get_coach_events($id_coach)
+{
+    require DB_PATH;
+
+    $sql = "SELECT id FROM events WHERE id_employee = :id_coach";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_coach" => $id_coach]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    $rows = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+    return [
+        "status" => true,
+        "data" => $rows
+    ];
+}
+
+
+
+/**
+ * Delete the customers of an event.
+ * @param int $id_event         ID of the event
+ * @return array                Status of the operation
+ */
+function delete_event_customers($id_event)
+{
+    require DB_PATH;
+
+    $sql = "DELETE FROM events_customers WHERE id_event = :id_event";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_event" => $id_event]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
+ * Delete an event from the database.
+ * @param int $id_coach         ID of the coach
+ * @return array                Status of the operation
+ */
+function delete_coach_events($id_coach)
+{
+    require DB_PATH;
+
+    $sql = "DELETE FROM events WHERE id_employee = :id_coach";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_coach" => $id_coach]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
+ * Delete the employees removed more than three years ago.
+ * @return array                Status of the operation
+ */
+function delete_employees_removed_more_than_three_years_ago()
+{
+    require DB_PATH;
+
+    $sql = "DELETE FROM employees WHERE remove_date <= DATE_SUB(NOW(), INTERVAL 3 YEAR)";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute();
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
+ * Get the IDs of the customers removed more than three years ago.
+ * @return array                IDs of the customers
+ */
+function get_customers_removed_more_than_three_years_ago()
+{
+    require DB_PATH;
+
+    $sql = "SELECT id FROM customers WHERE remove_date <= DATE_SUB(NOW(), INTERVAL 3 YEAR)";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute();
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    $rows = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+    return [
+        "status" => true,
+        "data" => $rows
+    ];
+}
+
+
+
+/**
+ * Delete a customer from coaches favorites.
+ * @param int $id_customer      ID of the customer
+ * @return array                Status of the operation
+ */
+function delete_customer_from_coaches_favorites($id_customer)
+{
+    require DB_PATH;
+
+    $sql = "DELETE FROM coach_favorites WHERE id_customer = :id_customer";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_customer" => $id_customer]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
+ * Delete the customer encounters.
+ * @param int $id_customer      ID of the customer
+ * @return array                Status of the operation
+ */
+function delete_customer_encounters($id_customer)
+{
+    require DB_PATH;
+
+    $sql = "DELETE FROM encounters WHERE id_customer = :id_customer";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_customer" => $id_customer]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
+ * Delete the customer events.
+ * @param int $id_customer      ID of the customer
+ * @return array                Status of the operation
+ */
+function delete_customer_events($id_customer)
+{
+    require DB_PATH;
+
+    $sql = "DELETE FROM events_customers WHERE id_customer = :id_customer";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_customer" => $id_customer]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
+ * Delete the customer payments.
+ * @param int $id_customer      ID of the customer
+ * @return array                Status of the operation
+ */
+function delete_customer_payments($id_customer)
+{
+    require DB_PATH;
+
+    $sql = "DELETE FROM payments WHERE id_customer = :id_customer";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_customer" => $id_customer]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
+ * Delete a customer image from the database.
+ * @param int $id_customer      ID of the customer
+ * @return array                Status of the operation
+ */
+function delete_customer_image($id_customer)
+{
+    require DB_PATH;
+
+    $sql = "DELETE FROM customers_images WHERE id_customer = :id_customer";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_customer" => $id_customer]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
+ * Get the IDs of a customer clothes.
+ * @param int $id_customer      ID of the customer
+ * @return array                Status of the operation
+ */
+function get_customer_clothes($id_customer)
+{
+    require DB_PATH;
+
+    $sql = "SELECT id FROM clothes WHERE id_customer = :id_customer";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_customer" => $id_customer]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    $rows = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+    return [
+        "status" => true,
+        "data" => $rows
+    ];
+}
+
+
+
+/**
+ * Delete a customer clothe image from the database.
+ * @param int $id_clothe        ID of the clothe
+ * @return array                Status of the operation
+ */
+function delete_customer_clothe_image($id_clothe)
+{
+    require DB_PATH;
+
+    $sql = "DELETE FROM clothes_images WHERE id_cloth = :id_cloth";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_cloth" => $id_clothe]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
+ * Delete the customer clothes.
+ * @param int $id_customer      ID of the customer
+ * @return array                Status of the operation
+ */
+function delete_customer_clothes($id_customer)
+{
+    require DB_PATH;
+
+    $sql = "DELETE FROM clothes WHERE id_customer = :id_customer";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_customer" => $id_customer]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
+ * Delete the customers removed more than three years ago.
+ * @return array                Status of the operation
+ */
+function delete_customers_removed_more_than_three_years_ago()
+{
+    require DB_PATH;
+
+    $sql = "DELETE FROM customers WHERE remove_date <= DATE_SUB(NOW(), INTERVAL 3 YEAR)";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute();
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
+ * Delete the encounters removed more than three years ago.
+ * @return array                IDs of the encounters
+ */
+function delete_encounters_removed_more_than_three_years_ago()
+{
+    require DB_PATH;
+
+    $sql = "DELETE FROM encounters WHERE remove_date <= DATE_SUB(NOW(), INTERVAL 3 YEAR)";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute();
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
+}
+
+
+
+/**
+ * Get the IDs of the events removed more than three years ago.
+ * @return array                IDs of the events
+ */
+function get_events_removed_more_than_three_years_ago()
+{
+    require DB_PATH;
+
+    $sql = "SELECT id FROM events WHERE remove_date <= DATE_SUB(NOW(), INTERVAL 3 YEAR)";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute();
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    $rows = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+    return [
+        "status" => true,
+        "data" => $rows
+    ];
+}
+
+
+
+/**
+ * Delete the events removed more than three years ago.
+ * @return array                Status of the operation
+ */
+function delete_events_removed_more_than_three_years_ago()
+{
+    require DB_PATH;
+
+    $sql = "DELETE FROM events WHERE remove_date <= DATE_SUB(NOW(), INTERVAL 3 YEAR)";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute();
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    return [
+        "status" => true
+    ];
 }

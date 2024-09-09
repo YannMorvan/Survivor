@@ -1,5 +1,8 @@
 # Run the backup script daily at 2 AM
 0 2 * * * /usr/local/bin/db-backup.sh >> /var/log/cron/cron.log 2>&1
 
-# Run the update-data script daily at 2 AM
-30 2 * * * /usr/local/bin/update-data.sh >> /var/log/cron/cron.log 2>&1
+# Run the delete-data script daily at 2:30 AM
+30 2 * * * /usr/local/bin/delete-data.sh >> /var/log/cron/cron.log 2>&1
+
+# Run the update-data script daily at 3 AM
+0 3 * * * /usr/local/bin/update-data.sh >> /var/log/cron/cron.log 2>&1

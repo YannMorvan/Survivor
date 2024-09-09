@@ -1,8 +1,16 @@
 <?php
 
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json');
+$origin = isset($_SERVER["HTTP_ORIGIN"]) ? $_SERVER["HTTP_ORIGIN"] : "";
 
+if ($origin == $_ENV["FRONT_HOST"]) {
+    header("Access-Control-Allow-Origin: " . $_ENV["FRONT_HOST"]);
+} else {
+    header("Access-Control-Allow-Origin: http://localhost:3000");
+}
+
+
+header("Access-Control-Allow-Credentials: true");
+header("Content-Type: application/json");
 session_start();
 
 require_once __DIR__ . '/db_connection.php';
@@ -33,7 +41,8 @@ try {
             "gender" => $_POST["gender"],
             "birth_date" => $_POST["birth_date"],
             "description" => $_POST["description"],
-            "astrological_sign" => $_POST["astrological_sign"]
+            "astrological_sign" => $_POST["astrological_sign"],
+            "removed" => 0
         ]);
 
         echo json_encode([
@@ -58,7 +67,8 @@ try {
             "birth_date" => $_POST["birth_date"],
             "description" => $_POST["description"],
             "astrological_sign" => $_POST["astrological_sign"],
-            "id_coach" => $_POST["id_coach"]
+            "id_coach" => $_POST["id_coach"],
+            "removed" => 0
         ]);
 
         echo json_encode([

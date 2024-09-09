@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { sendPostRequest } from "../../utils/utils.js";
 
-const StarRating = ({ rating }: {rating: number}) => {
+const StarRating = ({ rating }: { rating: number }) => {
   const totalStars = 5;
   const filledStars = Array(rating).fill("★");
   const emptyStars = Array(totalStars - rating).fill("☆");
@@ -45,7 +45,7 @@ interface Customer {
   positiveEncounters: number;
   surname: string;
   totalEncounters: number;
-  coachName: string;
+  id_coach: string;
   lastActivity: string;
 }
 
@@ -66,6 +66,12 @@ interface Payment {
   amount: string;
 }
 
+interface Coach {
+  id: number;
+  name: string;
+  surname: string;
+}
+
 const ProfileDetails = ({ params }: { params: { id: string } }) => {
   const router = useRouter();
 
@@ -81,7 +87,7 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
     positiveEncounters: 0,
     surname: "",
     totalEncounters: 0,
-    coachName: "",
+    id_coach: "",
     lastActivity: "",
   });
 
@@ -91,11 +97,17 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
 
   const [payment, setPayments] = React.useState<Payment[]>([]);
 
+  const [coachData, setCoachData] = React.useState<Coach>({
+    id: 0,
+    name: "",
+    surname: "",
+  });
+
   useEffect(() => {
     const fetchCustomerData = async () => {
       try {
         const response = await sendPostRequest(
-          `http://${process.env.NEXT_PUBLIC_PHP_HOST}/client_profile.php`,
+          `http://localhost/client_profile.php`,
           {
             id: params.id,
           }
@@ -122,17 +134,68 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
           positiveEncounters: customer.positiveEncounters || 0,
           surname: customer.surname,
           totalEncounters: customer.totalEncounters || 0,
-          coachName: customer.coachName || "Pas de Coach assigné",
+          id_coach: customer.id_coach
+            ? customer.id_coach.toString()
+            : "Pas de Coach assigné",
           lastActivity: customer.lastActivity || "Aucune activité",
         });
-
-        console.log(customer.payment);
       } catch (error) {
         console.error(error);
       }
     };
     fetchCustomerData();
   }, []);
+
+  useEffect(() => {
+    const fetchCoach = async () => {
+      if (!customerData.id_coach || isNaN(Number(customerData.id_coach))) {
+        console.log("Coach ID is not valid:", customerData.id_coach);
+        return;
+      }
+
+      try {
+        const response = await sendPostRequest(
+          `http://localhost/get_coach.php`,
+          {
+            id_coach: customerData.id_coach,
+          }
+        );
+
+        const parsedResponse = JSON.parse(response);
+
+        if (parsedResponse.error) {
+          console.error("Error fetching coach:", parsedResponse.error);
+          return;
+        }
+
+        if (!parsedResponse.coach || typeof parsedResponse.coach !== "object") {
+          console.error("Unexpected response format:", parsedResponse);
+          return;
+        }
+
+        const coach = parsedResponse.coach;
+
+        if (coach && coach.id && coach.name && coach.surname) {
+          setCoachData({
+            id: coach.id,
+            name: coach.name,
+            surname: coach.surname,
+          });
+        } else {
+          console.error(
+            "Coach data is undefined or missing required fields",
+            coach
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching coach:", error);
+      }
+    };
+
+    if (customerData.id_coach) {
+      fetchCoach();
+    }
+  }, [customerData.id_coach]);
 
   return (
     <div className="mx-6 flex flex-col">
@@ -211,7 +274,7 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
             </div>
             <div>
               <p>Coach</p>
-              <p className="text-[#384B65]">{customerData.coachName}</p>
+              <p className="text-[#384B65]">{`${coachData.name} ${coachData.surname}`}</p>
             </div>
           </div>
         </div>
