@@ -1,8 +1,17 @@
 import React from 'react';
 import Event from '../event';
 
-const MonthView = ({ events, onEventClick }: any) => {
-    const daysInMonth = 30; // Cela peut être calculé dynamiquement en fonction du mois.
+const MonthView = ({ events, month, onEventClick }: any) => {
+    
+    const [monthName, year] = month.split(' ');
+    const monthIndex = new Date(Date.parse(monthName + " 1, " + year)).getMonth();
+    const yearNumber = parseInt(year, 10);
+
+    const getDaysInMonth = (monthIndex: number, year: number) => {
+        return new Date(year, monthIndex + 1, 0).getDate();
+    };
+    
+    const daysInMonth = getDaysInMonth(monthIndex, yearNumber);
 
     const getDayEvents = (dayNumber: number) => {
         return events.filter((event: any) => {
