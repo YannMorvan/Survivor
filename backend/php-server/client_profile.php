@@ -30,18 +30,20 @@ try {
     $stm->execute(["id" => $_POST["id"]]);
     $customer = $stm->fetch(PDO::FETCH_ASSOC);
 
-    // TODO: check if user is authorized to view the payment data
     $paymentQuery = "SELECT * FROM payments WHERE id_customer = :id_customer";
     $paymentStm = $pdo->prepare($paymentQuery);
     $paymentStm->execute(["id_customer" => $_POST["id"]]);
     $payments = $paymentStm->fetchAll(PDO::FETCH_ASSOC);
 
-    usort($payments, function ($a, $b) {
+    if (!$_SESSION["is_coach"])
+        $payments = [];
+    else
+        usort($payments, function ($a, $b) {
 
-        $dateA = new DateTime($a["date"]);
-        $dateB = new DateTime($b["date"]);
-        return $dateB <=> $dateA;
-    });
+            $dateA = new DateTime($a["date"]);
+            $dateB = new DateTime($b["date"]);
+            return $dateB <=> $dateA;
+        });
 
     $recent_payments = array_slice($payments, 0, 4);
 
@@ -63,7 +65,6 @@ try {
     $count_encounters = count($encounters);
     $count_positive_encounters = count(array_filter($encounters, function ($encounter) {
 
-        // TODO: define the rating threshold
         $rating = 3;
 
         return $encounter["rating"] >= $rating;
