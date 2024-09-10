@@ -19,14 +19,16 @@ require_once __DIR__ . "./functions.php";
 
 try {
 
-    $query = "UPDATE customers SET removed = 1";
+    $query = "UPDATE customers SET (removed, remove_date) VALUES (:removed, :remove_date)";
 
     $stm = $pdo->prepare($query);
     $stm->execute();
 
     echo json_encode([
         "status" => true,
-        "message" => "Customers deleted successfully"
+        "message" => "Customers deleted successfully",
+        "removed" => 1,
+        "remove_date" => date("Y-m-d")
     ]);
 
 } catch (PDOException $e) {

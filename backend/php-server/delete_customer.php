@@ -27,11 +27,13 @@ if (!isset($_POST['id'])) {
 
 try {
 
-    $query = "UPDATE customers SET removed = 1 WHERE id = :id";
+    $query = "UPDATE customers SET (removed, remove_date) VALUES (:removed, :remove_date) WHERE id = :id";
 
     $stm = $pdo->prepare($query);
     $stm->execute([
-        "id" => $_POST["id"]
+        "id" => $_POST["id"],
+        "removed" => 1,
+        "remove_date" => date("Y-m-d")
     ]);
 
     echo json_encode([

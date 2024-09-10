@@ -19,12 +19,14 @@ require_once __DIR__ . '/functions.php';
 
 try {
 
-    $query = "UPDATE employees SET removed = 1 WHERE work = :work AND work = :work2";
+    $query = "UPDATE employees SET (removed, remove_date) VALUES (:removed, :remove_date) WHERE work = :work AND work = :work2";
 
     $stm = $pdo->prepare($query);
     $stm->execute([
         "work" => "coach",
-        "work2" => "Coach"
+        "work2" => "Coach",
+        "removed" => 1,
+        "remove_date" => date("Y-m-d")
     ]);
 
     echo json_encode([
