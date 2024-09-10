@@ -10,26 +10,23 @@ if ($origin == $_ENV["FRONT_HOST"]) {
 
 
 header("Access-Control-Allow-Credentials: true");
-header('Content-Type: application/json');
+header("Content-Type: application/json");
 
 session_start();
 
-require_once __DIR__ . '/db_connection.php';
-require_once __DIR__ . '/functions.php';
+require_once __DIR__ . "/db_connection.php";
+require_once __DIR__ . "./functions.php";
 
 try {
 
-    $query = "UPDATE employees SET removed = 1 WHERE work = :work AND work = :work2";
+    $query = "UPDATE customers SET removed = 1";
 
     $stm = $pdo->prepare($query);
-    $stm->execute([
-        "work" => "coach",
-        "work2" => "Coach"
-    ]);
+    $stm->execute();
 
     echo json_encode([
         "status" => true,
-        "message" => "Coaches deleted successfully"
+        "message" => "Customers deleted successfully"
     ]);
 
 } catch (PDOException $e) {
