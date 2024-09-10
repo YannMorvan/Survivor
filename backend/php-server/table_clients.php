@@ -1,8 +1,16 @@
 <?php
 
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
+$origin = isset($_SERVER["HTTP_ORIGIN"]) ? $_SERVER["HTTP_ORIGIN"] : "";
 
+if ($origin == $_ENV["FRONT_HOST"]) {
+    header("Access-Control-Allow-Origin: " . $_ENV["FRONT_HOST"]);
+} else {
+    header("Access-Control-Allow-Origin: http://localhost:3000");
+}
+
+
+header("Access-Control-Allow-Credentials: true");
+header("Content-Type: application/json");
 session_start();
 
 require_once __DIR__ . "/functions.php";
@@ -10,7 +18,7 @@ require_once __DIR__ . "/db_connection.php";
 
 try {
 
-    $query = "SELECT * FROM customers";
+    $query = "SELECT * FROM customers WHERE removed = 0";
 
     $stm = $pdo->prepare($query);
     $stm->execute();
@@ -35,9 +43,6 @@ try {
         $imageStm = $pdo->prepare($imageQuery);
         $imageStm->execute(["id_customer" => $customer["id"]]);
         $images = $imageStm->fetch(PDO::FETCH_ASSOC);
-
-        if (empty($payments) || empty($images))
-            return null;
 
         return [
             "id" => $customer["id"],

@@ -1,8 +1,16 @@
 <?php
 
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json');
+$origin = isset($_SERVER["HTTP_ORIGIN"]) ? $_SERVER["HTTP_ORIGIN"] : "";
 
+if ($origin == $_ENV["FRONT_HOST"]) {
+    header("Access-Control-Allow-Origin: " . $_ENV["FRONT_HOST"]);
+} else {
+    header("Access-Control-Allow-Origin: http://localhost:3000");
+}
+
+
+header("Access-Control-Allow-Credentials: true");
+header("Content-Type: application/json");
 session_start();
 
 require_once __DIR__ . '/db_connection.php';
@@ -25,7 +33,8 @@ try {
             'name' => $_POST['name'],
             'surname' => $_POST['surname'],
             'email' => $_POST['email'],
-            'phone_number' => $_POST['phone_number']
+            'phone_number' => $_POST['phone_number'],
+            "removed" => 0
         ]);
     } else {
         $query = "UPDATE employees SET name = :name, surname = :surname, email = :email, phone_number = :phone_number, password = :password WHERE id = :id";
@@ -36,7 +45,8 @@ try {
             'surname' => $_POST['surname'],
             'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
             'email' => $_POST['email'],
-            'phone_number' => $_POST['phone_number']
+            'phone_number' => $_POST['phone_number'],
+            "removed" => 0
         ]);
     }
 

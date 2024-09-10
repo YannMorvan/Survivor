@@ -2,24 +2,16 @@
 
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
-session_start();
 
-require_once __DIR__ . "/functions.php";
+require_once __DIR__ . "/../functions.php";
 
 
-if (!isset($_ENV["API_KEY"])) {
-    echo json_encode([
-        "status" => false,
-        "message" => "Environment variable API_KEY is not set"
-    ]);
-    exit();
-}
+parse_str(implode("&", array_slice($argv, 1)), $_POST);
 
-if (!isset($_SESSION["token"])) {
-    echo json_encode([
-        "status" => false,
-        "message" => "No token found. Please login"
-    ]);
+$res = check_api_key_and_token($_ENV["API_KEY"], $_POST["token"]);
+
+if ($res["status"] == false) {
+    echo json_encode($res);
     exit();
 }
 
@@ -27,7 +19,7 @@ if (!isset($_SESSION["token"])) {
 $errors = [];
 
 
-$res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/employees");
+$res = get_data_from_api($_ENV["API_KEY"], $_POST["token"], "https://soul-connection.fr/api/employees");
 
 if ($res["status"] == false) {
     echo json_encode([
@@ -51,7 +43,7 @@ foreach ($employees as $i => $employee) {
     }
 
 
-    $res = get_data_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/employees/" . $employee->id);
+    $res = get_data_from_api($_ENV["API_KEY"], $_POST["token"], "https://soul-connection.fr/api/employees/" . $employee->id);
 
     if ($res["status"] == false) {
         $errors[] = [
@@ -71,7 +63,7 @@ foreach ($employees as $i => $employee) {
     }
 
 
-    $res = get_image_from_api($_ENV["API_KEY"], $_SESSION["token"], "https://soul-connection.fr/api/employees/" . $employee->id . "/image");
+    $res = get_image_from_api($_ENV["API_KEY"], $_POST["token"], "https://soul-connection.fr/api/employees/" . $employee->id . "/image");
 
     if ($res["status"] == false) {
         $errors[] = [

@@ -10,7 +10,8 @@ if ($origin == $_ENV["FRONT_HOST"]) {
 
 
 header("Access-Control-Allow-Credentials: true");
-header("Content-Type: application/json");
+header('Content-Type: application/json');
+
 session_start();
 
 require_once __DIR__ . '/db_connection.php';
@@ -18,27 +19,21 @@ require_once __DIR__ . '/functions.php';
 
 try {
 
-    $query = "SELECT title, tip FROM tips";
+    $query = "SELECT * FROM employees WHERE id = :id AND removed = 0";
 
     $stm = $pdo->prepare($query);
-    $stm->execute();
-    $tips = $stm->fetchAll(PDO::FETCH_ASSOC);
-
-    if (empty($tips)) {
-        echo json_encode([
-            "status" => false,
-            "message" => 'No tips found'
-        ]);
-        exit();
-    }
+    $stm->execute([
+        'id' => $_POST['id_coach']
+    ]);
+    $coach = $stm->fetch(PDO::FETCH_ASSOC);
 
     echo json_encode([
         "status" => true,
-        "data" => $tips
+        "coach" => $coach
     ]);
+
 } catch (PDOException $e) {
     echo json_encode([
         "status" => false,
-        "message" => $e->getMessage()
-    ]);
+        'error' => $e->getMessage()]);
 }
