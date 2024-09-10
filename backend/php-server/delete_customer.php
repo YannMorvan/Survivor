@@ -27,7 +27,7 @@ if (!isset($_POST['id'])) {
 
 try {
 
-    $query = "UPDATE customers SET (removed, remove_date) VALUES (:removed, :remove_date) WHERE id = :id";
+    $query = "UPDATE customers SET removed = :removed, remove_date = :remove_date WHERE id = :id";
 
     $stm = $pdo->prepare($query);
     $stm->execute([

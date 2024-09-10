@@ -19,7 +19,7 @@ require_once __DIR__ . '/functions.php';
 
 try {
 
-    $query = "UPDATE employees SET (removed, remove_date) VALUES (:removed, :remove_date) WHERE work = :work AND work = :work2";
+    $query = "UPDATE employees SET removed = :removed, remove_date = :removed_date WHERE work = :work AND work = :work2";
 
     $stm = $pdo->prepare($query);
     $stm->execute([

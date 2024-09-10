@@ -19,7 +19,7 @@ require_once __DIR__ . "./functions.php";
 
 try {
 
-    $query = "UPDATE customers SET (removed, remove_date) VALUES (:removed, :remove_date)";
+    $query = "UPDATE customers SET removed = :removed, remove_date = :remove_date";
 
     $stm = $pdo->prepare($query);
     $stm->execute();

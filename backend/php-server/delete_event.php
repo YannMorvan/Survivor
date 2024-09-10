@@ -26,7 +26,7 @@ if (!isset($_POST['id'])) {
 
 try {
 
-    $query = "UPDATE events SET (removed, remove_date) VALUES (:removed, :remove_date) WHERE id = :id";
+    $query = "UPDATE events SET removed = :removed, remove_date = :remove_date WHERE id = :id";
 
     $stm = $pdo->prepare($query);
     $stm->execute([
