@@ -13,6 +13,7 @@ header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json");
 
 require_once __DIR__ . "/db_connection.php";
+require_once __DIR__ . "/functions.php";
 
 
 try {
