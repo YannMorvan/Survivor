@@ -20,7 +20,8 @@ export default function Events() {
     const [selectedWeek, setSelectedWeek] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(new Date());
     const [selectedEvent, setSelectedEvent] = useState<Events>();
-    const [view, setView] = useState<'mois' | 'semaine' | 'jour' | 'liste'>('mois');
+    const [view, setView] = useState<'mois' | 'semaine' | 'jour'>('mois');
+    const [listView, setListView] = useState<boolean>(false);
 
     useEffect(() => {
         if (view === 'mois') {
@@ -37,7 +38,7 @@ export default function Events() {
         } else if (view === 'jour') {
             setSelectedMonth(selectedDay.toLocaleString('default', { month: 'long', year: 'numeric' }));
         }
-    }, [view, selectedMonth, selectedWeek, selectedDay]);
+    }, [view]);
 
     const changeDate = (direction: string) => {
         if (view === 'semaine') {
@@ -140,9 +141,9 @@ export default function Events() {
                                 </p>
                                 <p
                                     className={`text-xs font-semibold border px-4 py-2 cursor-pointer ${
-                                        view === 'liste' ? 'bg-slate-100' : ''
+                                        listView === true ? 'bg-slate-100' : ''
                                     }`}
-                                    onClick={() => setView('liste')}
+                                    onClick={() => setListView(!listView)}
                                 >
                                     Liste
                                 </p>
@@ -150,7 +151,7 @@ export default function Events() {
                         </div>
                     </div>
                 </div>
-                <Calendar month={selectedMonth} week={selectedWeek} day={selectedDay} view={view} onEventClick={handleEventClick} />
+                <Calendar month={selectedMonth} week={selectedWeek} day={selectedDay} list={listView} view={view} onEventClick={handleEventClick} />
             </div>
             <div className='mt-10 border bg-white p-5'>
                 <div className='w-full'>
