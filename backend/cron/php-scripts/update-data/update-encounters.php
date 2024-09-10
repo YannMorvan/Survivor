@@ -43,6 +43,20 @@ foreach ($encounters as $i => $encounter) {
     }
 
 
+    $res = do_encounter_exist_in_database($encounter->id);
+
+    if ($res["status"] == false) {
+        $errors[] = [
+            "context" => "Check if an encounter exist in database",
+            "error" => $res["message"]
+        ];
+        continue;
+    }
+    if ($res["does_exist"] == true) {
+        continue;
+    }
+
+
     $res = get_data_from_api($_ENV["API_KEY"], $_POST["token"], "https://soul-connection.fr/api/encounters/" . $encounter->id);
 
     if ($res["status"] == false) {

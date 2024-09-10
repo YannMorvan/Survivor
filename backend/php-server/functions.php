@@ -68,3 +68,57 @@ function login($api_key, $email, $password)
         "token" => $response->access_token
     ];
 }
+
+
+
+/**
+ * Get the country where an address is located.
+ * @param string $address       Address
+ * @return array                Data of the country
+ */
+function get_country_from_address($address)
+{
+    $address = urlencode($address);
+
+
+    $header = [
+        "Content-Type: application/json"
+    ];
+
+    $ch = curl_init("https://api.geoapify.com/v1/geocode/search?text={$address}&apiKey={$_ENV["GEOAPIFY_API_KEY"]}");
+
+    curl_setopt_array($ch, [
+        CURLOPT_HTTPHEADER => $header,
+        CURLOPT_RETURNTRANSFER => true
+    ]);
+
+    $response = curl_exec($ch);
+    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+
+    curl_close($ch);
+
+
+    if ($code != 200) {
+        return [
+            "status" => false,
+            "code" => $code,
+            "error" => $error
+        ];
+    }
+
+
+    $response = json_decode($response, true);
+
+    if (isset($response["features"][0]["properties"]["country"])) {
+        return [
+            "status" => true,
+            "country" => $response["features"][0]["properties"]["country"]
+        ];
+    } else {
+        return [
+            "status" => false,
+            "error" => "Country not found"
+        ];
+    }
+}
