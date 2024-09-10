@@ -11,10 +11,9 @@ if ($origin == $_ENV["FRONT_HOST"]) {
 
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json");
-session_start();
 
 require_once __DIR__ . '/db_connection.php';
-require_once __DIR__ . '/functions.php';
+
 
 try {
 
@@ -23,6 +22,7 @@ try {
     $stm = $pdo->prepare($query);
     $stm->execute();
     $tips = $stm->fetchAll(PDO::FETCH_ASSOC);
+
 
     if (empty($tips)) {
         echo json_encode([
@@ -36,6 +36,7 @@ try {
         "status" => true,
         "data" => $tips
     ]);
+
 } catch (PDOException $e) {
     echo json_encode([
         "status" => false,
