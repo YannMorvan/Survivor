@@ -39,19 +39,13 @@ try {
         $paymentStm->execute(["id_customer" => $customer["id"]]);
         $payments = $paymentStm->fetch(PDO::FETCH_ASSOC);
 
-        $imageQuery = "SELECT * FROM customers_images WHERE id_customer = :id_customer";
-        $imageStm = $pdo->prepare($imageQuery);
-        $imageStm->execute(["id_customer" => $customer["id"]]);
-        $images = $imageStm->fetch(PDO::FETCH_ASSOC);
-
         return [
             "id" => $customer["id"],
             "name" => $customer["name"],
             "surname" => $customer['surname'],
-            "image" => base64_encode($images["image"]),
             "email" => $customer["email"],
             "phone_number" => $customer["phone_number"],
-            "payement_method" => $payments["method"],
+            "payement_method" => $payments["method"]
         ];
     }, $customers));
 

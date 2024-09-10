@@ -16,7 +16,6 @@ require_once __DIR__ . "/functions.php";
 require_once __DIR__ . "/db_connection.php";
 
 try {
-    // TODO: add phone number and amount of customer for each employee
 
     $query = "SELECT * FROM employees WHERE removed = 0";
     $stmt = $pdo->prepare($query);
@@ -33,17 +32,19 @@ try {
 
     $employes_array = array_filter(array_map(function ($employe) use ($pdo) {
 
-        $imageQuery = "SELECT * FROM employees_images WHERE id_employee = :id_employee";
-        $imageStmt = $pdo->prepare($imageQuery);
-        $imageStmt->execute(["id_employee" => $employe["id"]]);
-        $image = $imageStmt->fetch(PDO::FETCH_ASSOC);
+        $query = "SELECT * FROM customers WHERE id_coach = :id";
+
+        $stm = $pdo->prepare($query);
+        $stm->execute(["id" => $employe["id"]]);
+        $amount_customer = count($stm->fetchAll(PDO::FETCH_ASSOC));
 
         return [
             "id" => $employe["id"],
             "name" => $employe["name"],
             "surname" => $employe["surname"],
             "email" => $employe["email"],
-            "image" => empty($image) ? null : base64_encode($image["image"])
+            "phone_number" => $employe["phone_number"],
+            "amount_customer" => $amount_customer
         ];
     }, $employes));
 
