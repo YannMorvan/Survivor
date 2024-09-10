@@ -225,8 +225,47 @@ const Page = () => {
     setIsModalEditOpen(false);
   };
 
-  const openDeleteModal = () => {
+  const openDeleteModal = async (coachId: string) => {
     setIsModalDeleteOpen(true);
+    setDropdownOpen(null);
+    if (!coachId || isNaN(Number(coachId))) {
+      console.error("Invalid coach ID:", coachId);
+      return;
+    }
+
+    try {
+      const response = await sendPostRequest(`http://localhost/get_coach.php`, {
+        id_coach: coachId,
+      });
+
+      const parsedResponse = JSON.parse(response);
+
+      if (parsedResponse.error) {
+        console.error("Error fetching coach:", parsedResponse.error);
+        return;
+      }
+
+      if (!parsedResponse.coach || typeof parsedResponse.coach !== "object") {
+        console.error("Unexpected response format:", parsedResponse);
+        return;
+      }
+
+      const coach = parsedResponse.coach;
+
+      setFormData({
+        email: coach.email || "",
+        id: coach.id || "",
+        name: coach.name || "",
+        surname: coach.surname || "",
+        birth_date: coach.birth_date || "",
+        phone: coach.phone_number || "",
+        gender: coach.gender || "",
+        work: coach.work || "",
+        password: "",
+      });
+    } catch (error) {
+      console.error("Error fetching coach:", error);
+    }
   };
 
   const closeDeleteModal = () => {
@@ -503,14 +542,28 @@ const Page = () => {
     setDropdownOpen(dropdownOpen === id ? null : id);
   };
 
-  const handleEdit = (id: string) => {
-    setIsModalEditOpen(true);
-    setDropdownOpen(null);
-  };
+  const handleDeleteCoach = async (id: string) => {
+    try {
+      const response = await sendPostRequest(
+        "http://localhost/delete_coach.php",
+        {
+          id,
+        }
+      );
 
-  const handleDelete = (id: string) => {
-    setIsModalDeleteOpen(true);
-    setDropdownOpen(null);
+      const parsedResponse = JSON.parse(response);
+
+      if (parsedResponse.error) {
+        setError(parsedResponse.error);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      setError("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+      setIsModalDeleteOpen(false);
+    }
   };
 
   const handleFilterToggle = () => {
@@ -708,7 +761,7 @@ const Page = () => {
                       </button>
                       <button
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
-                        onClick={() => handleDelete(coach.id)}
+                        onClick={() => openDeleteModal(coach.id)}
                       >
                         Supprimer
                       </button>
@@ -879,7 +932,9 @@ const Page = () => {
             <div className="flex justify-center gap-4 mt-4">
               <button
                 className="bg-red-500 text-white px-4 py-2 rounded-md"
-                onClick={closeDeleteModal}
+                onClick={() => {
+                  handleDeleteCoach(formData.id);
+                }}
               >
                 Supprimer
               </button>
