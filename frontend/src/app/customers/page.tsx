@@ -292,8 +292,73 @@ const Page = () => {
     }
   };
 
-  const openDeleteModal = () => {
+  const handleDeleteCustomer = async (id: string) => {
+    try {
+      const response = await sendPostRequest(
+        "http://localhost/delete_customer.php",
+        {
+          id,
+        }
+      );
+
+      const parsedResponse = JSON.parse(response);
+
+      if (parsedResponse.error) {
+        setError(parsedResponse.error);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      setError("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+      setIsModalDeleteOpen(false);
+    }
+  };
+
+  const openDeleteModal = async (customerId: string) => {
     setIsModalDeleteOpen(true);
+    setDropdownOpen(null);
+    try {
+      const response = await sendPostRequest(
+        `http://localhost/client_profile.php`,
+        {
+          id: customerId,
+        }
+      );
+
+      const parsedResponse = JSON.parse(response);
+
+      if (parsedResponse.error) {
+        console.error(parsedResponse.error);
+        return;
+      }
+
+      const customer = parsedResponse.data;
+
+      if (!customer) {
+        console.error("Customer data is undefined");
+        return;
+      }
+
+      setFormData({
+        address: customer.address || "",
+        email: customer.email || "",
+        id: customer.id || "",
+        name: customer.name || "",
+        surname: customer.surname || "",
+        id_coach: customer.id_coach
+          ? customer.id_coach.toString()
+          : "Pas de Coach assigné",
+        birth_date: customer.birth_date || "",
+        description: customer.description || "Pas de description",
+        astrological_sign: customer.astrological_sign || "",
+        phone_number: customer.phone_number || "",
+        gender: customer.gender || "",
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const closeDeleteModal = () => {
@@ -454,11 +519,6 @@ const Page = () => {
 
   const handleDropdownToggle = (id: string) => {
     setDropdownOpen(dropdownOpen === id ? null : id);
-  };
-
-  const handleDelete = (id: string) => {
-    setIsModalDeleteOpen(true);
-    setDropdownOpen(null);
   };
 
   const handleFilterToggle = () => {
@@ -786,7 +846,7 @@ const Page = () => {
                       </button>
                       <button
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
-                        onClick={() => handleDelete(customer.id)}
+                        onClick={() => openDeleteModal(customer.id)}
                       >
                         Supprimer
                       </button>
@@ -819,7 +879,7 @@ const Page = () => {
                   <input
                     type="text"
                     name="name"
-                    value={formData.name || customerData?.name || ""}
+                    value={formData.name || ""}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border rounded-lg"
                     required
@@ -996,7 +1056,9 @@ const Page = () => {
             <div className="flex justify-center gap-4 mt-4">
               <button
                 className="bg-red-500 text-white px-4 py-2 rounded-md"
-                onClick={closeDeleteModal}
+                onClick={() => {
+                  handleDeleteCustomer(formData.id);
+                }}
               >
                 Supprimer
               </button>
