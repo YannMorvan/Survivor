@@ -31,9 +31,7 @@ try {
     $encounters = $stm->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($encounters as $key => $encounter) {
-        $encounters[$key] = [
-            "date" => DateTime::createFromFormat("Y-m-d", $encounter["date"])->format("d/m/Y"),
-        ];
+        $encounters[$key]["date"] = DateTime::createFromFormat("Y-m-d", $encounter["date"])->format("d/m/Y");
     }
 
 
