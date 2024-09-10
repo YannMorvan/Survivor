@@ -25,7 +25,7 @@ if (!isset($_POST['email']) || !isset($_POST['name']) || !isset($_POST['surname'
 }
 
 try {
-    $query = "INSERT INTO employees (email, password, name, surname, birth_date, gender, work) VALUES (:email, :password, :name, :surname, :birth_date, :gender, :work)";
+    $query = "INSERT INTO employees (email, password, name, surname, birth_date, gender, work, phone_number, removed) VALUES (:email, :password, :name, :surname, :birth_date, :gender, :work, :phone_number, :removed)";
     $stmt = $pdo->prepare($query);
     $stmt->execute([
         "email" => $_POST["email"],
@@ -35,6 +35,7 @@ try {
         "birth_date" => $_POST["birth_date"],
         "gender" => $_POST["gender"],
         "work" => $_POST["work"],
+        "phone_number" => $_POST["phone_number"] ? $_POST['phone_number'] : null,
         "removed" => 0
     ]);
 
