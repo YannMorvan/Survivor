@@ -3,27 +3,25 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
-const LineChart = () => {
+const StarComparisonChart = () => {
   const chartRef = useRef(null);
 
   useEffect(() => {
-
     am4core.useTheme(am4themes_animated);
 
     let chart = am4core.create('chartdiv4', am4charts.XYChart);
 
     if (chart.logo) {
-        chart.logo.disabled = true;
+      chart.logo.disabled = true;
     }
 
     chart.data = [
-      { date: new Date(2019, 1, 12), value1: 50, previousDate: new Date(2019, 5, 5) },
-      { date: new Date(2019, 2, 13), value1: 53, previousDate: new Date(2019, 5, 6) },
-      { date: new Date(2019, 3, 14), value1: 56, previousDate: new Date(2019, 5, 7) },
-      { date: new Date(2019, 4, 15), value1: 52, previousDate: new Date(2019, 5, 8) },
-      { date: new Date(2019, 5, 16), value1: 48, previousDate: new Date(2019, 5, 9) },
-      { date: new Date(2019, 6, 17), value1: 47, previousDate: new Date(2019, 5, 10) },
-      { date: new Date(2019, 7, 18), value1: 59, previousDate: new Date(2019, 5, 11) }
+      { date: new Date(2020, 0, 1), star1: 4.5 },
+      { date: new Date(2020, 1, 1), star1: 4.7 },
+      { date: new Date(2020, 2, 1), star1: 4.9 },
+      { date: new Date(2020, 3, 1), star1: 5.0 },
+      { date: new Date(2020, 4, 1), star1: 4.8 },
+      { date: new Date(2020, 5, 1), star1: 4.6 }
     ];
 
     let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
@@ -34,26 +32,29 @@ const LineChart = () => {
     });
     dateAxis.renderer.labels.template.fill = am4core.color("#808080");
     dateAxis.renderer.labels.template.fontSize = 12;
-    let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
 
+    let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+    valueAxis.title.text = "Star Ratings";
+    valueAxis.title.fontWeight = 800;
     valueAxis.renderer.grid.template.disabled = true;
     dateAxis.renderer.grid.template.disabled = true;
     valueAxis.renderer.labels.template.disabled = true;
 
     let series = chart.series.push(new am4charts.LineSeries());
-    series.dataFields.valueY = 'value1';
+    series.dataFields.valueY = 'star1';
     series.dataFields.dateX = 'date';
     series.strokeWidth = 2;
     series.minBulletDistance = 10;
-    series.tooltipText = "[bold]{date.formatDate()}:[/] {value1}\n[bold]{previousDate.formatDate()}:[/] {value2}";
+    series.tooltipText = "[bold]{date.formatDate()}:[/] Star 1: {valueY}";
     series.tooltip.pointerOrientation = 'vertical';
 
     let series2 = chart.series.push(new am4charts.LineSeries());
-    series2.dataFields.valueY = 'value2';
+    series2.dataFields.valueY = 'star2';
     series2.dataFields.dateX = 'date';
     series2.strokeWidth = 2;
     series2.strokeDasharray = '3,4';
     series2.stroke = series.stroke;
+    series2.tooltipText = "[bold]{date.formatDate()}:[/] Star 2: {valueY}";
 
     var bullet = series.bullets.push(new am4charts.CircleBullet());
     bullet.disabled = true;
@@ -63,17 +64,15 @@ const LineChart = () => {
     secondCircle.radius = 6;
     secondCircle.fill = chart.colors.getIndex(8);
 
-
     bullet.events.on("inited", function(event){
-    animateBullet(event.target.circle);
-    })
-
+      animateBullet(event.target.circle);
+    });
 
     function animateBullet(bullet) {
-        var animation = bullet.animate([{ property: "scale", from: 1, to: 5 }, { property: "opacity", from: 1, to: 0 }], 1000, am4core.ease.circleOut);
-        animation.events.on("animationended", function(event){
+      var animation = bullet.animate([{ property: "scale", from: 1, to: 5 }, { property: "opacity", from: 1, to: 0 }], 1000, am4core.ease.circleOut);
+      animation.events.on("animationended", function(event){
         animateBullet(event.target.object);
-        })
+      });
     }
 
     chart.cursor = new am4charts.XYCursor();
@@ -91,4 +90,4 @@ const LineChart = () => {
   return <div id="chartdiv4" style={{ width: '100%', height: '200px' }}></div>;
 };
 
-export default LineChart;
+export default StarComparisonChart;

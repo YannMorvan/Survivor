@@ -90,7 +90,7 @@ const Navbar = () => {
                 type="button"
                 onClick={toggleDropdown}
                 ref={buttonRef}
-                className="lg:hidden block text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                className="lg:hidden block text-black border border-slate-300 bg-white hover:bg-slate-100 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-white"
               >
                 <Menu />
               </button>
@@ -106,16 +106,16 @@ const Navbar = () => {
                     <a href="/coaches" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/coaches')}`}>Coachs</a>
                   </li>
                   <li>
-                    <a href="/customers" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/customers')}`}>Customers</a>
+                    <a href="/customers" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/customers')}`}>Clients</a>
                   </li>
                   <li>
-                    <a href="/tips" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/tips')}`}>Tips</a>
+                    <a href="/tips" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/tips')}`}>Conseils</a>
                   </li>
                   <li>
-                    <a href="/events" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/events')}`}>Events</a>
+                    <a href="/events" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/events')}`}>Evènements</a>
                   </li>
                   <li>
-                    <a href="/clothes" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/clothes')}`}>Clothes</a>
+                    <a href="/clothes" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/clothes')}`}>Vetements</a>
                   </li>
                   <li>
                     <a href="/astro" className={`block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white ${getActiveRoute('/astro')}`}>Compatibilité</a>

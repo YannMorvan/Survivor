@@ -2,16 +2,59 @@ import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { sendPostRequest } from '../utils/utils';
+
+interface FormData {
+  name: string;
+  date: Date | null;
+  duration: string;
+  max_participants: string;
+  location_x: string;
+  location_y: string;
+  type: string;
+  location_name: string;
+  id_employee: number; 
+}
 
 const CrudModal = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
-    price: '',
-    category: '',
-    description: '',
     date: null,
+    duration: '',
+    max_participants: '',
+    location_x: '',
+    location_y: '',
+    type: '',
+    location_name: '',
+    id_employee: 3,
   });
+
+  const createEvent = async () => {
+    const eventData = {
+      id: 0,
+      name: formData?.name,
+      date: formData?.date ? formData.date.toISOString().split('T')[0] : '',
+      duration: parseInt(formData.duration, 10),
+      max_participants: parseInt(formData.max_participants, 10),
+      location_x: formData?.location_x,
+      location_y: formData?.location_y,
+      type: formData?.type,
+      location_name: formData?.location_name,
+    };
+
+    try {
+      const response = await sendPostRequest(
+        `http://localhost/create_event.php`,
+        eventData
+      );
+
+      const data = JSON.parse(response);
+      console.log(data);
+    } catch (error) {
+      console.error("Erreur lors de la requête : ", error);
+    }
+  };
 
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
@@ -26,15 +69,15 @@ const CrudModal = () => {
   };
 
   const handleDateChange = (date: Date | null) => {
-    if (date) {
-      setFormData({
-        ...formData,
-      });
-    }
+    setFormData({
+      ...formData,
+      date,
+    });
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    createEvent();
     toggleModal();
   };
 
@@ -97,13 +140,14 @@ const CrudModal = () => {
                       type="text"
                       name="name"
                       id="name"
-                      value={formData.name}
+                      value={formData?.name}
                       onChange={handleChange}
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                      placeholder="nom événement"
+                      placeholder="Nom de l'évènement"
                       required
                     />
                   </div>
+
                   <div className="col-span-2">
                     <label
                       htmlFor="date"
@@ -112,29 +156,126 @@ const CrudModal = () => {
                       Date de l'évènement
                     </label>
                     <DatePicker
-                      selected={formData.date}
+                      selected={formData?.date}
                       onChange={handleDateChange}
                       className="w-full p-2.5 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
                       dateFormat="dd/MM/yyyy"
-                      placeholderText="Selectionner une date"
+                      placeholderText="Sélectionner une date"
+                    />
+                  </div>
+
+                  <div className="col-span-1">
+                    <label
+                      htmlFor="duration"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Durée (en heures)
+                    </label>
+                    <input
+                      type="number"
+                      name="duration"
+                      id="duration"
+                      value={formData?.duration}
+                      onChange={handleChange}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      placeholder="Durée"
+                      required
+                    />
+                  </div>
+
+                  <div className="col-span-1">
+                    <label
+                      htmlFor="max_participants"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Participants max
+                    </label>
+                    <input
+                      type="number"
+                      name="max_participants"
+                      id="max_participants"
+                      value={formData?.max_participants}
+                      onChange={handleChange}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      placeholder="Nombre max de participants"
+                      required
+                    />
+                  </div>
+
+                  <div className="col-span-1">
+                    <label
+                      htmlFor="location_x"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Localisation X
+                    </label>
+                    <input
+                      type="text"
+                      name="location_x"
+                      id="location_x"
+                      value={formData?.location_x}
+                      onChange={handleChange}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      placeholder="Coordonnée X"
+                      required
+                    />
+                  </div>
+
+                  <div className="col-span-1">
+                    <label
+                      htmlFor="location_y"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Localisation Y
+                    </label>
+                    <input
+                      type="text"
+                      name="location_y"
+                      id="location_y"
+                      value={formData?.location_y}
+                      onChange={handleChange}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      placeholder="Coordonnée Y"
+                      required
                     />
                   </div>
 
                   <div className="col-span-2">
                     <label
-                      htmlFor="description"
+                      htmlFor="type"
                       className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                     >
-                      Description de l'évènement
+                      Type d'évènement
                     </label>
-                    <textarea
-                      id="description"
-                      name="description"
-                      value={formData.description}
+                    <input
+                      type="text"
+                      name="type"
+                      id="type"
+                      value={formData?.type}
                       onChange={handleChange}
-                      className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                      placeholder="Description de l'évènement"
-                    ></textarea>
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      placeholder="Type d'évènement"
+                      required
+                    />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label
+                      htmlFor="location_name"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Nom du lieu
+                    </label>
+                    <input
+                      type="text"
+                      name="location_name"
+                      id="location_name"
+                      value={formData?.location_name}
+                      onChange={handleChange}
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      placeholder="Nom du lieu"
+                      required
+                    />
                   </div>
                 </div>
                 <button
@@ -165,3 +306,4 @@ const CrudModal = () => {
 };
 
 export default CrudModal;
+

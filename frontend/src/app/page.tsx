@@ -28,6 +28,8 @@ export default function Login() {
 
       const parsedResponse = JSON.parse(response);
 
+      console.log(parsedResponse);
+
       if (parsedResponse.error) {
         setError(parsedResponse.error);
         return;
@@ -35,7 +37,7 @@ export default function Login() {
 
       console.log(parsedResponse);
 
-      window.location.href = "/dashboard";
+      //window.location.href = "/dashboard";
     } catch (error) {
       console.error(error);
       setError("An error occurred. Please try again.");
