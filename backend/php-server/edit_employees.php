@@ -34,7 +34,6 @@ try {
             'surname' => $_POST['surname'],
             'email' => $_POST['email'],
             'phone_number' => $_POST['phone_number'],
-            "removed" => 0
         ]);
     } else {
         $query = "UPDATE employees SET name = :name, surname = :surname, email = :email, phone_number = :phone_number, password = :password WHERE id = :id";
@@ -46,7 +45,6 @@ try {
             'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
             'email' => $_POST['email'],
             'phone_number' => $_POST['phone_number'],
-            "removed" => 0
         ]);
     }
 

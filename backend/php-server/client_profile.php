@@ -75,14 +75,6 @@ try {
         return $dateTimeStamp->getTimeStamp() > $currentTimestamp->getTimeStamp();
     }));
 
-    if (empty($customer) || empty($payments) || empty($images) || empty($encounters)) {
-        echo json_encode([
-            "status" => false,
-            "message" => "Customer data not found"
-        ]);
-        exit();
-    }
-
     usort($encounters, function ($a, $b) {
         $dateA = new DateTime($a["date"]);
         $dateB = new DateTime($b["date"]);
@@ -99,12 +91,17 @@ try {
         "status" => true,
         "data" => [
             "id" => $customer["id"],
-            "id_coach" => $customer["id_coach"],
+            "id_coach" => $customer["id_coach"] ? $customer["id_coach"] : null,
             "name" => $customer["name"],
             "surname" => $customer["surname"],
             "email" => $customer["email"],
             "address" => $customer["address"],
             "image" => base64_encode($images["image"]),
+            "phone_number" => $customer["phone_number"],
+            "birth_date" => $customer["birth_date"],
+            "gender" => $customer["gender"],
+            "astrological_sign" => $customer["astrological_sign"],
+            "description" => $customer["description"],
             "total_encounters" => $count_encounters,
             "positive_encounters" => $count_positive_encounters,
             "planned_encounters" => $count_planned_encounters,

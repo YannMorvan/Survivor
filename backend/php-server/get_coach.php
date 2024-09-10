@@ -10,8 +10,7 @@ if ($origin == $_ENV["FRONT_HOST"]) {
 
 
 header("Access-Control-Allow-Credentials: true");
-header('Content-Type: application/json');
-
+header("Content-Type: application/json");
 session_start();
 
 require_once __DIR__ . '/db_connection.php';

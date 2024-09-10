@@ -8,6 +8,8 @@ import {
   Sliders,
   Settings,
   X,
+  EyeOff,
+  Eye,
 } from "lucide-react";
 
 import { sendPostRequest } from "../utils/utils.js";
@@ -26,6 +28,7 @@ interface FormData {
   birth_date: string | null;
   gender: string;
   work: string;
+  password: string;
 }
 
 const Page = () => {
@@ -43,8 +46,9 @@ const Page = () => {
     email: "",
     phone: "",
     birth_date: "",
-    gender: "male",
+    gender: "",
     work: "",
+    password: "",
   });
 
   interface CheckedItems {
@@ -57,7 +61,7 @@ const Page = () => {
     image: string;
     name: string;
     surname: string;
-    phone: string;
+    phone_number: string;
     nbrCustomers: number;
   }
 
@@ -104,7 +108,7 @@ const Page = () => {
               email: item.email,
               image: item.image,
               surname: item.surname,
-              phone: item.phone || "555",
+              phone_number: item.phone_number,
               nbrCustomers: 0,
             })
           );
@@ -134,7 +138,12 @@ const Page = () => {
   const [selectedGender, setSelectedGender] = useState("");
 
   const handleGenderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedGender(event.target.value);
+    const gender = event.target.value;
+    setSelectedGender(gender);
+    setFormData({
+      ...formData,
+      gender: gender || "",
+    });
   };
 
   const openAddModal = () => {
@@ -142,14 +151,77 @@ const Page = () => {
   };
 
   const closeAddModal = () => {
+    setFormData({
+      email: "",
+      id: "",
+      name: "",
+      surname: "",
+      birth_date: "",
+      phone: "",
+      gender: "",
+      work: "",
+      password: "",
+    });
+    setIsPasswordVisible(false);
     setIsModalAddOpen(false);
   };
 
-  const openEditModal = () => {
+  const openEditModal = async (coachId: string) => {
     setIsModalEditOpen(true);
+    setDropdownOpen(null);
+    if (!coachId || isNaN(Number(coachId))) {
+      console.error("Invalid coach ID:", coachId);
+      return;
+    }
+
+    try {
+      const response = await sendPostRequest(`http://localhost/get_coach.php`, {
+        id_coach: coachId,
+      });
+
+      const parsedResponse = JSON.parse(response);
+
+      if (parsedResponse.error) {
+        console.error("Error fetching coach:", parsedResponse.error);
+        return;
+      }
+
+      if (!parsedResponse.coach || typeof parsedResponse.coach !== "object") {
+        console.error("Unexpected response format:", parsedResponse);
+        return;
+      }
+
+      const coach = parsedResponse.coach;
+
+      setFormData({
+        email: coach.email || "",
+        id: coach.id || "",
+        name: coach.name || "",
+        surname: coach.surname || "",
+        birth_date: coach.birth_date || "",
+        phone: coach.phone_number || "",
+        gender: coach.gender || "",
+        work: coach.work || "",
+        password: "",
+      });
+    } catch (error) {
+      console.error("Error fetching coach:", error);
+    }
   };
 
   const closeEditModal = () => {
+    setFormData({
+      email: "",
+      id: "",
+      name: "",
+      surname: "",
+      birth_date: "",
+      phone: "",
+      gender: "",
+      work: "",
+      password: "",
+    });
+    setIsPasswordVisible(false);
     setIsModalEditOpen(false);
   };
 
@@ -260,7 +332,7 @@ const Page = () => {
     }
   };
 
-  const handleCreateCoach = async (e: React.FormEvent) => {
+  const handleEditCoach = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (
@@ -281,13 +353,65 @@ const Page = () => {
 
     try {
       const response = await sendPostRequest(
+        "http://localhost/edit_employees.php",
+        {
+          id: formData.id,
+          name: formData.name,
+          surname: formData.surname,
+          email: formData.email,
+          phone_number: formData.phone,
+          birth_date: formData.birth_date,
+          password: formData.password,
+          gender: formData.gender,
+          work: formData.work,
+        }
+      );
+
+      const parsedResponse = JSON.parse(response);
+
+      if (parsedResponse.error) {
+        setError(parsedResponse.error);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      setError("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+      setIsModalEditOpen(false);
+    }
+  };
+
+  const handleCreateCoach = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (
+      !formData.name ||
+      !formData.surname ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.birth_date ||
+      !formData.gender ||
+      !formData.work ||
+      !formData.password
+    ) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await sendPostRequest(
         "http://localhost/add_employee_to_db.php",
         {
           name: formData.name,
           surname: formData.surname,
           email: formData.email,
-          phone: formData.phone,
+          phone_number: formData.phone,
           birth_date: formData.birth_date,
+          password: formData.password,
           gender: formData.gender,
           work: formData.work,
         }
@@ -345,7 +469,7 @@ const Page = () => {
     const rows = coachesData.map((coach) => [
       coach.name,
       coach.email,
-      coach.phone,
+      coach.phone_number,
       coach.nbrCustomers,
     ]);
 
@@ -391,6 +515,12 @@ const Page = () => {
 
   const handleFilterToggle = () => {
     setFilterOpen(!filterOpen);
+  };
+
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible((prevState) => !prevState);
   };
 
   return (
@@ -549,10 +679,12 @@ const Page = () => {
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <span className="text-l">{coach.name}</span>
+                  <span className="text-l">
+                    {coach.name + " " + coach.surname}
+                  </span>
                 </td>
                 <td className="p-4 text-[#6B83A2]">{coach.email}</td>
-                <td className="p-4 text-[#6B83A2]">{coach.phone}</td>
+                <td className="p-4 text-[#6B83A2]">{coach.phone_number}</td>
                 <td className="p-4 text-[#6B83A2]">{coach.nbrCustomers}</td>
                 <td className="p-4 text-[#6B83A2] relative">
                   <button
@@ -570,7 +702,7 @@ const Page = () => {
                     >
                       <button
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
-                        onClick={() => handleEdit(coach.id)}
+                        onClick={() => openEditModal(coach.id)}
                       >
                         Editer
                       </button>
@@ -602,25 +734,25 @@ const Page = () => {
               <X />
             </button>
             <h2 className="text-2xl mb-4">Editer le Coach</h2>
-            <form onSubmit={handleCreateCoach}>
+            <form onSubmit={handleEditCoach}>
               <div className="flex flex-row gap-4 w-full">
                 <div className="mb-4">
-                  <label className="block text-gray-700">Nom</label>
+                  <label className="block text-gray-700">Prénom</label>
                   <input
                     type="text"
                     name="name"
-                    value={formData.name}
+                    value={formData.name || ""}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border rounded-lg"
                     required
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-gray-700">Prénom</label>
+                  <label className="block text-gray-700">Nom</label>
                   <input
                     type="text"
                     name="surname"
-                    value={formData.surname}
+                    value={formData.surname || ""}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border rounded-lg"
                     required
@@ -632,22 +764,90 @@ const Page = () => {
                 <input
                   type="email"
                   name="email"
-                  value={formData.email}
+                  value={formData.email || ""}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border rounded-lg"
                   required
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-gray-700">Tel</label>
-                <input
-                  type="text"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border rounded-lg"
-                  required
-                />
+                <label className="block text-gray-700">Mot De Passe</label>
+                <div className="relative">
+                  <input
+                    type={isPasswordVisible ? "text" : "password"}
+                    name="password"
+                    value={formData.password || ""}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                  <div
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                    onClick={togglePasswordVisibility}
+                  >
+                    {isPasswordVisible ? (
+                      <EyeOff />
+                    ) : (
+                      <Eye className="text-gray-600" />
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-row gap-4 w-full">
+                <div className="mb-4">
+                  <label className="block text-gray-700">Tel</label>
+                  <input
+                    type="text"
+                    name="phone"
+                    value={formData.phone || ""}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded-lg"
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-gray-700">Métier</label>
+                  <input
+                    type="text"
+                    name="work"
+                    value={formData.work || ""}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded-lg"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="flex flex-row gap-4 w-full">
+                <div className="mb-4 w-full">
+                  <label htmlFor="date" className="block text-gray-700">
+                    Date d'anniversaire
+                  </label>
+                  <DatePicker
+                    selected={
+                      formData.birth_date ? new Date(formData.birth_date) : null
+                    }
+                    onChange={handleDateChange}
+                    className="w-full px-3 py-2 border rounded-lg"
+                    dateFormat="dd/MM/yyyy"
+                    placeholderText="Selectionner une date"
+                  />
+                </div>
+                <div className="mb-4 w-full">
+                  <label className="block text-gray-700">Genre</label>
+                  <select
+                    id="gender"
+                    value={selectedGender || formData.gender || ""}
+                    onChange={handleGenderChange}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
+                      !selectedGender ? "text-gray-500" : "text-gray-700"
+                    }`}
+                  >
+                    <option value="" disabled hidden>
+                      Genre
+                    </option>
+                    <option value="Male">Homme</option>
+                    <option value="Female">Femme</option>
+                  </select>
+                </div>
               </div>
               <div className="flex justify-center">
                 <button
@@ -743,6 +943,29 @@ const Page = () => {
                   required
                 />
               </div>
+              <div className="mb-4">
+                <label className="block text-gray-700">Mot De Passe</label>
+                <div className="relative">
+                  <input
+                    type={isPasswordVisible ? "text" : "password"}
+                    name="password"
+                    value={formData.password || ""}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border rounded-lg"
+                    required
+                  />
+                  <div
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                    onClick={togglePasswordVisibility}
+                  >
+                    {isPasswordVisible ? (
+                      <EyeOff />
+                    ) : (
+                      <Eye className="text-gray-600" />
+                    )}
+                  </div>
+                </div>
+              </div>
               <div className="flex flex-row gap-4 w-full">
                 <div className="mb-4">
                   <label className="block text-gray-700">Tel</label>
@@ -786,7 +1009,7 @@ const Page = () => {
                   <label className="block text-gray-700">Genre</label>
                   <select
                     id="gender"
-                    value={selectedGender || ""}
+                    value={selectedGender || formData.gender || ""}
                     onChange={handleGenderChange}
                     className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
                       !selectedGender ? "text-gray-500" : "text-gray-700"
@@ -795,8 +1018,8 @@ const Page = () => {
                     <option value="" disabled hidden>
                       Genre
                     </option>
-                    <option value="male">Homme</option>
-                    <option value="female">Femme</option>
+                    <option value="Male">Homme</option>
+                    <option value="Female">Femme</option>
                   </select>
                 </div>
               </div>
