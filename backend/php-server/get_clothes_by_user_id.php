@@ -11,10 +11,9 @@ if ($origin == $_ENV["FRONT_HOST"]) {
 
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json");
-session_start();
 
 require_once __DIR__ . '/db_connection.php';
-require_once __DIR__ . '/functions.php';
+
 
 if (!isset($_POST["id"])) {
     echo json_encode([
@@ -24,27 +23,36 @@ if (!isset($_POST["id"])) {
     exit();
 }
 
+
 try {
-    $query = "SELECT type FROM clothes";
 
-    $stm = $pdo->prepare($query);
-    $stm->execute();
-    $clothes = $stm->fetchAll(PDO::FETCH_ASSOC);
-    $uniqueTypes = array_unique(array_column($clothes, 'type'));
+    $sql = "SELECT clo.type, img.image
+            FROM clothes AS clo
+            LEFT JOIN clothes_images AS img ON clo.id = img.id_cloth
+            WHERE clo.id_customer = :id";
 
-    $imagesByType = [];
-
-    foreach ($uniqueTypes as $type) {
-        $imagesByType[$type] = [];
-    }
-    $query = "SELECT c.type, ci.image from clothes c JOIN clothes_images ci ON c.id = ci.id_cloth WHERE c.id_customer = :id";
-    $stm = $pdo->prepare($query);
+    $stm = $pdo->prepare($sql);
     $stm->execute(["id" => $_POST["id"]]);
     $results = $stm->fetchAll(PDO::FETCH_ASSOC);
 
-    foreach ($results as $row) {
-        $imagesByType[$row['type']][] = base64_encode($row['image']);
+
+    if (empty($results)) {
+        echo json_encode([
+            "status" => false,
+            "message" => "No clothes found"
+        ]);
+        exit();
     }
+
+
+    $imagesByType = [];
+
+    foreach ($results as $row) {
+        if (isset($row["image"])) {
+            $imagesByType[$row['type']][] = base64_encode($row['image']);
+        }
+    }
+
 
     echo json_encode([
         "status" => true,

@@ -11,18 +11,18 @@ if ($origin == $_ENV["FRONT_HOST"]) {
 
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json");
-session_start();
 
-require_once __DIR__ . "/functions.php";
 require_once __DIR__ . "/db_connection.php";
+
 
 try {
 
-    $query = "SELECT * FROM customers WHERE removed = 0";
+    $query = "SELECT * FROM customers WHERE removed = :removed";
 
     $stm = $pdo->prepare($query);
-    $stm->execute();
+    $stm->execute(["removed" => 0]);
     $customers = $stm->fetchAll(PDO::FETCH_ASSOC);
+
 
     if (empty($customers)) {
         echo json_encode([
@@ -32,12 +32,18 @@ try {
         exit();
     }
 
+
     $customers_array = array_filter(array_map(function ($customer) use ($pdo) {
 
         $paymentQuery = "SELECT * FROM payments WHERE id_customer = :id_customer";
+
         $paymentStm = $pdo->prepare($paymentQuery);
         $paymentStm->execute(["id_customer" => $customer["id"]]);
         $payments = $paymentStm->fetch(PDO::FETCH_ASSOC);
+
+        if (empty($payments)) {
+            return [];
+        }
 
         return [
             "id" => $customer["id"],
