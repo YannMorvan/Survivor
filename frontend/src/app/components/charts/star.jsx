@@ -16,12 +16,12 @@ const StarComparisonChart = () => {
     }
 
     chart.data = [
-      { date: new Date(2020, 0, 1), star1: 4.5, star2: 4.2 },
-      { date: new Date(2020, 1, 1), star1: 4.7, star2: 4.0 },
-      { date: new Date(2020, 2, 1), star1: 4.9, star2: 4.3 },
-      { date: new Date(2020, 3, 1), star1: 5.0, star2: 4.6 },
-      { date: new Date(2020, 4, 1), star1: 4.8, star2: 4.5 },
-      { date: new Date(2020, 5, 1), star1: 4.6, star2: 4.4 }
+      { date: new Date(2020, 0, 1), star1: 4.5 },
+      { date: new Date(2020, 1, 1), star1: 4.7 },
+      { date: new Date(2020, 2, 1), star1: 4.9 },
+      { date: new Date(2020, 3, 1), star1: 5.0 },
+      { date: new Date(2020, 4, 1), star1: 4.8 },
+      { date: new Date(2020, 5, 1), star1: 4.6 }
     ];
 
     let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
