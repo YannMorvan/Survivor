@@ -43,6 +43,20 @@ foreach ($customers as $i => $customer) {
     }
 
 
+    $res = do_customer_exist_in_database($customer->id);
+
+    if ($res["status"] == false) {
+        $errors[] = [
+            "context" => "Check if a customer exists in database",
+            "error" => $res["message"]
+        ];
+        continue;
+    }
+    if ($res["does_exist"] == true) {
+        continue;
+    }
+
+
     $res = get_data_from_api($_ENV["API_KEY"], $_POST["token"], "https://soul-connection.fr/api/customers/" . $customer->id);
 
     if ($res["status"] == false) {

@@ -28,6 +28,7 @@ services:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - API_KEY=${API_KEY}
+      - GEOAPIFY_API_KEY=${GEOAPIFY_API_KEY}
     depends_on:
       - db
 
@@ -68,6 +69,7 @@ services:
       - API_KEY=${API_KEY}
       - API_EMAIL=${API_EMAIL}
       - API_PASSWORD=${API_PASSWORD}
+      - GEOAPIFY_API_KEY=${GEOAPIFY_API_KEY}
     depends_on:
       - db
 

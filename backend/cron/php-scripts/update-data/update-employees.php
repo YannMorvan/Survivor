@@ -43,6 +43,20 @@ foreach ($employees as $i => $employee) {
     }
 
 
+    $res = do_employee_exist_in_database($employee->id);
+
+    if ($res["status"] == false) {
+        $errors[] = [
+            "context" => "Check if an employee exists in database",
+            "error" => $res["message"]
+        ];
+        continue;
+    }
+    if ($res["does_exist"] == true) {
+        continue;
+    }
+
+
     $res = get_data_from_api($_ENV["API_KEY"], $_POST["token"], "https://soul-connection.fr/api/employees/" . $employee->id);
 
     if ($res["status"] == false) {

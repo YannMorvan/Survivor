@@ -43,6 +43,20 @@ foreach ($events as $i => $event) {
     }
 
 
+    $res = do_event_exist_in_database($event->id);
+
+    if ($res["status"] == false) {
+        $errors[] = [
+            "context" => "Check if an event exists in database",
+            "error" => $res["message"]
+        ];
+        continue;
+    }
+    if ($res["does_exist"] == true) {
+        continue;
+    }
+
+
     $res = get_data_from_api($_ENV["API_KEY"], $_POST["token"], "https://soul-connection.fr/api/events/" . $event->id);
 
     if ($res["status"] == false) {
