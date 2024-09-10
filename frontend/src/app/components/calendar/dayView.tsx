@@ -8,7 +8,6 @@ const DayView = ({ events, day, list, onEventClick }: any) => {
 
     const getDayEvents = (dayNumber: number) => {
         return events.filter((event: any) => {
-            // Convertir la chaîne de date en objet Date pour une comparaison correcte
             const eventDate = new Date(event.date);
             return eventDate.getDate() === dayNumber && eventDate.getMonth() === monthIndex && eventDate.getFullYear() === year;
         });
@@ -27,15 +26,15 @@ const DayView = ({ events, day, list, onEventClick }: any) => {
     return (
         <div>
             {list ? (
-                <div className="list-view">
+                <div className='list-view'>
                     <div className='flex border-b pb-5 mt-5'>
                         <p className='text-2xl mt-2 w-2/12'>{day.toLocaleDateString('default', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                         <div className='w-10/12'>
                             <div className={`${dayEvents.length === 0 ? '' : ''} w-full rounded p-1.5`}>
                                 {dayEvents.length > 0 ? (
                                     dayEvents.map((event: any, index: number) => (
-                                        <div className='mb-2 bg-sky-600 rounded p-1.5'>
-                                            <p key={index} className='text-white cursor-pointer' onClick={() => handleClick(event)}>
+                                        <div key={event.id} className='mb-2 bg-sky-600 rounded p-1.5'>
+                                            <p className='text-white cursor-pointer' onClick={() => handleClick(event)}>
                                                 {event.name}
                                             </p>
                                         </div>
