@@ -27,7 +27,8 @@ export default function Events() {
         if (view === 'mois') {
             const [monthName, year] = selectedMonth.split(' ');
             const monthIndex = new Date(Date.parse(monthName + " 1, " + year)).getMonth();
-            const firstDayOfMonth = new Date(year, monthIndex, 1);
+            const yearNumber = parseInt(year, 10);
+            const firstDayOfMonth = new Date(yearNumber, monthIndex, 1);
             const firstWeekStart = getWeekStartDate(firstDayOfMonth);
             setSelectedWeek(firstWeekStart);
             setSelectedDay(firstDayOfMonth);
