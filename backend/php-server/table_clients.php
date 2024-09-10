@@ -42,17 +42,13 @@ try {
         $paymentStm->execute(["id_customer" => $customer["id"]]);
         $payments = $paymentStm->fetch(PDO::FETCH_ASSOC);
 
-        if (empty($payments)) {
-            return [];
-        }
-
         return [
             "id" => $customer["id"],
             "name" => $customer["name"],
             "surname" => $customer['surname'],
             "email" => $customer["email"],
             "phone_number" => $customer["phone_number"],
-            "payement_method" => $payments["method"],
+            "payement_method" => $_SESSION['is_coach'] ? [] : $payments["method"],
             "country" => $customer["country"],
             "country_code" => get_country_code($customer["country"]),
         ];
