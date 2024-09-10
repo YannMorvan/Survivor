@@ -13,6 +13,7 @@ interface FormData {
   location_y: string;
   type: string;
   location_name: string;
+  id_employee: number; 
 }
 
 const CrudModal = () => {
@@ -26,6 +27,7 @@ const CrudModal = () => {
     location_y: '',
     type: '',
     location_name: '',
+    id_employee: 3,
   });
 
   const createEvent = async () => {
