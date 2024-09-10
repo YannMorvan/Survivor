@@ -24,7 +24,7 @@ const getEventsByMonth = (events: Event[], month: number, year: number): Event[]
     });
 };
 
-const Calendar = ({ month, week, day, view, onEventClick }: any) => {
+const Calendar = ({ month, week, day, list, view, onEventClick }: any) => {
     const [events, setEvents] = useState<Event[]>([]);
 
     useEffect(() => {
@@ -36,6 +36,7 @@ const Calendar = ({ month, week, day, view, onEventClick }: any) => {
                 );
                 
                 const data = JSON.parse(response);
+                console.log(data);
                 const fetchedEvents = data.data.events;
                 setEvents(fetchedEvents);
             } catch (error) {
@@ -44,7 +45,7 @@ const Calendar = ({ month, week, day, view, onEventClick }: any) => {
         };
     
         fetchClientsData();
-    }, []);
+    }, [month]);
 
     const [monthName, year] = month.split(' ');
     const monthIndex = new Date(Date.parse(monthName + " 1, 2024")).getMonth();
@@ -98,13 +99,13 @@ const Calendar = ({ month, week, day, view, onEventClick }: any) => {
             <div className="max-w-11/12 ml-10 mr-10">
                 <div className="wrapper bg-white rounded-xl w-full">
                     {view === 'mois' && (
-                        <MonthView events={viewEvents} month={month} onEventClick={onEventClick} />
+                        <MonthView events={viewEvents} list={list} month={month} onEventClick={onEventClick} />
                     )}
                     {view === 'semaine' && (
-                        <WeekView events={viewEvents} startDate={week} onEventClick={onEventClick} />
+                        <WeekView events={viewEvents} list={list} startDate={week} onEventClick={onEventClick} />
                     )}
                     {view === 'jour' && (
-                        <DayView events={viewEvents} day={day} onEventClick={onEventClick} />
+                        <DayView events={viewEvents} list={list} day={day} onEventClick={onEventClick} />
                     )}
                     {view === 'liste' && (
                         <ListView events={viewEvents} onEventClick={onEventClick} />
