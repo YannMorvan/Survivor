@@ -158,6 +158,19 @@ const Page = () => {
   };
 
   const closeAddModal = () => {
+    setFormData({
+      address: "",
+      email: "",
+      id: "",
+      name: "",
+      surname: "",
+      id_coach: "",
+      birth_date: "",
+      description: "",
+      astrological_sign: "",
+      phone_number: "",
+      gender: "",
+    });
     setIsModalAddOpen(false);
   };
 
@@ -208,6 +221,19 @@ const Page = () => {
   };
 
   const closeEditModal = () => {
+    setFormData({
+      address: "",
+      email: "",
+      id: "",
+      name: "",
+      surname: "",
+      id_coach: "",
+      birth_date: "",
+      description: "",
+      astrological_sign: "",
+      phone_number: "",
+      gender: "",
+    });
     setIsModalEditOpen(false);
   };
 
@@ -232,8 +258,6 @@ const Page = () => {
 
     setLoading(true);
     setError(null);
-
-    console.log(formData);
 
     try {
       const response = await sendPostRequest(
