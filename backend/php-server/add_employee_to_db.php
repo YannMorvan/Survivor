@@ -15,7 +15,7 @@ header("Content-Type: application/json");
 require_once __DIR__ . '/db_connection.php';
 
 
-if (!isset($_POST['email']) || !isset($_POST['name']) || !isset($_POST['surname']) || !isset($_POST['birth_date']) || !isset($_POST['gender']) || !isset($_POST['work'])) {
+if (!isset($_POST['email']) || !isset($_POST['name']) || !isset($_POST['surname']) || !isset($_POST['birth_date']) || !isset($_POST['gender']) || !isset($_POST['work']) || !isset($_POST['phone_number']) || !isset($_POST['password'])) {
     echo json_encode([
         "status" => false,
         "message" => "All fields are required"
@@ -26,12 +26,13 @@ if (!isset($_POST['email']) || !isset($_POST['name']) || !isset($_POST['surname'
 
 try {
 
-    $query = "INSERT INTO employees (email, password, name, surname, birth_date, gender, work) VALUES (:email, :password, :name, :surname, :birth_date, :gender, :work)";
+    $query = "INSERT INTO employees (email, phone_number, password, name, surname, birth_date, gender, work) VALUES (:email, :phone_number, :password, :name, :surname, :birth_date, :gender, :work)";
 
     $stmt = $pdo->prepare($query);
     $res = $stmt->execute([
         "email" => $_POST["email"],
-        "password" => isset($_POST["password"]) ? password_hash($_POST["password"], PASSWORD_DEFAULT) : null,
+        "phone_number" => $_POST["phone_number"],
+        "password" => password_hash($_POST["password"], PASSWORD_DEFAULT),
         "name" => $_POST["name"],
         "surname" => $_POST["surname"],
         "birth_date" => $_POST["birth_date"],

@@ -51,7 +51,9 @@ try {
             "surname" => $customer['surname'],
             "email" => $customer["email"],
             "phone_number" => $customer["phone_number"],
-            "payement_method" => $payments["method"]
+            "payement_method" => $payments["method"],
+            "country" => $customer["country"],
+            "country_code" => get_country_code($customer["country"]),
         ];
     }, $customers));
 

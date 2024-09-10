@@ -11,7 +11,6 @@ if ($origin == $_ENV["FRONT_HOST"]) {
 
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json");
-session_start();
 
 require_once __DIR__ . '/db_connection.php';
 require_once __DIR__ . '/functions.php';
@@ -42,7 +41,7 @@ try {
         "gender" => $_POST["gender"],
         "description" => $_POST["description"],
         "astrological_sign" => $_POST["astrological_sign"],
-        "id_coach" => $_SESSION["id_employee"]
+        "id_coach" => $_POST["id_coach"]
     ]);
 
 

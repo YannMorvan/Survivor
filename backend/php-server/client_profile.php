@@ -28,7 +28,7 @@ if (!isset($_POST["id"])) {
 try {
 
     $sql = "SELECT
-                cust.id, cust.id_coach, cust.name, cust.surname, cust.email, cust.address,
+                cust.id, cust.id_coach, cust.name, cust.surname, cust.email, cust.address, cust.phone_number, cust.birth_date, cust.gender, cust.astrological_sign, cust.description
                 cust_img.image,
                 COUNT(enc.id) AS total_encounters, COUNT(enc.rating >= 3 OR NULL) AS positive_encounters, COUNT(enc.date > NOW() OR NULL) AS planned_encounters
             FROM customers AS cust
@@ -76,11 +76,16 @@ try {
         "status" => true,
         "data" => [
             "id" => $customer["id"],
-            "id_coach" => $customer["id_coach"],
+            "id_coach" => $customer["id_coach"] ? $customer["id_coach"] : null,
             "name" => $customer["name"],
             "surname" => $customer["surname"],
             "email" => $customer["email"],
             "address" => $customer["address"],
+            "phone_number" => $customer["phone_number"],
+            "birth_date" => $customer["birth_date"],
+            "gender" => $customer["gender"],
+            "astrological_sign" => $customer["astrological_sign"],
+            "description" => $customer["description"],
             "image" => isset($customer["image"]) ? base64_encode($customer["image"]) : null,
             "total_encounters" => $customer["total_encounters"],
             "positive_encounters" => $customer["positive_encounters"],
