@@ -4,7 +4,7 @@ import Event from '../event';
 interface WeekViewProps {
     events: any[];
     onEventClick: (event: any) => void;
-    startDate: Date; // Date de début de la semaine
+    startDate: Date;
 }
 
 const WeekView = ({ events, onEventClick, list, startDate }: any) => {
@@ -61,7 +61,7 @@ const WeekView = ({ events, onEventClick, list, startDate }: any) => {
                     )}
                 </div>
             ) : (
-                <table className="w-full h-full h-[500px]">
+                <table className="w-full h-[500px]">
                     <thead>
                         <tr>
                             {['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'].map(day => (
