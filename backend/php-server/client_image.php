@@ -36,7 +36,7 @@ try {
     if (!empty($image)) {
         echo json_encode([
             "status" => true,
-            "data" => base64_encode($image)
+            "data" => base64_encode($image["image"])
         ]);
     } else {
         echo json_encode([
