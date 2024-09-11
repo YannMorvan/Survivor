@@ -26,10 +26,10 @@ if (!isset($_POST["id"])) {
 
 try {
 
-    $query = "SELECT image FROM employees_images WHERE id_employee = :id_employee";
+    $query = "SELECT image FROM customers_images WHERE id_customer = :id_customer";
 
     $stm = $pdo->prepare($query);
-    $stm->execute(["id_employee" => $_POST["id"]]);
+    $stm->execute(["id_customer" => $_POST["id"]]);
     $image = $stm->fetch(PDO::FETCH_ASSOC);
 
 
