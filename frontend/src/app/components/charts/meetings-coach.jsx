@@ -3,11 +3,23 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
-const ChartComponent = () => {
+const ChartComponent = ({ encounterss }) => {
   const chartRef = useRef(null);
 
   useEffect(() => {
     am4core.useTheme(am4themes_animated);
+
+    // Process encounters data to count by month
+    const encounterCountByMonth = encounterss.reduce((acc, encounter) => {
+      const month = new Date(encounter.date).toLocaleString('default', { month: 'short' });
+      acc[month] = (acc[month] || 0) + 1;
+      return acc;
+    }, {});
+
+    const chartData = Object.keys(encounterCountByMonth).map(month => ({
+      month,
+      encounters: encounterCountByMonth[month],
+    }));
 
     const chart = am4core.create('chartdiv', am4charts.XYChart);
 
@@ -15,45 +27,26 @@ const ChartComponent = () => {
       chart.logo.disabled = true;
     }
 
-    chart.data = [
-      { country: 'Jav', visits: 284 },
-      { country: 'Fev', visits: 311 },
-      { country: 'Mar', visits: 365 },
-      { country: 'Avr', visits: 480 },
-      { country: 'Mai', visits: 443 },
-      { country: 'Jun', visits: 541 },
-      { country: 'Jui', visits: 795 },
-      { country: 'Aou', visits: 886 },
-      { country: 'Sep', visits: 784 },
-      { country: 'Oct', visits: 838 },
-      { country: 'Nov', visits: 728 },
-      { country: 'Dec', visits: 928 },
-    ];
+    chart.data = chartData;
 
     let categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
-    categoryAxis.dataFields.category = 'country';
+    categoryAxis.dataFields.category = 'month';
     categoryAxis.renderer.labels.template.rotation = 0;
     categoryAxis.renderer.labels.template.horizontalCenter = 'middle';
     categoryAxis.renderer.labels.template.verticalCenter = 'bottom';
-
     categoryAxis.renderer.labels.template.fill = am4core.color('#808080');
     categoryAxis.renderer.labels.template.fontSize = 12;
-
-    categoryAxis.tooltip.label.rotation = 0;
-    categoryAxis.tooltip.label.horizontalCenter = 'middle';
-    categoryAxis.tooltip.label.verticalCenter = 'bottom';
+    categoryAxis.renderer.minGridDistance = 20;
 
     let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-
     valueAxis.renderer.labels.template.fill = am4core.color('#808080');
     valueAxis.renderer.labels.template.fontSize = 12;
-
     valueAxis.renderer.minGridDistance = 50;
 
     const series = chart.series.push(new am4charts.ColumnSeries());
-    series.dataFields.valueY = 'visits';
-    series.dataFields.categoryX = 'country';
-    series.name = 'Visits';
+    series.dataFields.valueY = 'encounters';
+    series.dataFields.categoryX = 'month';
+    series.name = 'Encounters';
     series.tooltipText = '{categoryX}: [bold]{valueY}[/]';
     series.columns.template.fillOpacity = 0.8;
 
@@ -61,10 +54,7 @@ const ChartComponent = () => {
     columnTemplate.strokeWidth = 2;
     columnTemplate.strokeOpacity = 1;
     columnTemplate.stroke = am4core.color('#FFFFFF');
-  
     series.columns.template.width = am4core.percent(40);
-
-    categoryAxis.renderer.minGridDistance = 20;
 
     columnTemplate.adapter.add('fill', (fill, target) => {
       return chart.colors.getIndex(target.dataItem.index);
@@ -85,7 +75,7 @@ const ChartComponent = () => {
         chartRef.current.dispose();
       }
     };
-  }, []);
+  }, [encounterss]);
 
   return <div id="chartdiv" style={{ width: '100%', height: '200px' }}></div>;
 };
