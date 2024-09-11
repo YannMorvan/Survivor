@@ -33,7 +33,7 @@ try {
 
     echo json_encode([
         "status" => true,
-        "data" => base64_encode($image)
+        "data" => base64_encode($image["image"])
     ]);
 
 } catch (PDOException $e) {
