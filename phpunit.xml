@@ -4,12 +4,7 @@
          colors="true">
     <testsuites>
         <testsuite name="Test Suite">
-            <directory>./backend/php-server/tests/Example.php</directory>
+            <directory>./backend/php-server/tests</directory>
         </testsuite>
     </testsuites>
-    <coverage processUncoveredFiles="true">
-        <include>
-            <directory suffix=".php">./src</directory>
-        </include>
-    </coverage>
 </phpunit>
