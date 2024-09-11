@@ -10,8 +10,7 @@ if ($origin == $_ENV["FRONT_HOST"]) {
 
 
 header("Access-Control-Allow-Credentials: true");
-header('Content-Type: application/json');
-
+header("Content-Type: application/json");
 session_start();
 
 require_once __DIR__ . '/db_connection.php';
@@ -19,22 +18,26 @@ require_once __DIR__ . '/functions.php';
 
 try {
 
-    $query = "UPDATE employees SET removed = 1 WHERE work = :work AND work = :work2";
+    $current_date = date("Y-m-d H:i:s");
+    $start_of_week = date("Y-m-d H:i:s", strtotime('monday this week'));
+
+    $query = "SELECT id, name, surname, country FROM customers WHERE join_date >= :start_of_week AND join_date <= :current_date AND removed = 0";
 
     $stm = $pdo->prepare($query);
     $stm->execute([
-        "work" => "coach",
-        "work2" => "Coach"
+        "start_of_week" => $start_of_week,
+        "current_date" => $current_date
     ]);
+    $customers = $stm->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
         "status" => true,
-        "message" => "Coaches deleted successfully"
+        "customers" => $customers
     ]);
 
 } catch (PDOException $e) {
     echo json_encode([
         "status" => false,
-        "message" => "Error: " . $e->getMessage()
+        "error" => "Database error: " . $e->getMessage()
     ]);
 }

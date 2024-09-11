@@ -10,22 +10,66 @@ if ($origin == $_ENV["FRONT_HOST"]) {
 
 
 header("Access-Control-Allow-Credentials: true");
-header('Content-Type: application/json');
+header("Content-Type: application/json");
 
-session_start();
+require_once __DIR__ . "/db_connection.php";
 
-require_once __DIR__ . '/db_connection.php';
-require_once __DIR__ . '/functions.php';
 
 try {
 
-    $query = "SELECT * FROM employees WHERE id = :id AND removed = 0";
+    $sql = "SELECT * FROM employees WHERE id = :id AND removed = :removed";
 
-    $stm = $pdo->prepare($query);
+    $stm = $pdo->prepare($sql);
     $stm->execute([
-        'id' => $_POST['id_coach']
+        "id" => $_POST["id_coach"],
+        "removed" => 0
     ]);
     $coach = $stm->fetch(PDO::FETCH_ASSOC);
+
+
+    if (empty($coach)) {
+        echo json_encode([
+            "status" => false,
+            "message" => "Coach not found"
+        ]);
+        exit();
+    }
+
+    $coach["customers"] = [];
+
+
+    $sql = "SELECT id, name, surname FROM customers WHERE id_coach = :id_coach AND removed = :removed";
+
+    $stm = $pdo->prepare($sql);
+    $stm->execute([
+        "id_coach" => $_POST["id_coach"],
+        "removed" => 0
+    ]);
+    $customers = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+
+    if (!empty($customers)) {
+
+        foreach ($customers as $i => $cus) {
+            $sql = "SELECT date, rating, comment, source FROM encounters WHERE id_customer = :id_customer AND removed = :removed";
+
+            $stm = $pdo->prepare($sql);
+            $stm->execute([
+                "id_customer" => $cus["id"],
+                "removed" => 0
+            ]);
+            $encounters = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+            $coach["customers"][] = [
+                "id" => $cus["id"],
+                "name" => $cus["name"],
+                "surname" => $cus["surname"],
+                "encounters" => $encounters
+            ];
+        }
+
+    }
+
 
     echo json_encode([
         "status" => true,
@@ -35,5 +79,5 @@ try {
 } catch (PDOException $e) {
     echo json_encode([
         "status" => false,
-        'error' => $e->getMessage()]);
+        "error" => $e->getMessage()]);
 }

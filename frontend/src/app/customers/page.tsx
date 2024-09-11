@@ -37,27 +37,6 @@ interface FormData {
 }
 
 const Page = () => {
-  const [isModalAddOpen, setIsModalAddOpen] = useState(false);
-  const [isModalEditOpen, setIsModalEditOpen] = useState(false);
-  const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
-  const [isSearchActive, setIsSearchActive] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
-    id: "",
-    name: "",
-    surname: "",
-    email: "",
-    phone_number: "",
-    birth_date: "",
-    gender: "",
-    astrological_sign: "",
-    description: "",
-    address: "",
-    id_coach: "",
-  });
-
   interface CoachesNames {
     id: string;
     name: string;
@@ -74,13 +53,55 @@ const Page = () => {
     email: string;
     image: string;
     surname: string;
-    phone: string;
+    phone_number: string;
     paymentMethod: string;
   }
 
-  const [customersData, setCustomersData] = useState<Customers[]>([]);
+  interface CustomerData {
+    id: string;
+    name: string;
+    email: string;
+    image: string;
+    surname: string;
+    phone_number: string;
+    id_coach: string;
+    birth_date: string;
+    address: string;
+    description: string;
+    gender: string;
+    astrological_sign: string;
+  }
 
+  const [isModalAddOpen, setIsModalAddOpen] = useState(false);
+  const [isModalEditOpen, setIsModalEditOpen] = useState(false);
+  const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [customersData, setCustomersData] = useState<Customers[]>([]);
+  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [minCustomers, setMinCustomers] = useState(0);
+  const [maxCustomers, setMaxCustomers] = useState(10);
+  const [customerData, setCustomerData] = useState<CustomerData | null>(null);
   const [allChecked, setAllChecked] = useState(false);
+  const [selectedGender, setSelectedGender] = useState("");
+  const [selectedCoach, setSelectedCoach] = useState("");
+  const [selectedAstro, setSelectedAstro] = useState("");
+  const [formData, setFormData] = useState<FormData>({
+    id: "",
+    name: "",
+    surname: "",
+    email: "",
+    phone_number: "",
+    birth_date: "",
+    gender: "",
+    astrological_sign: "",
+    description: "",
+    address: "",
+    id_coach: "",
+  });
 
   const [checkedItems, setCheckedItems] = useState<CheckedItems>(
     customersData.reduce((acc, customer) => {
@@ -88,6 +109,11 @@ const Page = () => {
       return acc;
     }, {} as CheckedItems)
   );
+
+  const modalAddRef = useRef<HTMLDivElement | null>(null);
+  const modalEditRef = useRef<HTMLDivElement | null>(null);
+  const modalDeleteRef = useRef<HTMLDivElement | null>(null);
+  const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
     const fetchCustomersData = async () => {
@@ -110,8 +136,8 @@ const Page = () => {
               email: item.email,
               image: item.image,
               surname: item.surname,
-              phone: item.phone || "555",
-              paymentMethod: item.paymentMethod || "Visa",
+              phone_number: item.phone_number,
+              paymentMethod: item.paymentMethod,
             })
           );
 
@@ -127,34 +153,212 @@ const Page = () => {
     fetchCustomersData();
   }, []);
 
-  const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [minCustomers, setMinCustomers] = useState(0);
-  const [maxCustomers, setMaxCustomers] = useState(10);
-
-  const modalAddRef = useRef<HTMLDivElement | null>(null);
-  const modalEditRef = useRef<HTMLDivElement | null>(null);
-  const modalDeleteRef = useRef<HTMLDivElement | null>(null);
-  const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-
   const openAddModal = () => {
     setIsModalAddOpen(true);
   };
 
   const closeAddModal = () => {
+    setFormData({
+      address: "",
+      email: "",
+      id: "",
+      name: "",
+      surname: "",
+      id_coach: "",
+      birth_date: "",
+      description: "",
+      astrological_sign: "",
+      phone_number: "",
+      gender: "",
+    });
     setIsModalAddOpen(false);
   };
 
-  const openEditModal = () => {
+  const openEditModal = async (customerId: string) => {
     setIsModalEditOpen(true);
+    setDropdownOpen(null);
+    fetchCoachesData();
+    try {
+      const response = await sendPostRequest(
+        `http://localhost/client_profile.php`,
+        {
+          id: customerId,
+        }
+      );
+
+      const parsedResponse = JSON.parse(response);
+
+      if (parsedResponse.error) {
+        console.error(parsedResponse.error);
+        return;
+      }
+
+      const customer = parsedResponse.data;
+
+      if (!customer) {
+        console.error("Customer data is undefined");
+        return;
+      }
+
+      setFormData({
+        address: customer.address || "",
+        email: customer.email || "",
+        id: customer.id || "",
+        name: customer.name || "",
+        surname: customer.surname || "",
+        id_coach: customer.id_coach
+          ? customer.id_coach.toString()
+          : "Pas de Coach assigné",
+        birth_date: customer.birth_date || "",
+        description: customer.description || "Pas de description",
+        astrological_sign: customer.astrological_sign || "",
+        phone_number: customer.phone_number || "",
+        gender: customer.gender || "",
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const closeEditModal = () => {
+    setFormData({
+      address: "",
+      email: "",
+      id: "",
+      name: "",
+      surname: "",
+      id_coach: "",
+      birth_date: "",
+      description: "",
+      astrological_sign: "",
+      phone_number: "",
+      gender: "",
+    });
     setIsModalEditOpen(false);
   };
 
-  const openDeleteModal = () => {
+  const handleEditCustomer = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (
+      !formData.name ||
+      !formData.surname ||
+      !formData.email ||
+      !formData.phone_number ||
+      !formData.birth_date ||
+      !formData.gender ||
+      !formData.astrological_sign ||
+      !formData.description ||
+      !formData.address ||
+      !formData.id_coach
+    ) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await sendPostRequest(
+        "http://localhost/edit_customer.php",
+        {
+          id: formData.id,
+          name: formData.name,
+          surname: formData.surname,
+          email: formData.email,
+          phone_number: formData.phone_number,
+          address: formData.address,
+          gender: formData.gender,
+          birth_date: formData.birth_date,
+          description: formData.description,
+          astrological_sign: formData.astrological_sign,
+          id_coach: formData.id_coach,
+        }
+      );
+
+      const parsedResponse = JSON.parse(response);
+
+      if (parsedResponse.error) {
+        setError(parsedResponse.error);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      setError("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+      setIsModalEditOpen(false);
+    }
+  };
+
+  const handleDeleteCustomer = async (id: string) => {
+    try {
+      const response = await sendPostRequest(
+        "http://localhost/delete_customer.php",
+        {
+          id,
+        }
+      );
+
+      const parsedResponse = JSON.parse(response);
+
+      if (parsedResponse.error) {
+        setError(parsedResponse.error);
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      setError("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+      setIsModalDeleteOpen(false);
+    }
+  };
+
+  const openDeleteModal = async (customerId: string) => {
     setIsModalDeleteOpen(true);
+    setDropdownOpen(null);
+    try {
+      const response = await sendPostRequest(
+        `http://localhost/client_profile.php`,
+        {
+          id: customerId,
+        }
+      );
+
+      const parsedResponse = JSON.parse(response);
+
+      if (parsedResponse.error) {
+        console.error(parsedResponse.error);
+        return;
+      }
+
+      const customer = parsedResponse.data;
+
+      if (!customer) {
+        console.error("Customer data is undefined");
+        return;
+      }
+
+      setFormData({
+        address: customer.address || "",
+        email: customer.email || "",
+        id: customer.id || "",
+        name: customer.name || "",
+        surname: customer.surname || "",
+        id_coach: customer.id_coach
+          ? customer.id_coach.toString()
+          : "Pas de Coach assigné",
+        birth_date: customer.birth_date || "",
+        description: customer.description || "Pas de description",
+        astrological_sign: customer.astrological_sign || "",
+        phone_number: customer.phone_number || "",
+        gender: customer.gender || "",
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const closeDeleteModal = () => {
@@ -247,12 +451,6 @@ const Page = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log(formData);
-    closeAddModal();
-  };
-
   useEffect(() => {
     const initialCheckedItems = customersData.reduce((acc, customer) => {
       acc[customer.id] = false;
@@ -290,7 +488,7 @@ const Page = () => {
     const rows = customersData.map((customer) => [
       customer.name,
       customer.email,
-      customer.phone,
+      customer.phone_number,
       customer.paymentMethod,
     ]);
 
@@ -323,16 +521,6 @@ const Page = () => {
     setDropdownOpen(dropdownOpen === id ? null : id);
   };
 
-  const handleEdit = (id: string) => {
-    setIsModalEditOpen(true);
-    setDropdownOpen(null);
-  };
-
-  const handleDelete = (id: string) => {
-    setIsModalDeleteOpen(true);
-    setDropdownOpen(null);
-  };
-
   const handleFilterToggle = () => {
     setFilterOpen(!filterOpen);
   };
@@ -352,8 +540,6 @@ const Page = () => {
     }
   };
 
-  const [selectedGender, setSelectedGender] = useState("");
-
   const handleGenderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const gender = event.target.value;
     setSelectedGender(gender);
@@ -363,8 +549,6 @@ const Page = () => {
     });
   };
 
-  const [selectedCoach, setSelectedCoach] = useState("");
-
   const handleCoachChange = (selectedOption: SingleValue<any>) => {
     setSelectedCoach(selectedOption.value);
     setFormData({
@@ -372,8 +556,6 @@ const Page = () => {
       id_coach: selectedOption.value || "",
     });
   };
-
-  const [selectedAstro, setSelectedAstro] = useState("");
 
   const handleAstroChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const astro = event.target.value;
@@ -386,8 +568,6 @@ const Page = () => {
 
   const handleCreateCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    console.log(formData);
 
     if (
       !formData.name ||
@@ -605,9 +785,6 @@ const Page = () => {
               <th className="p-4 text-left text-[#6B83A2]">Customer</th>
               <th className="p-4 text-left text-[#6B83A2]">Email</th>
               <th className="p-4 text-left text-[#6B83A2]">Tel</th>
-              <th className="p-4 text-left text-[#6B83A2]">
-                Nombre de Clients
-              </th>
               <th className="p-4 text-left text-[#6B83A2]">Actions</th>
             </tr>
           </thead>
@@ -638,8 +815,7 @@ const Page = () => {
                   </span>
                 </td>
                 <td className="p-4 text-[#6B83A2]">{customer.email}</td>
-                <td className="p-4 text-[#6B83A2]">{customer.phone}</td>
-                <td className="p-4 text-[#6B83A2]">{customer.paymentMethod}</td>
+                <td className="p-4 text-[#6B83A2]">{customer.phone_number}</td>
                 <td className="p-4 text-[#6B83A2] relative">
                   <button
                     className="text-[#384B65] hover:text-[#6B83A2]"
@@ -664,13 +840,13 @@ const Page = () => {
                       </button>
                       <button
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
-                        onClick={() => handleEdit(customer.id)}
+                        onClick={() => openEditModal(customer.id)}
                       >
                         Editer
                       </button>
                       <button
                         className="w-full px-4 py-2 text-left hover:bg-gray-100"
-                        onClick={() => handleDelete(customer.id)}
+                        onClick={() => openDeleteModal(customer.id)}
                       >
                         Supprimer
                       </button>
@@ -695,26 +871,26 @@ const Page = () => {
             >
               <X />
             </button>
-            <h2 className="text-2xl mb-4">Editer le Customer</h2>
-            <form onSubmit={handleCreateCustomer}>
+            <h2 className="text-2xl mb-4">Editer Le Client</h2>
+            <form onSubmit={handleEditCustomer}>
               <div className="flex flex-row gap-4 w-full">
                 <div className="mb-4">
-                  <label className="block text-gray-700">Nom</label>
+                  <label className="block text-gray-700">Prénom</label>
                   <input
                     type="text"
                     name="name"
-                    value={formData.name}
+                    value={formData.name || ""}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border rounded-lg"
                     required
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-gray-700">Prénom</label>
+                  <label className="block text-gray-700">Nom</label>
                   <input
                     type="text"
                     name="surname"
-                    value={formData.surname}
+                    value={formData.surname || ""}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border rounded-lg"
                     required
@@ -726,7 +902,7 @@ const Page = () => {
                 <input
                   type="email"
                   name="email"
-                  value={formData.email}
+                  value={formData.email || ""}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border rounded-lg"
                   required
@@ -736,8 +912,115 @@ const Page = () => {
                 <label className="block text-gray-700">Tel</label>
                 <input
                   type="text"
-                  name="phone"
-                  value={formData.phone_number}
+                  name="phone_number"
+                  value={formData.phone_number || ""}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  required
+                />
+              </div>
+              <div className="flex flex-row gap-4 w-full">
+                <div className="mb-4 w-1/2">
+                  <label className="block text-gray-700">Coach</label>
+                  <Select
+                    id="coach"
+                    value={
+                      options.find(
+                        (option) => option.value === selectedCoach
+                      ) ||
+                      options.find(
+                        (option) => option.value === formData?.id_coach
+                      ) ||
+                      null
+                    }
+                    onChange={(selectedOption) =>
+                      handleCoachChange(selectedOption)
+                    }
+                    options={options}
+                    className="w-full"
+                    classNamePrefix="react-select"
+                    placeholder="Select Coach"
+                    isSearchable
+                    required
+                  />
+                </div>
+                <div className="mb-4 w-1/2">
+                  <label htmlFor="date" className="block text-gray-700">
+                    Date d'anniversaire
+                  </label>
+                  <DatePicker
+                    selected={
+                      formData.birth_date ? new Date(formData.birth_date) : null
+                    }
+                    onChange={handleDateChange}
+                    className="w-full px-3 py-2 border rounded-lg"
+                    dateFormat="dd/MM/yyyy"
+                    placeholderText="Selectionner une date"
+                  />
+                </div>
+              </div>
+              <div className="mb-4 w-full">
+                <label className="block text-gray-700">Adresse</label>
+                <input
+                  name="address"
+                  value={formData.address || ""}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  required
+                />
+              </div>
+              <div className="flex flex-row gap-4 w-full">
+                <div className="mb-4 w-full">
+                  <label className="block text-gray-700">Genre</label>
+                  <select
+                    id="gender"
+                    value={selectedGender || formData.gender || ""}
+                    onChange={handleGenderChange}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
+                      !selectedGender ? "text-gray-500" : "text-gray-700"
+                    }`}
+                  >
+                    <option value="" disabled hidden>
+                      Genre
+                    </option>
+                    <option value="Male">Homme</option>
+                    <option value="Female">Femme</option>
+                  </select>
+                </div>
+                <div className="mb-4 w-full">
+                  <label className="block text-gray-700">
+                    Signe Astrologique
+                  </label>
+                  <select
+                    id="astrological_sign"
+                    value={selectedAstro || formData?.astrological_sign || ""}
+                    onChange={handleAstroChange}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
+                      !selectedAstro ? "text-gray-500" : "text-gray-700"
+                    }`}
+                  >
+                    <option value="" disabled hidden>
+                      Signe Astrologique
+                    </option>
+                    <option value="Aquarius">Verseau</option>
+                    <option value="Aries">Bélier</option>
+                    <option value="Cancer">Cancer</option>
+                    <option value="Capricorn">Capricorne</option>
+                    <option value="Taurus">Taureau</option>
+                    <option value="Leo">Lion</option>
+                    <option value="Libra">Balance</option>
+                    <option value="Pisces">Poissons</option>
+                    <option value="Scorpio">Scorpion</option>
+                    <option value="Sagittarius">Sagittaire</option>
+                    <option value="Virgo">Vierge</option>
+                  </select>
+                </div>
+              </div>
+              <div className="mb-4 w-full">
+                <label className="block text-gray-700">Description</label>
+                <input
+                  name="description"
+                  value={formData.description || ""}
                   onChange={handleChange}
                   className="w-full px-3 py-2 border rounded-lg"
                   required
@@ -773,7 +1056,9 @@ const Page = () => {
             <div className="flex justify-center gap-4 mt-4">
               <button
                 className="bg-red-500 text-white px-4 py-2 rounded-md"
-                onClick={closeDeleteModal}
+                onClick={() => {
+                  handleDeleteCustomer(formData.id);
+                }}
               >
                 Supprimer
               </button>

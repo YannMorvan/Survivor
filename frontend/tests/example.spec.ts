@@ -28,9 +28,9 @@ test.describe('Dashboard Page', () => {
 
   test('should change the period text when a dropdown item is clicked', async ({ page }: { page: Page }) => {
     await page.locator('button#Last\\ 30\\ jours\\ button').click();
-    await page.locator('div#dropdownDays p:has-text("10 derniers jours")').click();
+    await page.locator('div#dropdownDays p:has-text("14 derniers jours")').click();
     const buttonText = await page.locator('button#Last\\ 30\\ jours\\ button p').textContent();
-    expect(buttonText).toBe('10 derniers jours');
+    expect(buttonText).toBe('14 derniers jours');
   });
 
   test('should display the correct text on the "Reports" button', async ({ page }: { page: Page }) => {

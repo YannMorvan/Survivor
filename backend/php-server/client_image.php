@@ -11,10 +11,9 @@ if ($origin == $_ENV["FRONT_HOST"]) {
 
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json");
-session_start();
 
-require_once __DIR__ . "/functions.php";
 require_once __DIR__ . "/db_connection.php";
+
 
 if (!isset($_POST["id"])) {
     echo json_encode([
@@ -24,19 +23,27 @@ if (!isset($_POST["id"])) {
     exit();
 }
 
+
 try {
 
-    $query = "SELECT image FROM employees_images WHERE id_employee = :id_employee";
+    $query = "SELECT image FROM customers_images WHERE id_customer = :id_customer";
 
     $stm = $pdo->prepare($query);
-    $stm->execute(["id_employee" => $_POST["id"]]);
-
+    $stm->execute(["id_customer" => $_POST["id"]]);
     $image = $stm->fetch(PDO::FETCH_ASSOC);
 
-    echo json_encode([
-        "status" => true,
-        "data" => base64_encode($image["image"])
-    ]);
+
+    if (!empty($image)) {
+        echo json_encode([
+            "status" => true,
+            "data" => base64_encode($image["image"])
+        ]);
+    } else {
+        echo json_encode([
+            "status" => false,
+            "message" => "No image found"
+        ]);
+    }
 
 } catch (PDOException $e) {
     echo json_encode([

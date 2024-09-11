@@ -11,10 +11,9 @@ if ($origin == $_ENV["FRONT_HOST"]) {
 
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json");
-session_start();
 
 require_once __DIR__ . '/db_connection.php';
-require_once __DIR__ . '/functions.php';
+
 
 if (!isset($_POST['type'])) {
     echo json_encode([
@@ -23,6 +22,7 @@ if (!isset($_POST['type'])) {
     ]);
     exit();
 }
+
 
 try {
 
@@ -40,12 +40,9 @@ try {
         exit();
     }
 
-foreach ($clothes as $key => $cloth) {
-    $clothes[$key]['image'] = base64_encode($cloth['image']);
-}
-
-// Log memory usage
-error_log("Memory usage: " . memory_get_usage());
+    foreach ($clothes as $key => $cloth) {
+        $clothes[$key]['image'] = base64_encode($cloth['image']);
+    }
 
     echo json_encode([
         "status" => true,

@@ -63,9 +63,9 @@ const WeekView = ({ events, onEventClick, list, startDate }: any) => {
             ) : (
                 <table className="w-full h-[500px]">
                     <thead>
-                        <tr>
+                        <tr className=''>
                             {['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'].map(day => (
-                                <th key={day} className="p-2 border-r border-l h-10 xl:w-40 lg:w-30 md:w-30 sm:w-20 w-10 xl:text-sm text-xs">
+                                <th key={day} className="p-2 border-r border-l h-5 xl:w-40 lg:w-30 md:w-30 sm:w-20 w-10 xl:text-sm text-xs">
                                     <span className="xl:block lg:block md:block sm:block hidden">{day}</span>
                                     <span className="xl:hidden lg:hidden md:hidden sm:hidden block">{day.slice(0, 3)}</span>
                                 </th>
@@ -73,7 +73,7 @@ const WeekView = ({ events, onEventClick, list, startDate }: any) => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr className="text-right mr-0 h-20">
+                        <tr className="text-right mr-0 h-full">
                             {Array.from({ length: daysInWeek }).map((_, colIndex) => {
                                 const currentDay = new Date(startDate);
                                 currentDay.setDate(currentDay.getDate() + colIndex);

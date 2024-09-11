@@ -127,6 +127,60 @@ function get_image_from_api($api_key, $token, $url)
 
 
 /**
+ * Get the country where an address is located.
+ * @param string $address       Address
+ * @return array                Data of the country
+ */
+function get_country_from_address($address)
+{
+    $address = urlencode($address);
+
+
+    $header = [
+        "Content-Type: application/json"
+    ];
+
+    $ch = curl_init("https://api.geoapify.com/v1/geocode/search?text={$address}&apiKey={$_ENV["GEOAPIFY_API_KEY"]}");
+
+    curl_setopt_array($ch, [
+        CURLOPT_HTTPHEADER => $header,
+        CURLOPT_RETURNTRANSFER => true
+    ]);
+
+    $response = curl_exec($ch);
+    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+
+    curl_close($ch);
+
+
+    if ($code != 200) {
+        return [
+            "status" => false,
+            "code" => $code,
+            "error" => $error
+        ];
+    }
+
+
+    $response = json_decode($response, true);
+
+    if (isset($response["features"][0]["properties"]["country"])) {
+        return [
+            "status" => true,
+            "country" => $response["features"][0]["properties"]["country"]
+        ];
+    } else {
+        return [
+            "status" => false,
+            "error" => "Country not found"
+        ];
+    }
+}
+
+
+
+/**
  * Set an employee in database from the API data.
  * @param object $employee      Employee data from the API
  * @return array                Status of the operation
@@ -221,11 +275,21 @@ function set_customer_from_api_data($customer)
         ];
     }
 
+
+    $res = get_country_from_address($customer->address);
+
+    if ($res["status"] == false) {
+        $country = null;
+    } else {
+        $country = $res["country"];
+    }
+
+
     $sql = "INSERT INTO customers
-            (id, email, phone_number, name, surname, address, birth_date, gender, description, astrological_sign)
-            VALUES (:id, :email, :phone_number, :name, :surname, :address, :birth_date, :gender, :description, :astrological_sign)
+            (id, email, phone_number, name, surname, address, country, birth_date, gender, description, astrological_sign)
+            VALUES (:id, :email, :phone_number, :name, :surname, :address, :country, :birth_date, :gender, :description, :astrological_sign)
             ON DUPLICATE KEY UPDATE
-            email = :email, phone_number = :phone_number, name = :name, surname = :surname, address = :address, birth_date = :birth_date, gender = :gender, description = :description, astrological_sign = :astrological_sign";
+            email = :email, phone_number = :phone_number, name = :name, surname = :surname, address = :address, country = :country, birth_date = :birth_date, gender = :gender, description = :description, astrological_sign = :astrological_sign";
 
     $stm = $pdo->prepare($sql);
     $res = $stm->execute([
@@ -235,6 +299,7 @@ function set_customer_from_api_data($customer)
         "name" => $customer->name,
         "surname" => $customer->surname,
         "address" => $customer->address,
+        "country" => $country,
         "birth_date" => $customer->birth_date,
         "gender" => $customer->gender,
         "description" => $customer->description,
@@ -1166,5 +1231,129 @@ function delete_events_removed_more_than_three_years_ago()
 
     return [
         "status" => true
+    ];
+}
+
+
+
+/**
+ * Get wether an employee exists in the database or not.
+ * @param int $id_employee      ID of the employee
+ * @return array                Status of the operation
+ */
+function do_employee_exist_in_database($id_employee)
+{
+    require DB_PATH;
+
+    $sql = "SELECT id FROM employees WHERE id = :id_employee";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_employee" => $id_employee]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    $row = $stm->fetch(PDO::FETCH_ASSOC);
+
+    return [
+        "status" => true,
+        "does_exist" => !empty($row)
+    ];
+}
+
+
+
+/**
+ * Get wether a customer exists in the database or not.
+ * @param int $id_customer      ID of the customer
+ * @return array                Status of the operation
+ */
+function do_customer_exist_in_database($id_customer)
+{
+    require DB_PATH;
+
+    $sql = "SELECT id FROM customers WHERE id = :id_customer";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_customer" => $id_customer]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    $row = $stm->fetch(PDO::FETCH_ASSOC);
+
+    return [
+        "status" => true,
+        "does_exist" => !empty($row)
+    ];
+}
+
+
+
+/**
+ * Get wether an encounter exists in the database or not.
+ * @param int $id_encounter     ID of the encounter
+ * @return array                Status of the operation
+ */
+function do_encounter_exist_in_database($id_encounter)
+{
+    require DB_PATH;
+
+    $sql = "SELECT id FROM encounters WHERE id = :id_encounter";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_encounter" => $id_encounter]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    $row = $stm->fetch(PDO::FETCH_ASSOC);
+
+    return [
+        "status" => true,
+        "does_exist" => !empty($row)
+    ];
+}
+
+
+
+/**
+ * Get wether an event exists in the database or not.
+ * @param int $id_event         ID of the event
+ * @return array                Status of the operation
+ */
+function do_event_exist_in_database($id_event)
+{
+    require DB_PATH;
+
+    $sql = "SELECT id FROM events WHERE id = :id_event";
+
+    $stm = $pdo->prepare($sql);
+    $res = $stm->execute(["id_event" => $id_event]);
+
+    if ($res == false) {
+        return [
+            "status" => false,
+            "message" => "Error executing the query"
+        ];
+    }
+
+    $row = $stm->fetch(PDO::FETCH_ASSOC);
+
+    return [
+        "status" => true,
+        "does_exist" => !empty($row)
     ];
 }

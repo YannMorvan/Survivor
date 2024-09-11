@@ -40,47 +40,14 @@ const Navbar = () => {
           <a href="/dashboard" className="flex items-center space-x-3 rtl:space-x-reverse">
             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Soul Connection</span>
           </a>
-          <div className="flex items-center justify-end md:order-2 space-x-1 md:space-x-0 rtl:space-x-reverse">
+          <div className="flex items-center justify-end md:order-2 space-x-10 md:space-x-0 rtl:space-x-reverse">
             <div className='lg:block hidden'>
               <MessageSquareMore className='text-sky-700 cursor-pointer mt-0.5 mr-3'/>
             </div>
-            <div className='lg:block hidden'>
-              <button
-                type="button"
-                ref={buttonRef}
-                id="langageDropdown"
-                aria-label='Language Dropdown'
-                onClick={toggleDropdown}
-                className="inline-flex items-center font-medium justify-center px-4 py-2 text-sm text-gray-900 dark:text-white rounded-lg cursor-pointer dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                <svg className="w-5 h-5 rounded-full me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3900 3900">
-                  <path fill="#b22234" d="M0 0h7410v3900H0z" />
-                  <path d="M0 450h7410m0 600H0m0 600h7410m0 600H0m0 600h7410m0 600H0" stroke="#fff" strokeWidth="300" />
-                  <path fill="#3c3b6e" d="M0 0h2964v2100H0z" />
-                  <g fill="#fff">
-                    <g id="d">
-                      <g id="c">
-                        <g id="e">
-                          <g id="b">
-                            <path id="a" d="M247 90l70.534 217.082-184.66-134.164h228.253L176.466 307.082z" />
-                            <use xlinkHref="#a" y="420" />
-                            <use xlinkHref="#a" y="840" />
-                            <use xlinkHref="#a" y="1260" />
-                          </g>
-                          <use xlinkHref="#a" y="1680" />
-                        </g>
-                        <use xlinkHref="#b" x="247" y="210" />
-                      </g>
-                      <use xlinkHref="#c" x="494" />
-                    </g>
-                    <use xlinkHref="#d" x="988" />
-                    <use xlinkHref="#c" x="1976" />
-                    <use xlinkHref="#e" x="2470" />
-                  </g>
-                </svg>
-              </button>
+            <div className='lg:block pr-6 hidden'>
+              <svg className="w-6 h-6" enableBackground="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="256" cy="256" fill="#f0f0f0" r="256"/><path d="m512 256c0-110.071-69.472-203.906-166.957-240.077v480.155c97.485-36.172 166.957-130.007 166.957-240.078z" fill="#d80027"/><path d="m0 256c0 110.071 69.473 203.906 166.957 240.077v-480.154c-97.484 36.171-166.957 130.006-166.957 240.077z" fill="#0052b4"/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
             </div>
-            <div className='border rounded-full p-2 bg-sky-600 lg:block hidden'>
+            <div className='border cursor-pointer rounded-full p-2 bg-sky-600 lg:block hidden'>
               <UserRound size={16} color='white'/>
             </div>
             <div className="relative inline-block text-left">
@@ -132,7 +99,7 @@ const Navbar = () => {
                   </li>
                   <li>
                     <div className='flex hover:bg-gray-100'>
-                      <div className='border rounded-full p-2 ml-2 bg-sky-600'>
+                      <div className='border cursor-pointer rounded-full p-2 ml-2 bg-sky-600'>
                         <UserRound size={12} color='white'/>
                       </div>
                       <a href="#" className="block py-1 pl-3.5 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Profile</a>

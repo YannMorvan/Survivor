@@ -13,8 +13,8 @@ header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json");
 session_start();
 
-require_once __DIR__ . "/functions.php";
 require_once __DIR__ . "/db_connection.php";
+
 
 if (!isset($_POST["id"])) {
     echo json_encode([
@@ -24,58 +24,25 @@ if (!isset($_POST["id"])) {
     exit();
 }
 
+
 try {
-    $sql = "SELECT * FROM customers WHERE id = :id";
+
+    $sql = "SELECT
+                cust.id, cust.id_coach, cust.name, cust.surname, cust.email, cust.address, cust.phone_number, cust.birth_date, cust.gender, cust.astrological_sign, cust.description,
+                cust_img.image,
+                COUNT(enc.id) AS total_encounters, COUNT(enc.rating >= 3 OR NULL) AS positive_encounters, COUNT(enc.date > NOW() OR NULL) AS planned_encounters
+            FROM customers AS cust
+            LEFT JOIN customers_images AS cust_img ON cust.id = cust_img.id_customer
+            LEFT JOIN encounters AS enc ON cust.id = enc.id_customer
+            WHERE cust.id = :id
+            GROUP BY cust.id";
+
     $stm = $pdo->prepare($sql);
     $stm->execute(["id" => $_POST["id"]]);
     $customer = $stm->fetch(PDO::FETCH_ASSOC);
 
-    $paymentQuery = "SELECT * FROM payments WHERE id_customer = :id_customer";
-    $paymentStm = $pdo->prepare($paymentQuery);
-    $paymentStm->execute(["id_customer" => $_POST["id"]]);
-    $payments = $paymentStm->fetchAll(PDO::FETCH_ASSOC);
 
-    if (!$_SESSION["is_coach"])
-        $payments = [];
-    else
-        usort($payments, function ($a, $b) {
-
-            $dateA = new DateTime($a["date"]);
-            $dateB = new DateTime($b["date"]);
-            return $dateB <=> $dateA;
-        });
-
-    $recent_payments = array_slice($payments, 0, 4);
-
-    foreach ($recent_payments as $i => $payments) {
-        $recent_payments[$i]["date"] = DateTime::createFromFormat("Y-m-d", $payments["date"])->format("d/m/Y");
-    }
-
-    $imageQuery = "SELECT * FROM customers_images WHERE id_customer = :id_customer";
-    $imageStm = $pdo->prepare($imageQuery);
-    $imageStm->execute(["id_customer" => $_POST["id"]]);
-    $images = $imageStm->fetch(PDO::FETCH_ASSOC);
-
-    $encountersQuery = "SELECT * FROM encounters WHERE id_customer = :id_customer";
-    $encountersStm = $pdo->prepare($encountersQuery);
-    $encountersStm->execute(["id_customer" => $_POST["id"]]);
-    $encounters = $encountersStm->fetchAll(PDO::FETCH_ASSOC);
-
-
-    $count_encounters = count($encounters);
-    $count_positive_encounters = count(array_filter($encounters, function ($encounter) {
-
-        $rating = 3;
-
-        return $encounter["rating"] >= $rating;
-    }));
-    $count_planned_encounters = count(array_filter($encounters, function ($encounter) {
-        $currentTimestamp = new DateTime("now");
-        $dateTimeStamp = new DateTime($encounter["date"]);
-        return $dateTimeStamp->getTimeStamp() > $currentTimestamp->getTimeStamp();
-    }));
-
-    if (empty($customer) || empty($payments) || empty($images) || empty($encounters)) {
+    if (empty($customer)) {
         echo json_encode([
             "status" => false,
             "message" => "Customer data not found"
@@ -83,33 +50,49 @@ try {
         exit();
     }
 
-    usort($encounters, function ($a, $b) {
-        $dateA = new DateTime($a["date"]);
-        $dateB = new DateTime($b["date"]);
-        return $dateB <=> $dateA;
-    });
 
-    $recent_encounters = array_slice($encounters, 0, 5);
+    $sql = "SELECT * FROM payments WHERE id_customer = :id_customer ORDER BY date DESC LIMIT 5";
 
-    foreach ($recent_encounters as $i => $encounter) {
-        $recent_encounters[$i]["date"] = DateTime::createFromFormat("Y-m-d", $encounter["date"])->format("d/m/Y");
+    $stm = $pdo->prepare($sql);
+    $stm->execute(["id_customer" => $_POST["id"]]);
+    $payments = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($payments as $i => $pay) {
+        $payments[$i]["date"] = DateTime::createFromFormat("Y-m-d", $pay["date"])->format("d/m/Y");
     }
+
+
+    $sql = "SELECT * FROM encounters WHERE id_customer = :id_customer ORDER BY date DESC LIMIT 5";
+
+    $stm = $pdo->prepare($sql);
+    $stm->execute(["id_customer" => $_POST["id"]]);
+    $encounters = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($encounters as $i => $enc) {
+        $encounters[$i]["date"] = DateTime::createFromFormat("Y-m-d", $enc["date"])->format("d/m/Y");
+    }
+
 
     echo json_encode([
         "status" => true,
         "data" => [
             "id" => $customer["id"],
-            "id_coach" => $customer["id_coach"],
+            "id_coach" => $customer["id_coach"] ? $customer["id_coach"] : null,
             "name" => $customer["name"],
             "surname" => $customer["surname"],
             "email" => $customer["email"],
             "address" => $customer["address"],
-            "image" => base64_encode($images["image"]),
-            "total_encounters" => $count_encounters,
-            "positive_encounters" => $count_positive_encounters,
-            "planned_encounters" => $count_planned_encounters,
-            "encounters" => $recent_encounters,
-            "payment" => $recent_payments
+            "phone_number" => $customer["phone_number"],
+            "birth_date" => $customer["birth_date"],
+            "gender" => $customer["gender"],
+            "astrological_sign" => $customer["astrological_sign"],
+            "description" => $customer["description"],
+            "image" => isset($customer["image"]) ? base64_encode($customer["image"]) : null,
+            "total_encounters" => $customer["total_encounters"],
+            "positive_encounters" => $customer["positive_encounters"],
+            "planned_encounters" => $customer["planned_encounters"],
+            "encounters" => $encounters,
+            "payment" => $_SESSION["is_coach"] ? [] : $payments
         ]
     ]);
 

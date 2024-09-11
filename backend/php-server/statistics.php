@@ -11,52 +11,34 @@ if ($origin == $_ENV["FRONT_HOST"]) {
 
 header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json");
-session_start();
 
-require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/db_connection.php';
+
 
 try {
 
-    $query = "SELECT * FROM events WHERE removed = 0";
+    $query = "SELECT * FROM events WHERE removed = :removed";
 
     $stm = $pdo->prepare($query);
-    $stm->execute();
+    $stm->execute(["removed" => 0]);
     $events = $stm->fetchAll(PDO::FETCH_ASSOC);
 
-    if (empty($events)) {
-        echo json_encode([
-            "status" => false,
-            "message" => "No events found"
-        ]);
-        exit();
-    }
 
-    $query = "SELECT * FROM encounters WHERE removed = 0";
+    $query = "SELECT * FROM encounters WHERE removed = :removed";
 
     $stm = $pdo->prepare($query);
-    $stm->execute();
+    $stm->execute(["removed" => 0]);
     $encounters = $stm->fetchAll(PDO::FETCH_ASSOC);
 
-    if (empty($encounters)) {
-        echo json_encode([
-            "status" => false,
-            "message" => "No encounters found"
-        ]);
-        exit();
+    foreach ($encounters as $key => $encounter) {
+        $encounters[$key]["date"] = DateTime::createFromFormat("Y-m-d", $encounter["date"])->format("d/m/Y");
     }
 
-foreach ($encounters as $key => $encounter) {
-    $encounters[$key] = [
-        "source" => $encounter["source"],
-        "date" => DateTime::createFromFormat("Y-m-d", $encounter["date"])->format("d/m/Y"),
-    ];
-}
 
-    $query = "SELECT address FROM customers WHERE removed = 0";
+    $query = "SELECT address, country FROM customers WHERE removed = :removed";
 
     $stm = $pdo->prepare($query);
-    $stm->execute();
+    $stm->execute(["removed" => 0]);
     $adresses = $stm->fetchAll(PDO::FETCH_ASSOC);
 
     // TODO: implement the missing graph's data

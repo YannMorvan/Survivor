@@ -3,7 +3,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
-const StarComparisonChart = () => {
+const StarComparisonChart = ({ coach1, coach2, data1, data2 }) => {
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -15,18 +15,30 @@ const StarComparisonChart = () => {
       chart.logo.disabled = true;
     }
 
-    chart.data = [
-      { date: new Date(2020, 0, 1), star1: 4.5, star2: 4.2 },
-      { date: new Date(2020, 1, 1), star1: 4.7, star2: 4.0 },
-      { date: new Date(2020, 2, 1), star1: 4.9, star2: 4.3 },
-      { date: new Date(2020, 3, 1), star1: 5.0, star2: 4.6 },
-      { date: new Date(2020, 4, 1), star1: 4.8, star2: 4.5 },
-      { date: new Date(2020, 5, 1), star1: 4.6, star2: 4.4 }
-    ];
+    let chartData = [];
+
+    const combinedData = [...data1, ...data2].reduce((acc, current) => {
+      const existing = acc.find(item => new Date(item.date).getTime() === new Date(current.date).getTime());
+      if (existing) {
+        if (data1.includes(current)) {
+          existing.star1 = current.rating;
+        } else {
+          existing.star2 = current.rating;
+        }
+      } else {
+        acc.push({
+          date: new Date(current.date),
+          star1: data1.includes(current) ? current.rating : undefined,
+          star2: data2.includes(current) ? current.rating : undefined,
+        });
+      }
+      return acc;
+    }, []);
+
+    chart.data = combinedData;
 
     let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.renderer.minGridDistance = 50;
-
     dateAxis.renderer.labels.template.adapter.add("visible", function(visible, target) {
       return target.dataItem.index % 2 === 0;
     });
@@ -40,42 +52,28 @@ const StarComparisonChart = () => {
     dateAxis.renderer.grid.template.disabled = true;
     valueAxis.renderer.labels.template.disabled = true;
 
-    let series = chart.series.push(new am4charts.LineSeries());
-    series.dataFields.valueY = 'star1';
-    series.dataFields.dateX = 'date';
-    series.strokeWidth = 2;
-    series.minBulletDistance = 10;
-    series.tooltipText = "[bold]{date.formatDate()}:[/] Coach 1: {valueY}";
-    series.tooltip.pointerOrientation = 'vertical';
-    series.name = "Coach 1";
+    let series1 = chart.series.push(new am4charts.LineSeries());
+    series1.dataFields.valueY = 'star1';
+    series1.dataFields.dateX = 'date';
+    series1.strokeWidth = 2;
+    series1.minBulletDistance = 10;
+    series1.tooltipText = "[bold]{date.formatDate()}:[/] " + coach1 + ": {valueY}";
+    series1.tooltip.pointerOrientation = 'vertical';
+    series1.name = coach1;
 
     let series2 = chart.series.push(new am4charts.LineSeries());
     series2.dataFields.valueY = 'star2';
     series2.dataFields.dateX = 'date';
     series2.strokeWidth = 2;
     series2.strokeDasharray = '3,4';
-    series2.stroke = series.stroke;
-    series2.tooltipText = "[bold]{date.formatDate()}:[/] Coach 2: {valueY}";
-    series2.name = "Coach 2";
+    series2.tooltipText = "[bold]{date.formatDate()}:[/] " + coach2 + ": {valueY}";
+    series2.name = coach2;
 
-    var bullet = series.bullets.push(new am4charts.CircleBullet());
-    bullet.disabled = true;
-    bullet.propertyFields.disabled = "disabled";
+    series1.fillOpacity = 0.5; 
+    series1.fill = am4core.color("#AAD9FF");
 
-    var secondCircle = bullet.createChild(am4core.Circle);
-    secondCircle.radius = 6;
-    secondCircle.fill = chart.colors.getIndex(8);
-
-    bullet.events.on("inited", function(event){
-      animateBullet(event.target.circle);
-    });
-
-    function animateBullet(bullet) {
-      var animation = bullet.animate([{ property: "scale", from: 1, to: 5 }, { property: "opacity", from: 1, to: 0 }], 1000, am4core.ease.circleOut);
-      animation.events.on("animationended", function(event){
-        animateBullet(event.target.object);
-      });
-    }
+    series2.fillOpacity = 0.5; 
+    series2.fill = am4core.color("#EBC1FF");
 
     chart.cursor = new am4charts.XYCursor();
     chart.cursor.xAxis = dateAxis;
@@ -90,7 +88,7 @@ const StarComparisonChart = () => {
         chartRef.current.dispose();
       }
     };
-  }, []);
+  }, [data1, data2]);
 
   return <div id="chartdiv4" style={{ width: '100%', height: '250px' }}></div>;
 };
