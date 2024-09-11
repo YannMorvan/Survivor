@@ -36,11 +36,11 @@ try {
 
     $customers_array = array_filter(array_map(function ($customer) use ($pdo) {
 
-        $paymentQuery = "SELECT * FROM payments WHERE id_customer = :id_customer";
+        $paymentQuery = "SELECT * FROM payments WHERE id_customer = :id_customer ORDER BY date";
 
         $paymentStm = $pdo->prepare($paymentQuery);
         $paymentStm->execute(["id_customer" => $customer["id"]]);
-        $payments = $paymentStm->fetch(PDO::FETCH_ASSOC);
+        $payments = $paymentStm->fetchAll(PDO::FETCH_ASSOC);
 
         return [
             "id" => $customer["id"],
@@ -48,7 +48,7 @@ try {
             "surname" => $customer['surname'],
             "email" => $customer["email"],
             "phone_number" => $customer["phone_number"],
-            "payement_method" => $_SESSION['is_coach'] ? [] : (empty($payements) ? [] : $payments["method"]),
+            "payement_method" => $_POST['is_coach'] ? (empty($payments) ? [] : $payments[0]["method"]) : [],
             "country" => $customer["country"],
             "country_code" => get_country_code($customer["country"]),
         ];
