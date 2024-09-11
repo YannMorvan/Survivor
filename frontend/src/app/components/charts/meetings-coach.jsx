@@ -9,7 +9,6 @@ const ChartComponent = ({ encounterss }) => {
   useEffect(() => {
     am4core.useTheme(am4themes_animated);
 
-    // Process encounters data to count by month
     const encounterCountByMonth = encounterss.reduce((acc, encounter) => {
       const month = new Date(encounter.date).toLocaleString('default', { month: 'short' });
       acc[month] = (acc[month] || 0) + 1;
@@ -65,8 +64,9 @@ const ChartComponent = ({ encounterss }) => {
     });
 
     chart.cursor = new am4charts.XYCursor();
-    chart.cursor.lineX.strokeOpacity = 0;
-    chart.cursor.lineY.strokeOpacity = 0;
+    chart.cursor.lineX.disabled = true;
+    chart.cursor.lineY.disabled = true;
+    chart.cursor.behavior = 'none';
 
     chartRef.current = chart;
 
