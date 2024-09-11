@@ -48,7 +48,7 @@ try {
             "surname" => $customer['surname'],
             "email" => $customer["email"],
             "phone_number" => $customer["phone_number"],
-            "payement_method" => $_SESSION['is_coach'] ? [] : $payments["method"],
+            "payement_method" => $_SESSION['is_coach'] ? [] : (empty($payements) ? [] : $payments["method"]),
             "country" => $customer["country"],
             "country_code" => get_country_code($customer["country"]),
         ];
