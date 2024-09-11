@@ -2,9 +2,47 @@ import React, { useEffect } from 'react';
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
+import { create } from '@amcharts/amcharts4/core';
 
-const LineChart = () => {
+const LineChart = ({ clientData }) => {
   useEffect(() => {
+
+    const generateComparisonData = () => {
+      const data = [];
+      const currentYear = 2024;
+
+      for (let day = 1; day <= 30; day++) {
+        data.push({
+          date: new Date(currentYear, 8, day).getTime(),
+          value1: 0,
+          value2: 0
+        });
+      }
+
+      return data;
+    };
+
+    const processClientData = (data) => {
+      const counts = generateComparisonData();
+
+      data.forEach(client => {
+        const date = new Date(client.join_date.split('/').reverse().join('-'));
+        const month = date.getMonth();
+        const day = date.getDate();
+
+        if (month === 8) {
+          counts[day - 1].value1++;
+        } else if (month === 7) {
+          if (day <= 30) {
+            counts[day - 1].value2++;
+          }
+        }
+      });
+
+      return counts;
+    };
+
+    const data = processClientData(clientData);
 
     let root = am5.Root.new("chartdiv");
 
@@ -48,7 +86,6 @@ const LineChart = () => {
 
     let yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
       min: 0,
-      max: 1200,
       strictMinMax: true,
       renderer: am5xy.AxisRendererY.new(root, { 
         grid: { visible: false },
@@ -58,7 +95,7 @@ const LineChart = () => {
           adapter: {
             text: (text, target) => {
               let value = target.dataItem.value;
-              if (value === 0 || value === 1200) {
+              if (value === 0 || value === 5) {
                 return text;
               } else {
                 return "";
@@ -147,32 +184,6 @@ const LineChart = () => {
       dateFields: ["valueX"]
     });
 
-    let data = [{
-      date: new Date(2024, 7, 1).getTime(),
-      value1: 1050,
-      value2: 948,
-    }, {
-      date: new Date(2024, 7, 5).getTime(),
-      value1: 953,
-      value2: 851,
-    }, {
-      date: new Date(2024, 7, 15).getTime(),
-      value1: 856,
-      value2: 758,
-    }, {
-      date: new Date(2024, 7, 20).getTime(),
-      value1: 1052,
-      value2: 953,
-    }, {
-      date: new Date(2024, 7, 25).getTime(),
-      value1: 848,
-      value2: 744,
-    }, {
-      date: new Date(2024, 7, 30).getTime(),
-      value1: 1047,
-      value2: 942,
-    }];
-
     series.data.setAll(data);
     series2.data.setAll(data);
 
@@ -196,10 +207,11 @@ const LineChart = () => {
     }
 
     createRange(0, yAxis, "0");
-    createRange(1200, yAxis, "1200");
-    createRange(new Date(2024, 7, 1).getTime(), xAxis, "01 Jul, 2024");
-    createRange(new Date(2024, 7, 15).getTime(), xAxis, "15 Jul, 2024");
-    createRange(new Date(2024, 7, 31).getTime(), xAxis, "30 Jul, 2024");
+    createRange(2, yAxis, "2");
+    createRange(4, yAxis, "4");
+    createRange(new Date(2024, 8, 1).getTime(), xAxis, "01 Sep, 2024");
+    createRange(new Date(2024, 8, 15).getTime(), xAxis, "15 Sep, 2024");
+    createRange(new Date(2024, 8, 31).getTime(), xAxis, "30 Sep, 2024");
 
     yAxis.get("renderer").grid.template.set("forceHidden", true);
     xAxis.get("renderer").grid.template.set("forceHidden", true);
@@ -211,7 +223,7 @@ const LineChart = () => {
     return () => {
       root.dispose();
     };
-  }, []);
+  }, [clientData]);
 
   return (
     <div id="chartdiv" style={{ width: "100%", height: "250px" }}></div>
