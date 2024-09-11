@@ -43,6 +43,7 @@ const Page = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCoach, setIsCoach] = useState(false);
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     id: "",
@@ -93,6 +94,10 @@ const Page = () => {
 
         if (data.status === true) {
           setIsLoading(false);
+        }
+        if (data.isCoach === true) {
+          setIsCoach(true);
+          router.push("/dashboard");
         } else {
           router.push("/");
         }
@@ -116,7 +121,7 @@ const Page = () => {
   }, [coachesData]);
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && !isCoach) {
       const fetchCoachesData = async () => {
         try {
           const response = await sendPostRequest(
@@ -153,7 +158,7 @@ const Page = () => {
 
       fetchCoachesData();
     }
-  }, [isLoading]);
+  }, [isLoading, isCoach]);
 
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -606,7 +611,7 @@ const Page = () => {
     setIsPasswordVisible((prevState) => !prevState);
   };
 
-  if (isLoading) {
+  if (isLoading || isCoach) {
     return <LoadingScreen />;
   }
 

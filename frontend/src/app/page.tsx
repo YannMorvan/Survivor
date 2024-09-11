@@ -29,11 +29,17 @@ export default function Login() {
       });
 
       const parsedResponse = JSON.parse(response);
+
+      if (!parsedResponse.status) {
+        throw new Error("Invalid email or password.");
+      } else {
+        router.push("/dashboard");
+        localStorage.setItem("needRefresh", "true");
+      }
     } catch (error) {
       setError("Invalid email or password.");
     } finally {
       setLoading(false);
-      router.push("/dashboard");
     }
   };
 
