@@ -30,6 +30,12 @@ try {
     ]);
     $customers = $stm->fetchAll(PDO::FETCH_ASSOC);
 
+
+    $customers = array_map(function ($customer) {
+        $cutomer["country_code"] = get_country_code($customer["country"]);
+        return $customer;
+    }, $customers);
+
     echo json_encode([
         "status" => true,
         "customers" => $customers
