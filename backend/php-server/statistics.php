@@ -17,9 +17,14 @@ require_once __DIR__ . '/db_connection.php';
 
 try {
 
-    $query = "SELECT * FROM events WHERE removed = :removed";
+    $sql = "SELECT
+                ev.id_employee, ev.name, ev.date, ev.duration, ev.type, ev.max_participants, ev.location_x, ev.location_y, ev.location_name,
+                co.color
+            FROM events AS ev
+            LEFT JOIN events_colors AS co ON ev.type = co.event_type
+            WHERE removed = :removed";
 
-    $stm = $pdo->prepare($query);
+    $stm = $pdo->prepare($sql);
     $stm->execute(["removed" => 0]);
     $events = $stm->fetchAll(PDO::FETCH_ASSOC);
 
