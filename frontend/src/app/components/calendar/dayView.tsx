@@ -58,7 +58,7 @@ const DayView = ({ events, day, list, onEventClick }: any) => {
                         </thead>
                         <tbody>
                             <tr>
-                                <td className="border pt-1 h-30 xl:w-40 lg:w-30 md:w-30 sm:w-20 w-10 overflow-auto">
+                                <td className="border h-full pt-1 xl:w-40 lg:w-30 md:w-30 sm:w-20 w-10 overflow-auto">
                                     <div className="flex flex-col h-full xl:w-50 lg:w-50 md:w-50 sm:w-full w-full overflow-hidden relative">
                                         <div className="bottom flex-grow mr-3 py-1 w-full cursor-pointer flex flex-col items-start justify-start relative">
                                             {dayEvents.map((event: any, index: number) => (

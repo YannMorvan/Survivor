@@ -11,7 +11,7 @@ export default function Astro() {
     const fetchClientsData = async () => {
       try {
         const response = await sendPostRequest(
-          `http://${process.env.NEXT_PUBLIC_PHP_HOST}/table_clients.php`,
+          `http://localhost/table_clients.php`,
           {}
         );
         
