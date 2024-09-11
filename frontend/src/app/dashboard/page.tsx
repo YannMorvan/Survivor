@@ -7,9 +7,6 @@ import ChartEvents from '../components/charts/events';
 import ChartMap from '../components/charts/map';
 import { sendPostRequest } from '../utils/utils';
 import ChartMeetings from '../components/charts/meetings';
-import { set } from 'date-fns';
-import { cp } from 'fs';
-import { get } from 'http';
 
 interface Event {
     date: string,
@@ -38,6 +35,13 @@ interface Data {
     address: Address[],
 }
 
+interface ClientData {
+    id: number,
+    join_date: string,
+    name: string,
+    country: string,
+}
+
 const getWeekNumber = (date: Date): number => {
     const target = new Date(date.valueOf());
     const dayNumber = (date.getUTCDay() + 6) % 7;
@@ -47,25 +51,59 @@ const getWeekNumber = (date: Date): number => {
     return 1 + Math.round(diff / (7 * 24 * 60 * 60 * 1000));
 };
 
+const clientData2 = [
+    { id: 1, join_date: "10/09/2024", name: "Nathalie", country: "FR"},
+    { id: 2, join_date: "10/09/2024", name: "Margaud", country: "US"},
+    { id: 3, join_date: "10/09/2024", name: "Thérèse", country: "US"},
+    { id: 4, join_date: "09/09/2024", name: "Marie", country: "US"},
+    { id: 4, join_date: "09/09/2024", name: "Marie", country: "US"},
+    { id: 5, join_date: "09/08/2024", name: "Jean",  country: "US"},
+    { id: 2, join_date: "10/09/2024", name: "Margaud", country: "US"},
+    { id: 3, join_date: "10/09/2024", name: "Thérèse", country: "US"},
+    { id: 4, join_date: "09/09/2024", name: "Marie", country: "US"},
+    { id: 4, join_date: "09/09/2024", name: "Marie", country: "US"},
+    { id: 5, join_date: "09/08/2024", name: "Jean",  country: "US"},
+    { id: 2, join_date: "10/09/2024", name: "Margaud", country: "US"},
+    { id: 3, join_date: "10/09/2024", name: "Thérèse", country: "US"},
+    { id: 4, join_date: "09/09/2024", name: "Marie", country: "US"},
+    { id: 4, join_date: "09/09/2024", name: "Marie", country: "US"},
+    { id: 5, join_date: "09/08/2024", name: "Jean",  country: "US"},
+];
 
 export default function Dashboard() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [mapIsDropdownOpen, setMapIsDropdownOpen] = useState(false);
     const [lastDays, setLastDays] = useState("30 derniers jours");
-    const [selectedPeriod, setSelectedPeriod] = useState('7J');
+    const [selectedPeriod, setSelectedPeriod] = useState('1M');
     const [selectedMapPeriod, setSelectedMapPeriod] = useState("30 jours");
+    const [clientData, setData] = useState<ClientData[]>([]);
     const [isMeetingsDropdownOpen, setIsMeetingsDropdownOpen] = useState(false);
     const [selectedMeetingsPeriod, setSelectedMeetingsPeriod] = useState("30 jours");
     const [events, setEvents] = useState<Event[]>([]);
     const [meetings, setMeetings] = useState<Encounters[]>([]);
     const [augustEvents, setAugustEvents] = useState<Event[]>([]);
-    const [weeklyEvents, setWeeklyEvents] = useState<Event[]>([]);
     const [dailyAverage, setDailyAverage] = useState<number>(0);
-    const [weeklyAverage, setWeeklyAverage] = useState<number>(0);
     const [progressionPercentage, setProgressionPercentage] = useState<number>(0);
     const [progressionDaily, setProgressionDaily] = useState<number>(0);
-    const [progressionWeekly, setProgressionWeekly] = useState<number>(0);
     const [clients, setClients] = useState<number>(0);
+
+    useEffect(() => {
+        const fetchClientsData = async () => {
+          try {
+            const response = await sendPostRequest(
+              `http://localhost/table_clients.php`,
+              {}
+            );
+            
+            const data = JSON.parse(response);
+            setData(data.data);
+          } catch (error) {
+            console.error("Erreur lors de la requête : ", error);
+          }
+        };
+      
+        fetchClientsData();
+      }, []);
 
     const getEventsByMonth = (events: Event[], month: number, year: number): Event[] => {
         return events.filter((event: Event) => {
@@ -82,23 +120,6 @@ export default function Dashboard() {
         const eventsByMonth = getEventsByMonth(events, month, year);
         const previousMonth = getEventsByMonth(events, month - 1, year);
         return previousMonth.length > 0 ? ((eventsByMonth.length - previousMonth.length) / previousMonth.length) * 100 : 0;
-    }
-
-    const getEventsByWeek = (events: Event[], month: number, week: number, year: number): Event[] => {
-        return events.filter((event: Event) => {
-            const eventDate = new Date(event.date);
-            if (isNaN(eventDate.getTime())) {
-                console.warn(`Date invalide pour l'événement : ${event.date}`);
-                return false;
-            }
-            return eventDate.getMonth() === month && getWeekNumber(eventDate) === week && eventDate.getFullYear() === year;
-        });
-    }
-
-    const getProgressionLastWeek = (events: Event[], month: number, week: number, year: number): number => {
-        const eventsByWeek = getEventsByWeek(events, month, week, year);
-        const previousWeek = getEventsByWeek(events, month, week - 1, year);
-        return previousWeek.length > 0 ? ((eventsByWeek.length - previousWeek.length) / previousWeek.length) * 100 : 0;
     }
 
     const getEventsAvgDay = (events: Event[], month: number, year: number): number => {
@@ -119,14 +140,11 @@ export default function Dashboard() {
             try {
                 const response = await sendPostRequest('http://localhost/statistics.php', {});
                 const data = JSON.parse(response);
- 
                 const events = data.data.events;
 
-                console.log(events);
-
                 const meetings = data.data.encounters;
-
-                setMeetings(data.data.encounters);
+                console.log(meetings);
+                setMeetings(meetings);
     
                 setEvents(events);
 
@@ -134,22 +152,14 @@ export default function Dashboard() {
 
                 const progressionMonth: number = getProgressionLastMonth(events, 6, 2024);
 
-                const weekly: Event[] = getEventsByWeek(events, 6, 2, 2024);
-
-                console.log(weekly);
-
-                const progressionWeekly = getProgressionLastWeek(events, 6, 2, 2024);
-
                 const dailyAvgAug: number = getEventsAvgDay(events, 6, 2024);
 
                 const progressionDay = getProgressionAvgDay(events, 6, 2024);
     
                 setAugustEvents(august);
                 setDailyAverage(dailyAvgAug);
-                setWeeklyEvents(weekly);
                 setProgressionPercentage(progressionMonth);
                 setProgressionDaily(progressionDay);
-                setProgressionWeekly(progressionWeekly);
             } catch (error) {
                 console.error('Erreur lors de la requête : ', error);
             }
@@ -167,6 +177,7 @@ export default function Dashboard() {
               );
               
               const data = JSON.parse(response);
+              console.log(data);
               setClients(data.data.length);
             } catch (error) {
               console.error("Erreur lors de la requête : ", error);
@@ -184,12 +195,6 @@ export default function Dashboard() {
     period: string
   ) => {
     setSelectedMeetingsPeriod(period);
-  };
-
-  const getButtonStyle: (period: string) => string = (period: string) => {
-    return selectedPeriod === period
-      ? "text-black bg-slate-100"
-      : "text-slate-500 bg-white";
   };
 
   const toggleMapDropdown: () => void = () => {
@@ -246,10 +251,7 @@ export default function Dashboard() {
                     <p onClick={() => setLastDays('30 derniers jours')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">30 derniers jours</p>
                 </li>
                 <li>
-                    <p onClick={() => setLastDays('10 derniers jours')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">10 derniers jours</p>
-                </li>
-                <li>
-                    <p onClick={() => setLastDays('5 derniers jours')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">5 derniers jours</p>
+                    <p onClick={() => setLastDays('14 derniers jours')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">14 derniers jours</p>
                 </li>
                 <li>
                     <p onClick={() => setLastDays('dernier jour')} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">dernier jour</p>
@@ -277,19 +279,19 @@ export default function Dashboard() {
                             </div>
                             <div className='flex border rounded overflow-hidden'>
                                 <p
-                                    className={`text-xs border px-2 py-1 cursor-pointer ${getButtonStyle('7J')}`}
+                                    className={`text-xs border px-2 py-1 cursor-pointer ${selectedPeriod === '7J' ? 'bg-slate-100' : 'bg-white'}`}
                                     onClick={() => handlePeriodClick('7J')}
                                 >
                                     7 J
                                 </p>
                                 <p
-                                    className={`text-xs border px-2 py-1 cursor-pointer ${getButtonStyle('1M')}`}
+                                    className={`text-xs border px-2 py-1 cursor-pointer ${selectedPeriod === '1M' ? 'bg-slate-100' : 'bg-white'}`}
                                     onClick={() => handlePeriodClick('1M')}
                                 >
                                     1 M
                                 </p>
                                 <p
-                                    className={`text-xs border px-2 py-1 cursor-pointer ${getButtonStyle('3M')}`}
+                                    className={`text-xs border px-2 py-1 cursor-pointer ${selectedPeriod === '3M' ? 'bg-slate-100' : 'bg-white'}`}
                                     onClick={() => handlePeriodClick('3M')}
                                 >
                                     3 M
@@ -320,7 +322,7 @@ export default function Dashboard() {
                     </div>
                 </div>
                 <div className='mt-5'>
-                    <CustomersOverView />
+                    <CustomersOverView clientData={clientData2} />
                 </div>
             </div>
             <div className='bg-white rounded-sm p-5 mt-5 lg:w-5/12 border'>
@@ -348,10 +350,10 @@ export default function Dashboard() {
                     </div>
                     <div className='md:text-left text-center'>
                         <p className='text-slate-500 text-sm'>Hebdomadaire</p>
-                        <p className='mt-1 text-slate-900 text-xl'>{weeklyAverage}</p>
+                        <p className='mt-1 text-slate-900 text-xl'>0</p>
                         <div className='flex md:justify-normal justify-center'>
                             <ArrowDown size={12} className='text-red-700 mt-1.5'/>
-                            <p className='mt-1 text-xs text-red-700'>{progressionWeekly}</p>
+                            <p className='mt-1 text-xs text-red-700'>0</p>
                         </div>
                     </div>
                     <div className='md:text-left text-center'>
@@ -415,7 +417,7 @@ export default function Dashboard() {
                     </div>
                 </div>
                 <div className='flex justify-center'>
-                    <ChartMap />
+                    <ChartMap clientData={clientData}/>
                 </div>
                 <div className='mt-5'>
                     <div className="flex justify-between mb-3">
