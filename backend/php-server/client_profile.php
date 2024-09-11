@@ -28,11 +28,12 @@ if (!isset($_POST["id"])) {
 try {
 
     $sql = "SELECT
-                cust.id, cust.id_coach, cust.name, cust.surname, cust.email, cust.address, cust.phone_number, cust.birth_date, cust.gender, cust.astrological_sign, cust.description
+                cust.id, cust.id_coach, cust.name, cust.surname, cust.email, cust.address, cust.phone_number, cust.birth_date, cust.gender, cust.astrological_sign, cust.description,
                 cust_img.image,
                 COUNT(enc.id) AS total_encounters, COUNT(enc.rating >= 3 OR NULL) AS positive_encounters, COUNT(enc.date > NOW() OR NULL) AS planned_encounters
             FROM customers AS cust
             LEFT JOIN customers_images AS cust_img ON cust.id = cust_img.id_customer
+            LEFT JOIN encounters AS enc ON cust.id = enc.id_customer
             WHERE cust.id = :id
             GROUP BY cust.id";
 
