@@ -137,41 +137,41 @@ const Page = () => {
   const modalDeleteRef = useRef<HTMLDivElement | null>(null);
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
-  useEffect(() => {
-    const fetchCustomersData = async () => {
-      try {
-        const response = await sendPostRequest(
-          `http://localhost/table_clients.php`,
-          {}
+  const fetchCustomersData = async () => {
+    try {
+      const response = await sendPostRequest(
+        `http://localhost/table_clients.php`,
+        {}
+      );
+
+      const parsedResponse = JSON.parse(response);
+
+      if (
+        parsedResponse.status === true &&
+        Array.isArray(parsedResponse.data)
+      ) {
+        const formattedData: Customers[] = parsedResponse.data.map(
+          (item: any) => ({
+            id: item.id.toString(),
+            name: item.name,
+            email: item.email,
+            image: item.image,
+            surname: item.surname,
+            phone_number: item.phone_number,
+            paymentMethod: item.paymentMethod,
+          })
         );
 
-        const parsedResponse = JSON.parse(response);
-
-        if (
-          parsedResponse.status === true &&
-          Array.isArray(parsedResponse.data)
-        ) {
-          const formattedData: Customers[] = parsedResponse.data.map(
-            (item: any) => ({
-              id: item.id.toString(),
-              name: item.name,
-              email: item.email,
-              image: item.image,
-              surname: item.surname,
-              phone_number: item.phone_number,
-              paymentMethod: item.paymentMethod,
-            })
-          );
-
-          setCustomersData(formattedData);
-        } else {
-          console.error("Unexpected response format:", parsedResponse);
-        }
-      } catch (error) {
-        console.error("Error fetching coaches data:", error);
+        setCustomersData(formattedData);
+      } else {
+        console.error("Unexpected response format:", parsedResponse);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching coaches data:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchCustomersData();
   }, []);
 
@@ -305,6 +305,8 @@ const Page = () => {
 
       const parsedResponse = JSON.parse(response);
 
+      fetchCustomersData();
+
       if (parsedResponse.error) {
         setError(parsedResponse.error);
         return;
@@ -333,6 +335,8 @@ const Page = () => {
         setError(parsedResponse.error);
         return;
       }
+
+      fetchCustomersData();
     } catch (error) {
       console.error(error);
       setError("An error occurred. Please try again.");
@@ -640,10 +644,10 @@ const Page = () => {
       const response = await sendPostRequest(
         "http://localhost/add_user_to_db.php",
         {
-          name: formData.name,
-          surname: formData.surname,
           email: formData.email,
           phone_number: formData.phone_number,
+          name: formData.name,
+          surname: formData.surname,
           birth_date: formData.birth_date,
           gender: formData.gender,
           astrological_sign: formData.astrological_sign,
@@ -654,6 +658,8 @@ const Page = () => {
       );
 
       const parsedResponse = JSON.parse(response);
+
+      fetchCustomersData();
 
       if (parsedResponse.error) {
         setError(parsedResponse.error);
@@ -1033,7 +1039,7 @@ const Page = () => {
                 <div className="mb-4 w-1/2">
                   <label className="block text-gray-700">Coach</label>
                   <Select
-                    id="coach"
+                    id="customer"
                     value={
                       options.find(
                         (option) => option.value === selectedCoach
@@ -1121,7 +1127,6 @@ const Page = () => {
                     onChange={handleAstroChange}
                     options={astroOptions}
                     className="w-full"
-                    classNamePrefix="react-select"
                     placeholder="Signe Astro"
                     isSearchable
                     menuPortalTarget={document.body}
@@ -1264,7 +1269,6 @@ const Page = () => {
                     }
                     options={options}
                     className="w-full"
-                    classNamePrefix="react-select"
                     placeholder="Select Coach"
                     isSearchable
                     onMenuOpen={fetchCoachesData}
@@ -1314,7 +1318,6 @@ const Page = () => {
                     onChange={handleGenderChange}
                     options={genderOptions}
                     className="w-full"
-                    classNamePrefix="react-select"
                     placeholder="Select Gender"
                     isSearchable
                   />
@@ -1338,7 +1341,6 @@ const Page = () => {
                     onChange={handleAstroChange}
                     options={astroOptions}
                     className="w-full"
-                    classNamePrefix="react-select"
                     placeholder="Signe Astro"
                     isSearchable
                     menuPortalTarget={document.body}

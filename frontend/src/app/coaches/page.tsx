@@ -88,43 +88,39 @@ const Page = () => {
     }
   }, [coachesData]);
 
-  useEffect(() => {
-    const fetchCoachesData = async () => {
-      try {
-        const response = await sendPostRequest(
-          `http://localhost/employes_table.php`,
-          {}
-        );
+  const fetchCoachesData = async () => {
+    try {
+      const response = await sendPostRequest(
+        `http://localhost/employes_table.php`,
+        {}
+      );
 
-        const parsedResponse = JSON.parse(response);
+      const parsedResponse = JSON.parse(response);
 
-        if (
-          parsedResponse.status === true &&
-          Array.isArray(parsedResponse.data)
-        ) {
-          const formattedData: Coach[] = parsedResponse.data.map(
-            (item: any) => ({
-              id: item.id.toString(),
-              name: item.name,
-              email: item.email,
-              image: item.image,
-              surname: item.surname,
-              phone_number: item.phone_number,
-              amount_customer: item.amount_customer,
-            })
-          );
+      if (
+        parsedResponse.status === true &&
+        Array.isArray(parsedResponse.data)
+      ) {
+        const formattedData: Coach[] = parsedResponse.data.map((item: any) => ({
+          id: item.id.toString(),
+          name: item.name,
+          email: item.email,
+          image: item.image,
+          surname: item.surname,
+          phone_number: item.phone_number,
+          amount_customer: item.amount_customer,
+        }));
 
-          console.log("formattedData", formattedData);
-
-          setCoachesData(formattedData);
-        } else {
-          console.error("Unexpected response format:", parsedResponse);
-        }
-      } catch (error) {
-        console.error("Error fetching coaches data:", error);
+        setCoachesData(formattedData);
+      } else {
+        console.error("Unexpected response format:", parsedResponse);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching coaches data:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchCoachesData();
   }, []);
 
@@ -430,6 +426,8 @@ const Page = () => {
 
       const parsedResponse = JSON.parse(response);
 
+      fetchCoachesData();
+
       if (parsedResponse.error) {
         setError(parsedResponse.error);
         return;
@@ -479,6 +477,8 @@ const Page = () => {
       );
 
       const parsedResponse = JSON.parse(response);
+
+      fetchCoachesData();
 
       if (parsedResponse.error) {
         setError(parsedResponse.error);
@@ -567,6 +567,8 @@ const Page = () => {
         setError(parsedResponse.error);
         return;
       }
+
+      fetchCoachesData();
     } catch (error) {
       console.error(error);
       setError("An error occurred. Please try again.");
