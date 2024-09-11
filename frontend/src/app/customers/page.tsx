@@ -108,6 +108,8 @@ const Page = () => {
     { value: "Female", label: "Femmes" },
   ];
 
+  const bulkActions = [{ value: "delete", label: "Supprimer" }];
+
   const astroOptions = [
     { value: "Aquarius", label: "Verseau" },
     { value: "Aries", label: "Bélier" },
@@ -541,6 +543,32 @@ const Page = () => {
     }
   };
 
+  const handleBulkAction = async () => {
+    const selectedIds = Object.entries(checkedItems)
+      .filter(([_, isChecked]) => isChecked)
+      .map(([id]) => id);
+
+    try {
+      for (const id of selectedIds) {
+        const response = await sendPostRequest(
+          "http://localhost/delete_customer.php",
+          {
+            id: id,
+          }
+        );
+
+        const parsedResponse = JSON.parse(response);
+
+        if (parsedResponse.error) {
+          setError(parsedResponse.error);
+          return;
+        }
+      }
+    } catch (error) {
+      setError("An error occurred while deleting coaches.");
+    }
+  };
+
   const filteredCustomers = customersData.filter((customer) => {
     const [firstName, lastName] = customer.name.split(" ");
     const search = searchQuery.toLowerCase();
@@ -677,6 +705,8 @@ const Page = () => {
     }
   };
 
+  const [selectedBulkAction, setSelectedBulkAction] = useState("");
+
   return (
     <div className="mx-6 flex flex-col">
       <div className="flex justify-between items-center mb-2 flex-row">
@@ -711,12 +741,27 @@ const Page = () => {
         <div className="py-2 px-4 border border-gray-200 bg-white">
           <div className="my-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <select className="border border-gray-300 p-2 rounded-md bg-white">
-                <option>Action Groupée</option>
-              </select>
+              <Select
+                id="bulkActions"
+                value={
+                  bulkActions.find(
+                    (bulkAction) => bulkAction.value === selectedBulkAction
+                  ) || null
+                }
+                options={bulkActions}
+                onChange={(selectedOption) =>
+                  setSelectedBulkAction(selectedOption?.value || "")
+                }
+                className="w-full"
+                classNamePrefix="react-select"
+                placeholder="Action Groupée"
+                isSearchable
+                isClearable
+              />
               <button
                 className="bg-blue-500 text-white px-4 py-2 rounded-md  disabled:bg-slate-200"
-                disabled
+                onClick={handleBulkAction}
+                disabled={selectedBulkAction === ""}
               >
                 <p className="text-slate-600">Appliquer</p>
               </button>
