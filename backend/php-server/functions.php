@@ -337,3 +337,95 @@ function get_country_from_address($address)
         ];
     }
 }
+
+
+
+/**
+ * Convert an hexadecimal color to RGB.
+ * @param string $hex           Hexadecimal color
+ * @return array                RGB color
+ */
+function hex_to_rgb($hex) {
+    $hex = str_replace("#", "", $hex);
+
+    if (strlen($hex) == 3) {
+        $r = hexdec(str_repeat(substr($hex, 0, 1), 2));
+        $g = hexdec(str_repeat(substr($hex, 1, 1), 2));
+        $b = hexdec(str_repeat(substr($hex, 2, 1), 2));
+    } else {
+        $r = hexdec(substr($hex, 0, 2));
+        $g = hexdec(substr($hex, 2, 2));
+        $b = hexdec(substr($hex, 4, 2));
+    }
+
+    return [$r, $g, $b];
+}
+
+
+
+/**
+ * Get the luminance of a color.
+ * @param array $rgb            RGB color
+ * @return float                Luminance
+ */
+function get_luminance($rgb) {
+    foreach ($rgb as &$value) {
+        $value /= 255;
+        $value = ($value <= 0.03928) ? $value / 12.92 : pow(($value + 0.055) / 1.055, 2.4);
+    }
+
+    return 0.2126 * $rgb[0] + 0.7152 * $rgb[1] + 0.0722 * $rgb[2];
+}
+
+
+
+/**
+ * Get the contrast ratio between a color and white.
+ * @param string $hex_color     Hexadecimal color
+ * @param string $white         Hexadecimal white color
+ * @return float
+ */
+function get_contrast_ratio($hex_color, $white = "#FFFFFF")
+{
+    $rgb1 = hex_to_rgb($hex_color);
+    $rgb2 = hex_to_rgb($white);
+
+    $luminance1 = get_luminance($rgb1);
+    $luminance2 = get_luminance($rgb2);
+
+    $contrast_ratio = ($luminance1 + 0.05) / ($luminance2 + 0.05);
+
+    if ($contrast_ratio < 1) {
+        $contrast_ratio = 1 / $contrast_ratio;
+    }
+
+    return $contrast_ratio;
+}
+
+
+
+/**
+ * Generate a random hexadecimal color.
+ * @return string               Hexadecimal color
+ */
+function generate_random_color()
+{
+    return sprintf("#%06X", mt_rand(0, 0xFFFFFF));
+}
+
+
+
+/**
+ * Generate a readable color with a contrast ratio greater than a threshold.
+ * @param float $contrast_threshold     Contrast ratio threshold
+ * @return string                       Hexadecimal color
+ */
+function generate_readable_color($contrast_threshold = 4.0)
+{
+    do {
+        $new_color = generate_random_color();
+        $contrast = get_contrast_ratio($new_color);
+    } while ($contrast < $contrast_threshold);
+
+    return $new_color;
+}

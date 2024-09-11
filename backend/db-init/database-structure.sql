@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db
--- Generation Time: Sep 09, 2024 at 12:16 PM
+-- Generation Time: Sep 11, 2024 at 02:57 PM
 -- Server version: 8.0.39
 -- PHP Version: 8.2.8
 
@@ -167,6 +167,18 @@ CREATE TABLE `events` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `events_colors`
+--
+
+CREATE TABLE `events_colors` (
+  `id` int NOT NULL,
+  `event_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `color` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `events_customers`
 --
 
@@ -274,6 +286,12 @@ ALTER TABLE `events`
   ADD KEY `id_employee_for_events` (`id_employee`);
 
 --
+-- Indexes for table `events_colors`
+--
+ALTER TABLE `events_colors`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `events_customers`
 --
 ALTER TABLE `events_customers`
@@ -350,6 +368,12 @@ ALTER TABLE `encounters`
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `events_colors`
+--
+ALTER TABLE `events_colors`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --

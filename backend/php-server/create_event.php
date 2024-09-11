@@ -13,18 +13,46 @@ header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json");
 session_start();
 
-require_once __DIR__ . '/db_connection.php';
+require_once __DIR__ . "/db_connection.php";
+require_once __DIR__ . "/functions.php";
 
 
 if (!isset($_POST["name"]) || !isset($_POST["date"]) || !isset($_POST["duration"]) || !isset($_POST["type"]) || !isset($_POST["max_participants"]) || !isset($_POST["location_x"]) || !isset($_POST["location_y"]) || !isset($_POST["location_name"])) {
     echo json_encode([
-        'status' => 'error',
-        'message' => 'Missing mandatory fields'
+        "status" => "error",
+        "message" => "Missing mandatory fields"
     ]);
     exit();
 }
 
 try {
+
+    $sql = "SELECT * FROM events_colors WHERE type = :type";
+
+    $stm = $pdo->prepare($sql);
+    $stm->execute(["type" => $_POST["type"]]);
+    $event = $stm->fetch(PDO::FETCH_ASSOC);
+
+
+    if (empty($event)) {
+        $sql = "INSERT INTO events_colors (type, color) VALUES (:type, :color)";
+
+        $stm = $pdo->prepare($sql);
+        $res = $stm->execute([
+            "type" => $_POST["type"],
+            "color" => generate_readable_color()
+        ]);
+
+
+        if ($res == false) {
+            echo json_encode([
+                "status" => false,
+                "message" => "Error: Event not created"
+            ]);
+            exit();
+        }
+    }
+
 
     $query = "INSERT INTO events
             (id_employee, name, date, duration, type, max_participants, location_x, location_y, location_name)
@@ -45,19 +73,19 @@ try {
 
     if ($res == true) {
         echo json_encode([
-            'status' => true,
-            'message' => 'Event created successfully'
+            "status" => true,
+            "message" => "Event created successfully"
         ]);
     } else {
         echo json_encode([
-            'status' => false,
-            'message' => 'Error: Event not created'
+            "status" => false,
+            "message" => "Error: Event not created"
         ]);
     }
 
 } catch (PDOException $e) {
     echo json_encode([
-        'status' => false,
-        'message' => 'Database error: ' . $e->getMessage()
+        "status" => false,
+        "message" => "Database error: " . $e->getMessage()
     ]);
 }
