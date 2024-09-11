@@ -29,12 +29,11 @@ export default function Login() {
       });
 
       const parsedResponse = JSON.parse(response);
-
-      console.log(parsedResponse);
-
-      router.push("/dashboard");
     } catch (error) {
       setError("Invalid email or password.");
+    } finally {
+      setLoading(false);
+      router.push("/dashboard");
     }
   };
 

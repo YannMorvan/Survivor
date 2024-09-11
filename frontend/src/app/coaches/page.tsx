@@ -17,7 +17,10 @@ import { sendPostRequest } from "../utils/utils.js";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-import { format, formatDuration } from "date-fns";
+import { format } from "date-fns";
+
+import { useRouter } from "next/navigation";
+import LoadingScreen from "../components/loading";
 
 interface FormData {
   id: string;
@@ -39,6 +42,8 @@ const Page = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     id: "",
     name: "",
@@ -77,6 +82,29 @@ const Page = () => {
   });
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await sendPostRequest(
+          "http://localhost/check_session.php",
+          {}
+        );
+
+        const data = JSON.parse(response);
+
+        if (data.status === true) {
+          setIsLoading(false);
+        } else {
+          router.push("/");
+        }
+      } catch (error) {
+        console.error("Error during the request: ", error);
+      }
+    };
+
+    fetchData();
+  }, [router]);
+
+  useEffect(() => {
     if (coachesData.length > 0) {
       setCheckedItems(
         coachesData.reduce((acc, coach) => {
@@ -88,42 +116,44 @@ const Page = () => {
   }, [coachesData]);
 
   useEffect(() => {
-    const fetchCoachesData = async () => {
-      try {
-        const response = await sendPostRequest(
-          `http://localhost/employes_table.php`,
-          {}
-        );
-
-        const parsedResponse = JSON.parse(response);
-
-        if (
-          parsedResponse.status === true &&
-          Array.isArray(parsedResponse.data)
-        ) {
-          const formattedData: Coach[] = parsedResponse.data.map(
-            (item: any) => ({
-              id: item.id.toString(),
-              name: item.name,
-              email: item.email,
-              image: item.image,
-              surname: item.surname,
-              phone_number: item.phone_number,
-              nbrCustomers: 0,
-            })
+    if (!isLoading) {
+      const fetchCoachesData = async () => {
+        try {
+          const response = await sendPostRequest(
+            `http://localhost/employes_table.php`,
+            {}
           );
 
-          setCoachesData(formattedData);
-        } else {
-          console.error("Unexpected response format:", parsedResponse);
-        }
-      } catch (error) {
-        console.error("Error fetching coaches data:", error);
-      }
-    };
+          const parsedResponse = JSON.parse(response);
 
-    fetchCoachesData();
-  }, []);
+          if (
+            parsedResponse.status === true &&
+            Array.isArray(parsedResponse.data)
+          ) {
+            const formattedData: Coach[] = parsedResponse.data.map(
+              (item: any) => ({
+                id: item.id.toString(),
+                name: item.name,
+                email: item.email,
+                image: item.image,
+                surname: item.surname,
+                phone_number: item.phone_number,
+                nbrCustomers: 0,
+              })
+            );
+
+            setCoachesData(formattedData);
+          } else {
+            console.error("Unexpected response format:", parsedResponse);
+          }
+        } catch (error) {
+          console.error("Error fetching coaches data:", error);
+        }
+      };
+
+      fetchCoachesData();
+    }
+  }, [isLoading]);
 
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -575,6 +605,10 @@ const Page = () => {
   const togglePasswordVisibility = () => {
     setIsPasswordVisible((prevState) => !prevState);
   };
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="mx-6 flex flex-col">

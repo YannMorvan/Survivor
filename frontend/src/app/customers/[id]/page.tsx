@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowLeft, Bookmark, Mail } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 import { sendPostRequest } from "../../utils/utils.js";
+
+import LoadingScreen from "../../components/loading";
+import { useRouter } from "next/navigation";
 
 const StarRating = ({ rating }: { rating: number }) => {
   const totalStars = 5;
@@ -91,60 +93,85 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
     lastActivity: "",
   });
 
-  const [recentEncounters, setRecentEncounters] = React.useState<Encounter[]>(
-    []
-  );
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [payment, setPayments] = React.useState<Payment[]>([]);
+  const [recentEncounters, setRecentEncounters] = useState<Encounter[]>([]);
 
-  const [coachData, setCoachData] = React.useState<Coach>({
+  const [payment, setPayments] = useState<Payment[]>([]);
+
+  const [coachData, setCoachData] = useState<Coach>({
     id: 0,
     name: "",
     surname: "",
   });
 
   useEffect(() => {
-    const fetchCustomerData = async () => {
+    const fetchData = async () => {
       try {
         const response = await sendPostRequest(
-          `http://localhost/client_profile.php`,
-          {
-            id: params.id,
-          }
+          "http://localhost/check_session.php",
+          {}
         );
 
-        const parsedResponse = JSON.parse(response);
+        const data = JSON.parse(response);
 
-        if (parsedResponse.error) {
-          console.error(parsedResponse.error);
-          return;
+        if (data.status === true) {
+          setIsLoading(false);
+        } else {
+          router.push("/");
         }
-
-        const customer = parsedResponse.data;
-
-        setCustomerData({
-          address: customer.address,
-          email: customer.email,
-          encounters: customer.encounters,
-          id: customer.id,
-          image: customer.image,
-          name: customer.name,
-          payment: Array.isArray(customer.payment) ? customer.payment : [],
-          plannedEncounters: customer.plannedEncounters || 0,
-          positiveEncounters: customer.positiveEncounters || 0,
-          surname: customer.surname,
-          totalEncounters: customer.totalEncounters || 0,
-          id_coach: customer.id_coach
-            ? customer.id_coach.toString()
-            : "Pas de Coach assigné",
-          lastActivity: customer.lastActivity || "Aucune activité",
-        });
       } catch (error) {
-        console.error(error);
+        console.error("Error during the request: ", error);
       }
     };
-    fetchCustomerData();
-  }, []);
+
+    fetchData();
+  }, [router]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      const fetchCustomerData = async () => {
+        try {
+          const response = await sendPostRequest(
+            `http://localhost/client_profile.php`,
+            {
+              id: params.id,
+            }
+          );
+
+          const parsedResponse = JSON.parse(response);
+
+          if (parsedResponse.error) {
+            console.error(parsedResponse.error);
+            return;
+          }
+
+          const customer = parsedResponse.data;
+
+          setCustomerData({
+            address: customer.address,
+            email: customer.email,
+            encounters: customer.encounters,
+            id: customer.id,
+            image: customer.image,
+            name: customer.name,
+            payment: Array.isArray(customer.payment) ? customer.payment : [],
+            plannedEncounters: customer.plannedEncounters || 0,
+            positiveEncounters: customer.positiveEncounters || 0,
+            surname: customer.surname,
+            totalEncounters: customer.totalEncounters || 0,
+            id_coach: customer.id_coach
+              ? customer.id_coach.toString()
+              : "Pas de Coach assigné",
+            lastActivity: customer.lastActivity || "Aucune activité",
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      fetchCustomerData();
+    }
+  }, [params.id, isLoading]);
 
   useEffect(() => {
     const fetchCoach = async () => {
@@ -196,6 +223,10 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
       fetchCoach();
     }
   }, [customerData.id_coach]);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="mx-6 flex flex-col">

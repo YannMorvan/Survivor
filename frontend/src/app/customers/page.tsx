@@ -21,6 +21,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 import { format, formatDuration } from "date-fns";
 import { SingleValue, ActionMeta } from "react-select";
+import LoadingScreen from "../components/loading";
 
 interface FormData {
   id: string;
@@ -89,6 +90,8 @@ const Page = () => {
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedCoach, setSelectedCoach] = useState("");
   const [selectedAstro, setSelectedAstro] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     id: "",
     name: "",
@@ -116,42 +119,67 @@ const Page = () => {
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   useEffect(() => {
-    const fetchCustomersData = async () => {
+    const fetchData = async () => {
       try {
         const response = await sendPostRequest(
-          `http://localhost/table_clients.php`,
+          "http://localhost/check_session.php",
           {}
         );
 
-        const parsedResponse = JSON.parse(response);
+        const data = JSON.parse(response);
 
-        if (
-          parsedResponse.status === true &&
-          Array.isArray(parsedResponse.data)
-        ) {
-          const formattedData: Customers[] = parsedResponse.data.map(
-            (item: any) => ({
-              id: item.id.toString(),
-              name: item.name,
-              email: item.email,
-              image: item.image,
-              surname: item.surname,
-              phone_number: item.phone_number,
-              paymentMethod: item.paymentMethod,
-            })
-          );
-
-          setCustomersData(formattedData);
+        if (data.status === true) {
+          setIsLoading(false);
         } else {
-          console.error("Unexpected response format:", parsedResponse);
+          router.push("/");
         }
       } catch (error) {
-        console.error("Error fetching coaches data:", error);
+        console.error("Error during the request: ", error);
       }
     };
 
-    fetchCustomersData();
-  }, []);
+    fetchData();
+  }, [router]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      const fetchCustomersData = async () => {
+        try {
+          const response = await sendPostRequest(
+            `http://localhost/table_clients.php`,
+            {}
+          );
+
+          const parsedResponse = JSON.parse(response);
+
+          if (
+            parsedResponse.status === true &&
+            Array.isArray(parsedResponse.data)
+          ) {
+            const formattedData: Customers[] = parsedResponse.data.map(
+              (item: any) => ({
+                id: item.id.toString(),
+                name: item.name,
+                email: item.email,
+                image: item.image,
+                surname: item.surname,
+                phone_number: item.phone_number,
+                paymentMethod: item.paymentMethod,
+              })
+            );
+
+            setCustomersData(formattedData);
+          } else {
+            console.error("Unexpected response format:", parsedResponse);
+          }
+        } catch (error) {
+          console.error("Error fetching coaches data:", error);
+        }
+      };
+
+      fetchCustomersData();
+    }
+  }, [isLoading]);
 
   const openAddModal = () => {
     setIsModalAddOpen(true);
@@ -364,8 +392,6 @@ const Page = () => {
   const closeDeleteModal = () => {
     setIsModalDeleteOpen(false);
   };
-
-  const router = useRouter();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -656,6 +682,10 @@ const Page = () => {
       console.error("Error fetching coaches data:", error);
     }
   };
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="mx-6 flex flex-col">
