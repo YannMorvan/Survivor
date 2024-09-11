@@ -81,14 +81,14 @@ const Page = () => {
   const [loading, setLoading] = useState(false);
   const [customersData, setCustomersData] = useState<Customers[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [minCustomers, setMinCustomers] = useState(0);
-  const [maxCustomers, setMaxCustomers] = useState(10);
-  const [customerData, setCustomerData] = useState<CustomerData | null>(null);
+  const [paginationOption, setPaginationOption] = useState(false);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [allChecked, setAllChecked] = useState(false);
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedCoach, setSelectedCoach] = useState("");
   const [selectedAstro, setSelectedAstro] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+
   const [formData, setFormData] = useState<FormData>({
     id: "",
     name: "",
@@ -103,6 +103,28 @@ const Page = () => {
     id_coach: "",
   });
 
+  const genderOptions = [
+    { value: "Male", label: "Hommes" },
+    { value: "Female", label: "Femmes" },
+  ];
+
+  const bulkActions = [{ value: "delete", label: "Supprimer" }];
+
+  const astroOptions = [
+    { value: "Aquarius", label: "Verseau" },
+    { value: "Aries", label: "Bélier" },
+    { value: "Cancer", label: "Cancer" },
+    { value: "Capricorn", label: "Capricorne" },
+    { value: "Taurus", label: "Taureau" },
+    { value: "Leo", label: "Lion" },
+    { value: "Libra", label: "Balance" },
+    { value: "Pisces", label: "Poissons" },
+    { value: "Scorpio", label: "Scorpion" },
+    { value: "Sagittarius", label: "Sagittaire" },
+    { value: "Virgo", label: "Vierge" },
+    { value: "Gemini", label: "Gémeaux" },
+  ];
+
   const [checkedItems, setCheckedItems] = useState<CheckedItems>(
     customersData.reduce((acc, customer) => {
       acc[customer.id] = false;
@@ -115,41 +137,43 @@ const Page = () => {
   const modalDeleteRef = useRef<HTMLDivElement | null>(null);
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
-  useEffect(() => {
-    const fetchCustomersData = async () => {
-      try {
-        const response = await sendPostRequest(
-          `http://localhost/table_clients.php`,
-          {}
+  const fetchCustomersData = async () => {
+    try {
+      const response = await sendPostRequest(
+        `http://localhost/table_clients.php`,
+        {}
+      );
+
+      const parsedResponse = JSON.parse(response);
+
+      if (
+        parsedResponse.status === true &&
+        Array.isArray(parsedResponse.data)
+      ) {
+        const formattedData: Customers[] = parsedResponse.data.map(
+          (item: any) => ({
+            id: item.id.toString(),
+            name: item.name,
+            email: item.email,
+            image: item.image,
+            surname: item.surname,
+            phone_number: item.phone_number,
+            paymentMethod: item.paymentMethod,
+          })
         );
 
-        const parsedResponse = JSON.parse(response);
+        fetchCustomersImage();
 
-        if (
-          parsedResponse.status === true &&
-          Array.isArray(parsedResponse.data)
-        ) {
-          const formattedData: Customers[] = parsedResponse.data.map(
-            (item: any) => ({
-              id: item.id.toString(),
-              name: item.name,
-              email: item.email,
-              image: item.image,
-              surname: item.surname,
-              phone_number: item.phone_number,
-              paymentMethod: item.paymentMethod,
-            })
-          );
-
-          setCustomersData(formattedData);
-        } else {
-          console.error("Unexpected response format:", parsedResponse);
-        }
-      } catch (error) {
-        console.error("Error fetching coaches data:", error);
+        setCustomersData(formattedData);
+      } else {
+        console.error("Unexpected response format:", parsedResponse);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching coaches data:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchCustomersData();
   }, []);
 
@@ -171,6 +195,9 @@ const Page = () => {
       phone_number: "",
       gender: "",
     });
+    setSelectedCoach("");
+    setSelectedAstro("");
+    setSelectedGender("");
     setIsModalAddOpen(false);
   };
 
@@ -206,11 +233,9 @@ const Page = () => {
         id: customer.id || "",
         name: customer.name || "",
         surname: customer.surname || "",
-        id_coach: customer.id_coach
-          ? customer.id_coach.toString()
-          : "Pas de Coach assigné",
+        id_coach: customer.id_coach ? customer.id_coach.toString() : "",
         birth_date: customer.birth_date || "",
-        description: customer.description || "Pas de description",
+        description: customer.description || "",
         astrological_sign: customer.astrological_sign || "",
         phone_number: customer.phone_number || "",
         gender: customer.gender || "",
@@ -234,6 +259,9 @@ const Page = () => {
       phone_number: "",
       gender: "",
     });
+    setSelectedCoach("");
+    setSelectedAstro("");
+    setSelectedGender("");
     setIsModalEditOpen(false);
   };
 
@@ -279,6 +307,8 @@ const Page = () => {
 
       const parsedResponse = JSON.parse(response);
 
+      fetchCustomersData();
+
       if (parsedResponse.error) {
         setError(parsedResponse.error);
         return;
@@ -307,6 +337,8 @@ const Page = () => {
         setError(parsedResponse.error);
         return;
       }
+
+      fetchCustomersData();
     } catch (error) {
       console.error(error);
       setError("An error occurred. Please try again.");
@@ -399,19 +431,11 @@ const Page = () => {
       ) {
         setDropdownOpen(null);
       }
-
-      if (
-        filterOpen &&
-        !(event.target as Element).closest(".filter-dropdown")
-      ) {
-        setFilterOpen(false);
-      }
     };
 
     if (
       isModalAddOpen ||
       dropdownOpen !== null ||
-      filterOpen ||
       isModalDeleteOpen ||
       isModalEditOpen
     ) {
@@ -423,15 +447,10 @@ const Page = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [
-    isModalAddOpen,
-    dropdownOpen,
-    filterOpen,
-    isModalDeleteOpen,
-    isModalEditOpen,
-  ]);
+  }, [isModalAddOpen, dropdownOpen, isModalDeleteOpen, isModalEditOpen]);
 
   const handleIconSearchClick = () => {
+    paginationOption && setPaginationOption(false);
     setIsSearchActive(true);
   };
 
@@ -506,23 +525,13 @@ const Page = () => {
     document.body.removeChild(link);
   };
 
-  const filteredCustomers = customersData.filter((customer) => {
-    const [firstName, lastName] = customer.name.split(" ");
-    const search = searchQuery.toLowerCase();
-    return (
-      (firstName.toLowerCase().includes(search) ||
-        lastName?.toLowerCase().includes(search)) &&
-      customer.name.length >= minCustomers &&
-      customer.name.length <= maxCustomers
-    );
-  });
-
   const handleDropdownToggle = (id: string) => {
     setDropdownOpen(dropdownOpen === id ? null : id);
   };
 
-  const handleFilterToggle = () => {
-    setFilterOpen(!filterOpen);
+  const handlePaginationToggle = () => {
+    isSearchActive && setIsSearchActive(false);
+    setPaginationOption(!paginationOption);
   };
 
   const handleDateChange = (birth_date: Date | null) => {
@@ -540,8 +549,52 @@ const Page = () => {
     }
   };
 
-  const handleGenderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const gender = event.target.value;
+  const handleBulkAction = async () => {
+    const selectedIds = Object.entries(checkedItems)
+      .filter(([_, isChecked]) => isChecked)
+      .map(([id]) => id);
+
+    try {
+      for (const id of selectedIds) {
+        const response = await sendPostRequest(
+          "http://localhost/delete_customer.php",
+          {
+            id: id,
+          }
+        );
+
+        const parsedResponse = JSON.parse(response);
+
+        if (parsedResponse.error) {
+          setError(parsedResponse.error);
+          return;
+        }
+      }
+    } catch (error) {
+      setError("An error occurred while deleting coaches.");
+    }
+  };
+
+  const filteredCustomers = customersData.filter((customer) => {
+    const [firstName, lastName] = customer.name.split(" ");
+    const search = searchQuery.toLowerCase();
+    return (
+      firstName.toLowerCase().includes(search) ||
+      lastName?.toLowerCase().includes(search)
+    );
+  });
+
+  const paginatedCustomers = filteredCustomers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const totalPages = Math.ceil(customersData.length / itemsPerPage);
+
+  const handleGenderChange = (
+    selectedOption: SingleValue<{ value: string; label: string }>
+  ) => {
+    const gender = selectedOption ? selectedOption.value : "";
     setSelectedGender(gender);
     setFormData({
       ...formData,
@@ -557,15 +610,16 @@ const Page = () => {
     });
   };
 
-  const handleAstroChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const astro = event.target.value;
+  const handleAstroChange = (
+    selectedOption: SingleValue<{ value: string; label: string }>
+  ) => {
+    const astro = selectedOption ? selectedOption.value : "";
     setSelectedAstro(astro);
     setFormData({
       ...formData,
       astrological_sign: astro || "",
     });
   };
-
   const handleCreateCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -592,10 +646,10 @@ const Page = () => {
       const response = await sendPostRequest(
         "http://localhost/add_user_to_db.php",
         {
-          name: formData.name,
-          surname: formData.surname,
           email: formData.email,
           phone_number: formData.phone_number,
+          name: formData.name,
+          surname: formData.surname,
           birth_date: formData.birth_date,
           gender: formData.gender,
           astrological_sign: formData.astrological_sign,
@@ -606,6 +660,8 @@ const Page = () => {
       );
 
       const parsedResponse = JSON.parse(response);
+
+      fetchCustomersData();
 
       if (parsedResponse.error) {
         setError(parsedResponse.error);
@@ -657,6 +713,42 @@ const Page = () => {
     }
   };
 
+  const [selectedBulkAction, setSelectedBulkAction] = useState("");
+
+  const fetchCustomersImage = async () => {
+    const currentCoaches = itemsPerPage * currentPage;
+
+    try {
+      for (
+        let i = 0 + currentCoaches - itemsPerPage;
+        i <= currentCoaches;
+        i++
+      ) {
+        const response = await sendPostRequest(
+          `http://localhost/client_image.php`,
+          { id: i }
+        );
+
+        const parsedResponse = JSON.parse(response);
+
+        if (parsedResponse.status === true) {
+          const image = parsedResponse.data;
+          setCustomersData((prevData) =>
+            prevData.map((item, index) =>
+              index === i - 1 ? { ...item, image } : item
+            )
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching coaches data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomersImage();
+  }, [currentPage]);
+
   return (
     <div className="mx-6 flex flex-col">
       <div className="flex justify-between items-center mb-2 flex-row">
@@ -691,12 +783,27 @@ const Page = () => {
         <div className="py-2 px-4 border border-gray-200 bg-white">
           <div className="my-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <select className="border border-gray-300 p-2 rounded-md bg-white">
-                <option>Action Groupée</option>
-              </select>
+              <Select
+                id="bulkActions"
+                value={
+                  bulkActions.find(
+                    (bulkAction) => bulkAction.value === selectedBulkAction
+                  ) || null
+                }
+                options={bulkActions}
+                onChange={(selectedOption) =>
+                  setSelectedBulkAction(selectedOption?.value || "")
+                }
+                className="w-full"
+                classNamePrefix="react-select"
+                placeholder="Action Groupée"
+                isSearchable
+                isClearable
+              />
               <button
                 className="bg-blue-500 text-white px-4 py-2 rounded-md  disabled:bg-slate-200"
-                disabled
+                onClick={handleBulkAction}
+                disabled={selectedBulkAction === ""}
               >
                 <p className="text-slate-600">Appliquer</p>
               </button>
@@ -720,52 +827,47 @@ const Page = () => {
                   <Search className="w-5 h-5" />
                 </button>
               )}
-              <button
-                className="text-gray-500 hover:text-gray-700"
-                onClick={handleFilterToggle}
-              >
+              <button className="text-gray-500 hover:text-gray-700">
                 <Sliders className="w-5 h-5" />
               </button>
-              <button className="text-gray-500 hover:text-gray-700">
+              <button
+                className="text-gray-500 hover:text-gray-700"
+                onClick={handlePaginationToggle}
+              >
                 <Settings className="w-5 h-5" />
               </button>
             </div>
           </div>
 
-          {filterOpen && (
+          {paginationOption && (
             <div className="filter-dropdown absolute right-6 bg-white border border-gray-200 shadow-lg rounded-md p-4 z-10">
               <label className="block text-gray-700 mb-2">
-                Nombre de Clients
+                Clients par page
               </label>
               <div className="flex flex-row justify-between items-center">
-                <div className="flex flex-col gap-2 mr-2">
-                  <span>Min:</span>
-                  <span>Max:</span>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center">
-                    <input
-                      type="range"
-                      min="0"
-                      max="10"
-                      value={minCustomers}
-                      onChange={(e) => setMinCustomers(Number(e.target.value))}
-                      className="mr-2"
-                    />
-                    <span>{minCustomers}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="range"
-                      min="0"
-                      max="10"
-                      value={maxCustomers}
-                      onChange={(e) => setMaxCustomers(Number(e.target.value))}
-                      className="mr-2"
-                    />
-                    <span>{maxCustomers}</span>
-                  </div>
-                </div>
+                <button
+                  onClick={() =>
+                    setItemsPerPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  className="px-3 py-2 border rounded-l-lg bg-gray-200 hover:bg-gray-300"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  value={itemsPerPage}
+                  onChange={(e) =>
+                    setItemsPerPage(Math.max(Number(e.target.value), 1))
+                  }
+                  className="w-full px-3 py-2 border-t border-b border-gray-300 text-center"
+                  min="1"
+                />
+                <button
+                  onClick={() => setItemsPerPage((prev) => prev + 1)}
+                  className="px-3 py-2 border rounded-r-lg bg-gray-200 hover:bg-gray-300"
+                >
+                  +
+                </button>
               </div>
             </div>
           )}
@@ -789,7 +891,7 @@ const Page = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredCustomers.map((customer) => (
+            {paginatedCustomers.map((customer) => (
               <tr
                 key={customer.id}
                 className="border-t border-gray-200 hover:bg-gray-50 relative"
@@ -805,7 +907,11 @@ const Page = () => {
                 <td className="p-4 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full overflow-hidden">
                     <img
-                      src={`data:image/jpeg;base64,${customer.image}`}
+                      src={
+                        customer.image
+                          ? `data:image/jpeg;base64,${customer.image}`
+                          : ""
+                      }
                       alt={customer.name}
                       className="w-full h-full object-cover"
                     />
@@ -857,6 +963,56 @@ const Page = () => {
             ))}
           </tbody>
         </table>
+        <nav
+          className="flex items-center flex-column flex-wrap md:flex-row justify-between py-4"
+          aria-label="Table navigation"
+        >
+          <span className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
+            Showing{" "}
+            <span className="font-semibold text-gray-900 dark:text-white">
+              {(currentPage - 1) * itemsPerPage + 1}-
+              {Math.min(currentPage * itemsPerPage, filteredCustomers.length)}
+            </span>{" "}
+            of{" "}
+            <span className="font-semibold text-gray-900 dark:text-white">
+              {filteredCustomers.length}
+            </span>
+          </span>
+          <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
+            <li>
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              >
+                Précédent
+              </button>
+            </li>
+            {[...Array(totalPages)].map((_, index) => (
+              <li key={index}>
+                <button
+                  onClick={() => setCurrentPage(index + 1)}
+                  className={`flex items-center justify-center px-3 h-8 leading-tight ${
+                    currentPage === index + 1
+                      ? "text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
+                      : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              </li>
+            ))}
+            <li>
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              >
+                Suivant
+              </button>
+            </li>
+          </ul>
+        </nav>
       </div>
 
       {isModalEditOpen && (
@@ -923,7 +1079,7 @@ const Page = () => {
                 <div className="mb-4 w-1/2">
                   <label className="block text-gray-700">Coach</label>
                   <Select
-                    id="coach"
+                    id="customer"
                     value={
                       options.find(
                         (option) => option.value === selectedCoach
@@ -972,48 +1128,53 @@ const Page = () => {
               <div className="flex flex-row gap-4 w-full">
                 <div className="mb-4 w-full">
                   <label className="block text-gray-700">Genre</label>
-                  <select
+                  <Select
                     id="gender"
-                    value={selectedGender || formData.gender || ""}
+                    value={
+                      genderOptions.find(
+                        (genderOption) => genderOption.value === selectedGender
+                      ) ||
+                      genderOptions.find(
+                        (genderOption) =>
+                          genderOption.value === formData?.gender
+                      ) ||
+                      null
+                    }
                     onChange={handleGenderChange}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
-                      !selectedGender ? "text-gray-500" : "text-gray-700"
-                    }`}
-                  >
-                    <option value="" disabled hidden>
-                      Genre
-                    </option>
-                    <option value="Male">Homme</option>
-                    <option value="Female">Femme</option>
-                  </select>
+                    options={genderOptions}
+                    className="w-full"
+                    classNamePrefix="react-select"
+                    placeholder="Select Gender"
+                    isSearchable
+                  />
                 </div>
                 <div className="mb-4 w-full">
                   <label className="block text-gray-700">
                     Signe Astrologique
                   </label>
-                  <select
+                  <Select
                     id="astrological_sign"
-                    value={selectedAstro || formData?.astrological_sign || ""}
+                    value={
+                      astroOptions.find(
+                        (astroOption) => astroOption.value === selectedAstro
+                      ) ||
+                      astroOptions.find(
+                        (astroOption) =>
+                          astroOption.value === formData?.astrological_sign
+                      ) ||
+                      null
+                    }
                     onChange={handleAstroChange}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
-                      !selectedAstro ? "text-gray-500" : "text-gray-700"
-                    }`}
-                  >
-                    <option value="" disabled hidden>
-                      Signe Astrologique
-                    </option>
-                    <option value="Aquarius">Verseau</option>
-                    <option value="Aries">Bélier</option>
-                    <option value="Cancer">Cancer</option>
-                    <option value="Capricorn">Capricorne</option>
-                    <option value="Taurus">Taureau</option>
-                    <option value="Leo">Lion</option>
-                    <option value="Libra">Balance</option>
-                    <option value="Pisces">Poissons</option>
-                    <option value="Scorpio">Scorpion</option>
-                    <option value="Sagittarius">Sagittaire</option>
-                    <option value="Virgo">Vierge</option>
-                  </select>
+                    options={astroOptions}
+                    className="w-full"
+                    placeholder="Signe Astro"
+                    isSearchable
+                    menuPortalTarget={document.body}
+                    menuPosition="fixed"
+                    styles={{
+                      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                    }}
+                  />
                 </div>
               </div>
               <div className="mb-4 w-full">
@@ -1148,7 +1309,6 @@ const Page = () => {
                     }
                     options={options}
                     className="w-full"
-                    classNamePrefix="react-select"
                     placeholder="Select Coach"
                     isSearchable
                     onMenuOpen={fetchCoachesData}
@@ -1183,48 +1343,52 @@ const Page = () => {
               <div className="flex flex-row gap-4 w-full">
                 <div className="mb-4 w-full">
                   <label className="block text-gray-700">Genre</label>
-                  <select
+                  <Select
                     id="gender"
-                    value={selectedGender || ""}
+                    value={
+                      genderOptions.find(
+                        (genderOption) => genderOption.value === selectedGender
+                      ) ||
+                      genderOptions.find(
+                        (genderOption) =>
+                          genderOption.value === formData?.gender
+                      ) ||
+                      null
+                    }
                     onChange={handleGenderChange}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
-                      !selectedGender ? "text-gray-500" : "text-gray-700"
-                    }`}
-                  >
-                    <option value="" disabled hidden>
-                      Genre
-                    </option>
-                    <option value="Male">Homme</option>
-                    <option value="Female">Femme</option>
-                  </select>
+                    options={genderOptions}
+                    className="w-full"
+                    placeholder="Select Gender"
+                    isSearchable
+                  />
                 </div>
                 <div className="mb-4 w-full">
                   <label className="block text-gray-700">
                     Signe Astrologique
                   </label>
-                  <select
+                  <Select
                     id="astrological_sign"
-                    value={selectedAstro || ""}
+                    value={
+                      astroOptions.find(
+                        (astroOption) => astroOption.value === selectedAstro
+                      ) ||
+                      astroOptions.find(
+                        (astroOption) =>
+                          astroOption.value === formData?.astrological_sign
+                      ) ||
+                      null
+                    }
                     onChange={handleAstroChange}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
-                      !selectedAstro ? "text-gray-500" : "text-gray-700"
-                    }`}
-                  >
-                    <option value="" disabled hidden>
-                      Signe Astrologique
-                    </option>
-                    <option value="Aquarius">Verseau</option>
-                    <option value="Aries">Bélier</option>
-                    <option value="Cancer">Cancer</option>
-                    <option value="Capricorn">Capricorne</option>
-                    <option value="Taurus">Taureau</option>
-                    <option value="Leo">Lion</option>
-                    <option value="Libra">Balance</option>
-                    <option value="Pisces">Poissons</option>
-                    <option value="Scorpio">Scorpion</option>
-                    <option value="Sagittarius">Sagittaire</option>
-                    <option value="Virgo">Vierge</option>
-                  </select>
+                    options={astroOptions}
+                    className="w-full"
+                    placeholder="Signe Astro"
+                    isSearchable
+                    menuPortalTarget={document.body}
+                    menuPosition="fixed"
+                    styles={{
+                      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                    }}
+                  />
                 </div>
               </div>
               <div className="mb-4 w-full">
