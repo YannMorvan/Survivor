@@ -4,14 +4,15 @@ import * as am4maps from "@amcharts/amcharts4/maps";
 import am4geodata_worldLow from "@amcharts/amcharts4-geodata/worldLow";
 import am4themes_animated from "@amcharts/amcharts4/themes/animated";
 
-const MapComponent = () => {
+const MapComponent = ({ clientData }) => {
   useEffect(() => {
-
     let chart = am4core.create("chartdiv3", am4maps.MapChart);
 
     if (chart.logo) {
         chart.logo.disabled = true;
     }
+
+    console.log(clientData);
 
     am4core.useTheme(am4themes_animated);
 
@@ -31,12 +32,40 @@ const MapComponent = () => {
     let hs = polygonTemplate.states.create("hover");
     hs.properties.fill = am4core.color("#9CADF3");
 
+    const countryCounts = clientData.reduce((acc, client) => {
+      if (!client.country) return acc;
+      if (!acc[client.country]) {
+        acc[client.country] = 0;
+      }
+      acc[client.country]++;
+      return acc;
+    }, {});
+
+    worldSeries.data = Object.keys(countryCounts).map(country => ({
+      id: country,
+      value: countryCounts[country]
+    }));
+
+    const values = Object.values(countryCounts);
+    const maxValue = Math.max(...values);
+    const minValue = Math.min(...values);
+
+    const getColor = (value) => {
+      const ratio = (value - minValue) / (maxValue - minValue);
+      return am4core.color(am4core.color("#A6D7FF").brighten(ratio * -0.2).toString());
+    };
+
+    polygonTemplate.adapter.add("fill", (fill, target) => {
+      let value = target.dataItem && target.dataItem.value;
+      return value !== undefined ? getColor(value) : fill;
+    });
+
     return () => {
       if (chart) {
         chart.dispose();
       }
     };
-  }, []);
+  }, [clientData]);
 
   return <div id="chartdiv3" style={{ width: '100%', height: '200px' }}></div>;
 };
