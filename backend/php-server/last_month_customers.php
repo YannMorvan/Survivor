@@ -19,7 +19,7 @@ require_once __DIR__ . '/functions.php';
 try {
 
     $current_date = date("Y-m-d H:i:s");
-    $starting_date = date("Y-m-d H:i:s", strtotime('-1 week', strtotime($current_date)));
+    $starting_date = date("Y-m-d H:i:s", strtotime('-3 month', strtotime($current_date)));
 
     $query = "SELECT id, name, surname, country FROM customers WHERE join_date >= :starting_date AND join_date <= :current_date AND removed = 0";
 
