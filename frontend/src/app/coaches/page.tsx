@@ -16,8 +16,9 @@ import { sendPostRequest } from "../utils/utils.js";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import Select, { SingleValue } from "react-select";
 
-import { format, formatDuration } from "date-fns";
+import { format, formatDuration, set } from "date-fns";
 
 interface FormData {
   id: string;
@@ -62,7 +63,7 @@ const Page = () => {
     name: string;
     surname: string;
     phone_number: string;
-    nbrCustomers: number;
+    amount_customer: number;
   }
 
   const [allChecked, setAllChecked] = useState(false);
@@ -109,9 +110,11 @@ const Page = () => {
               image: item.image,
               surname: item.surname,
               phone_number: item.phone_number,
-              nbrCustomers: 0,
+              amount_customer: item.amount_customer,
             })
           );
+
+          console.log("formattedData", formattedData);
 
           setCoachesData(formattedData);
         } else {
@@ -135,10 +138,35 @@ const Page = () => {
   const modalDeleteRef = useRef<HTMLDivElement | null>(null);
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const filteredCoaches = coachesData.filter((coach) => {
+    const [firstName, lastName] = coach.name.split(" ");
+    const search = searchQuery.toLowerCase();
+    const withinRange =
+      coach.amount_customer >= minCustomers &&
+      coach.amount_customer <= maxCustomers;
+    return (
+      (firstName.toLowerCase().includes(search) ||
+        lastName?.toLowerCase().includes(search)) &&
+      withinRange
+    );
+  });
+
+  const paginatedCoaches = filteredCoaches.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const totalPages = Math.ceil(coachesData.length / itemsPerPage);
+
   const [selectedGender, setSelectedGender] = useState("");
 
-  const handleGenderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const gender = event.target.value;
+  const handleGenderChange = (
+    selectedOption: SingleValue<{ value: string; label: string }>
+  ) => {
+    const gender = selectedOption ? selectedOption.value : "";
     setSelectedGender(gender);
     setFormData({
       ...formData,
@@ -162,6 +190,7 @@ const Page = () => {
       work: "",
       password: "",
     });
+    setSelectedGender("");
     setIsPasswordVisible(false);
     setIsModalAddOpen(false);
   };
@@ -221,6 +250,7 @@ const Page = () => {
       work: "",
       password: "",
     });
+    setSelectedGender("");
     setIsPasswordVisible(false);
     setIsModalEditOpen(false);
   };
@@ -509,7 +539,7 @@ const Page = () => {
       coach.name,
       coach.email,
       coach.phone_number,
-      coach.nbrCustomers,
+      coach.amount_customer,
     ]);
 
     const csvContent = [headers, ...rows]
@@ -525,18 +555,6 @@ const Page = () => {
     link.click();
     document.body.removeChild(link);
   };
-
-  const filteredCoaches = coachesData.filter((coach) => {
-    const [firstName, lastName] = coach.name.split(" ");
-    const search = searchQuery.toLowerCase();
-    const withinRange =
-      coach.nbrCustomers >= minCustomers && coach.nbrCustomers <= maxCustomers;
-    return (
-      (firstName.toLowerCase().includes(search) ||
-        lastName?.toLowerCase().includes(search)) &&
-      withinRange
-    );
-  });
 
   const handleDropdownToggle = (id: string) => {
     setDropdownOpen(dropdownOpen === id ? null : id);
@@ -575,6 +593,11 @@ const Page = () => {
   const togglePasswordVisibility = () => {
     setIsPasswordVisible((prevState) => !prevState);
   };
+
+  const genderOptions = [
+    { value: "Male", label: "Hommes" },
+    { value: "Female", label: "Femmes" },
+  ];
 
   return (
     <div className="mx-6 flex flex-col">
@@ -711,7 +734,7 @@ const Page = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredCoaches.map((coach) => (
+            {paginatedCoaches.map((coach) => (
               <tr
                 key={coach.id}
                 className="border-t border-gray-200 hover:bg-gray-50 relative"
@@ -738,7 +761,7 @@ const Page = () => {
                 </td>
                 <td className="p-4 text-[#6B83A2]">{coach.email}</td>
                 <td className="p-4 text-[#6B83A2]">{coach.phone_number}</td>
-                <td className="p-4 text-[#6B83A2]">{coach.nbrCustomers}</td>
+                <td className="p-4 text-[#6B83A2]">{coach.amount_customer}</td>
                 <td className="p-4 text-[#6B83A2] relative">
                   <button
                     className="text-[#384B65] hover:text-[#6B83A2]"
@@ -772,6 +795,56 @@ const Page = () => {
             ))}
           </tbody>
         </table>
+        <nav
+          className="flex items-center flex-column flex-wrap md:flex-row justify-between py-4"
+          aria-label="Table navigation"
+        >
+          <span className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
+            Showing{" "}
+            <span className="font-semibold text-gray-900 dark:text-white">
+              {(currentPage - 1) * itemsPerPage + 1}-
+              {Math.min(currentPage * itemsPerPage, filteredCoaches.length)}
+            </span>{" "}
+            of{" "}
+            <span className="font-semibold text-gray-900 dark:text-white">
+              {filteredCoaches.length}
+            </span>
+          </span>
+          <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
+            <li>
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              >
+                Précédent
+              </button>
+            </li>
+            {[...Array(totalPages)].map((_, index) => (
+              <li key={index}>
+                <button
+                  onClick={() => setCurrentPage(index + 1)}
+                  className={`flex items-center justify-center px-3 h-8 leading-tight ${
+                    currentPage === index + 1
+                      ? "text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
+                      : "text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              </li>
+            ))}
+            <li>
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              >
+                Suivant
+              </button>
+            </li>
+          </ul>
+        </nav>
       </div>
 
       {isModalEditOpen && (
@@ -886,20 +959,25 @@ const Page = () => {
                 </div>
                 <div className="mb-4 w-full">
                   <label className="block text-gray-700">Genre</label>
-                  <select
+                  <Select
                     id="gender"
-                    value={selectedGender || formData.gender || ""}
+                    value={
+                      genderOptions.find(
+                        (genderOption) => genderOption.value === selectedGender
+                      ) ||
+                      genderOptions.find(
+                        (genderOption) =>
+                          genderOption.value === formData?.gender
+                      ) ||
+                      null
+                    }
                     onChange={handleGenderChange}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
-                      !selectedGender ? "text-gray-500" : "text-gray-700"
-                    }`}
-                  >
-                    <option value="" disabled hidden>
-                      Genre
-                    </option>
-                    <option value="Male">Homme</option>
-                    <option value="Female">Femme</option>
-                  </select>
+                    options={genderOptions}
+                    className="w-full"
+                    classNamePrefix="react-select"
+                    placeholder="Genre"
+                    isSearchable
+                  />
                 </div>
               </div>
               <div className="flex justify-center">
@@ -1062,20 +1140,25 @@ const Page = () => {
                 </div>
                 <div className="mb-4 w-full">
                   <label className="block text-gray-700">Genre</label>
-                  <select
+                  <Select
                     id="gender"
-                    value={selectedGender || formData.gender || ""}
+                    value={
+                      genderOptions.find(
+                        (genderOption) => genderOption.value === selectedGender
+                      ) ||
+                      genderOptions.find(
+                        (genderOption) =>
+                          genderOption.value === formData?.gender
+                      ) ||
+                      null
+                    }
                     onChange={handleGenderChange}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
-                      !selectedGender ? "text-gray-500" : "text-gray-700"
-                    }`}
-                  >
-                    <option value="" disabled hidden>
-                      Genre
-                    </option>
-                    <option value="Male">Homme</option>
-                    <option value="Female">Femme</option>
-                  </select>
+                    options={genderOptions}
+                    className="w-full"
+                    classNamePrefix="react-select"
+                    placeholder="Genre"
+                    isSearchable
+                  />
                 </div>
               </div>
               <div className="flex justify-center">
