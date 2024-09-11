@@ -19,13 +19,13 @@ require_once __DIR__ . '/functions.php';
 try {
 
     $current_date = date("Y-m-d H:i:s");
-    $start_of_week = date("Y-m-d H:i:s", strtotime('monday this week'));
+    $starting_date = date("Y-m-d H:i:s", strtotime('-1 week', strtotime($current_date)));
 
-    $query = "SELECT * FROM events WHERE date >= :start_of_week AND date <= :current_date AND removed = 0";
+    $query = "SELECT * FROM events WHERE date >= :starting_date AND date <= :current_date AND removed = 0";
 
     $stm = $pdo->prepare($query);
     $stm->execute([
-        "start_of_week" => $start_of_week,
+        "starting_date" => $starting_date,
         "current_date" => $current_date
     ]);
     $events = $stm->fetchAll(PDO::FETCH_ASSOC);
