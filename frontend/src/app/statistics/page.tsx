@@ -6,11 +6,19 @@ import Image from 'next/image';
 import { sendPostRequest } from '../utils/utils';
 import { ArrowLeftRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import GradualChart from '../components/charts/gradual-chart';
 
 interface Coach {
     id: number;
     name: string;
     image: string;
+}
+
+interface Encounters {
+    date: string;
+    rating: number;
+    comment: string;
+    source: string;
 }
 
 export default function Page() {
@@ -22,6 +30,11 @@ export default function Page() {
     const [coaches, setCoaches] = useState<Coach[]>([]);
     const [selectedCoach, setSelectedCoach] = useState('Choisir un coach');
     const [selectedCoach2, setSelectedCoach2] = useState('Choisir un coach');
+    const [coachId1, setCoachId1] = useState(0);
+    const [coachId2, setCoachId2] = useState(0);
+    const [encounter, setEncounter] = useState<Encounters[]>([]);
+    const [coachCustomers, setCoachCustomers] = useState([]);
+    const [avgStar, setAvgStar] = useState(0);
 
     const handleDropdown = () => {
         setToggleDropdown(!isDropdownOpen);
@@ -29,11 +42,13 @@ export default function Page() {
 
     const handleCoachSelect = (coach: Coach) => {
         setSelectedCoach(coach.name);
+        setCoachId1(coach.id);
         setIsOpen(false);
     };
 
     const handleCoachSelect2 = (coach: Coach) => {
         setSelectedCoach2(coach.name);
+        setCoachId2(coach.id);
         setIsOpen2(false);
     }
     
@@ -43,9 +58,101 @@ export default function Page() {
             return;
         }
 
-        router.replace(`/statistics/${selectedCoach}/${selectedCoach2}`);
+        router.replace(`/statistics/${coachId1}/${coachId2}`);
 
     }, [selectedCoach, selectedCoach2]);
+
+    useEffect(() => {
+        if (selectedCoach != 'Choisir un coach') {
+            const fetchClientsData = async () => {
+                try {
+                const response = await sendPostRequest(
+                    `http://localhost/get_coach.php`,
+                    {id_coach: coachId1}
+                );
+                
+                const data = JSON.parse(response);
+                const all_encounters: Encounters[] = [];
+                data.coach.customers.forEach((customer) => {
+                    all_encounters.push(...customer.encounters);
+                    customer.encounters.forEach((encounter) => {
+                        encounter.name = customer.name;
+                    });
+                    all_encounters.sort((a, b) => {
+                        return a.date < b.date ? -1 : 1;
+                    });
+                });
+                setCoachCustomers(data.coach.customers);
+                setEncounter(all_encounters);
+                console.log(all_encounters);
+
+                let avgStar = 0;
+
+                all_encounters.forEach((encounter) => {
+                    avgStar += encounter.rating;
+                });
+
+                avgStar = avgStar / all_encounters.length;
+
+                setAvgStar(avgStar);
+
+                } catch (error) {
+                console.error("Erreur lors de la requête : ", error);
+                }
+            };
+            
+            fetchClientsData();
+        }
+    }, [selectedCoach]);
+
+    useEffect(() => {
+        console.log(coachCustomers);
+    }, [coachCustomers]);
+
+    useEffect(() => {
+        if (selectedCoach2 != 'Choisir un coach') {
+            console.log("second coach id", coachId2);
+            const fetchClientsData = async () => {
+                try {
+                const response = await sendPostRequest(
+                    `http://localhost/get_coach.php`,
+                    {id_coach: coachId2}
+                );
+                
+                const data = JSON.parse(response);
+                const all_encounters: Encounters[] = [];
+                data.coach.customers.forEach((customer) => {
+                    all_encounters.push(...customer.encounters);
+                    customer.encounters.forEach((encounter) => {
+                        encounter.name = customer.name;
+                    });
+                    all_encounters.sort((a, b) => {
+                        return a.date < b.date ? -1 : 1;
+                    });
+                });
+                setCoachCustomers(data.coach.customers);
+                setEncounter(all_encounters);
+                console.log(all_encounters);
+
+                let avgStar = 0;
+
+                all_encounters.forEach((encounter) => {
+                    avgStar += encounter.rating;
+                });
+
+                avgStar = avgStar / all_encounters.length;
+
+                setAvgStar(avgStar);
+
+                } catch (error) {
+                console.error("Erreur lors de la requête : ", error);
+                }
+            };
+            
+            fetchClientsData();
+        }
+    }, [selectedCoach2]);
+
 
     const handleDropdown2 = () => {
         setToggleDropdown2(!isDropdownOpen2);
@@ -101,8 +208,8 @@ export default function Page() {
             </button>
 
             {isOpen && (
-                <div id="dropdownUsers" className="z-10 w-36 mt-12 max-w-full absolute bg-white rounded-lg shadow w-60 dark:bg-gray-700">
-                    <ul className="h-48 py-2 overflow-y-auto text-gray-700 dark:text-gray-200" aria-labelledby="dropdownUsersButton">
+                <div id="dropdownUsers" className="z-10 min-w-20 max-w-40 mt-12 absolute bg-white rounded-lg shadow w-60 dark:bg-gray-700">
+                    <ul className="h-80 py-2 overflow-y-auto text-gray-700 dark:text-gray-200" aria-labelledby="dropdownUsersButton">
                         {coaches.map((coach, index) => (
                             <li key={index}>
                                <a
@@ -117,12 +224,6 @@ export default function Page() {
                             </li>
                         ))}
                     </ul>
-                    <a href="#" className="flex items-center p-3 text-sm font-medium text-blue-600 border-t border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-blue-500 hover:underline">
-                        <svg className="w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
-                            <path d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Zm11-3h-2V5a1 1 0 0 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 0 0 2 0V9h2a1 1 0 1 0 0-2Z" />
-                        </svg>
-                        Ajouter un coach
-                    </a>
                 </div>
             )}
             <div className="mx-3 mt-2">
@@ -141,8 +242,8 @@ export default function Page() {
             </button>
 
             {isOpen2 && (
-                <div id="dropdownUsers2" className="z-10 w-36 max-w-full right-7 mt-12 absolute bg-white rounded-lg shadow w-60 dark:bg-gray-700">
-                    <ul className="h-48 py-2 overflow-y-auto text-gray-700 dark:text-gray-200" aria-labelledby="dropdownUsersButton2">
+                <div id="dropdownUsers2" className="z-10 min-w-20 max-w-40 right-7 mt-12 absolute bg-white rounded-lg shadow w-60 dark:bg-gray-700">
+                    <ul className="h-80 py-2 overflow-y-auto text-gray-700 dark:text-gray-200" aria-labelledby="dropdownUsersButton2">
                         {coaches.map((coach, index) => (
                             <li key={index}>
                                 <a
@@ -157,12 +258,6 @@ export default function Page() {
                             </li>
                         ))}
                     </ul>
-                    <a href="#" className="flex items-center p-3 text-sm font-medium text-blue-600 border-t border-gray-200 rounded-b-lg bg-gray-50 dark:border-gray-600 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-blue-500 hover:underline">
-                        <svg className="w-4 h-4 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 18">
-                            <path d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9ZM8 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2a5.006 5.006 0 0 0-5-5Zm11-3h-2V5a1 1 0 0 0-2 0v2h-2a1 1 0 1 0 0 2h2v2a1 1 0 0 0 2 0V9h2a1 1 0 1 0 0-2Z" />
-                        </svg>
-                        Ajouter un coach
-                    </a>
                 </div>
             )}
         </div>
@@ -177,35 +272,47 @@ export default function Page() {
                     <p>Note Global</p>
                 </div>
                 <div className='mt-2 flex'>
+                <div className='mt-2 flex'>
                     <div>
-                        <p className='text-6xl'>4.0</p>
+                        <p className='text-6xl'>{avgStar}</p>
                     </div>
                     <div>
                         <div className="flex items-center mt-5 ml-2">
-                            <svg className="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        {[...Array(Math.floor(avgStar))].map((_, index) => (
+                            <svg
+                            key={`gold-${index}`}
+                            className="w-4 h-4 text-yellow-300 ms-1"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="currentColor"
+                            viewBox="0 0 22 20"
+                            >
+                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
                             </svg>
-                            <svg className="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                        ))}
+                        {[...Array(5 - Math.floor(avgStar))].map((_, index) => (
+                            <svg
+                            key={`gray-${index}`}
+                            className="w-4 h-4 text-gray-300 ms-1"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="currentColor"
+                            viewBox="0 0 22 20"
+                            >
+                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
                             </svg>
-                            <svg className="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                            </svg>
-                            <svg className="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                            </svg>
-                            <svg className="w-4 h-4 text-gray-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                            </svg>
+                        ))}
                         </div>
                     </div>
+                    </div>
+
                 </div>
                 <div className='flex'>
                     <p className='text-green-500'>+ 0.5</p>
                     <p className='ml-1'>points depuis le dernier mois</p>
                 </div>
                 <div className='mt-5'>
-                    <Price />
+                    <Price encounters={encounter}/>
                 </div>
                 </div>
                 <div className='lg:w-2/3 lg:ml-4 lg:mt-0 mt-5 bg-white border border-slate-200 rounded-md p-5'>
@@ -238,15 +345,15 @@ export default function Page() {
                     <div className='flex'>
                         <div className='mt-1'>
                             <p className='text-slate-500'>Rendez-vous total</p>
-                            <p className='text-5xl'>123</p>
+                            <p className='text-5xl'>{encounter.length}</p>
                         </div>
                         <div className='mt-1 ml-10'>
                             <p className='text-green-500'>Rendez-vous ce dernier mois</p>
-                            <p className='text-5xl text-green-600'>+23</p>
+                            <p className='text-5xl text-green-600'>+ 1</p>
                         </div>
                     </div>
                     <div className='mt-5'>
-                        <Meetings />
+                        <Meetings encounterss={encounter}/>
                     </div>
                 </div>
             </div>
@@ -256,90 +363,61 @@ export default function Page() {
                     <p className='text-bold'>Dernières Reviews</p>
                 </div>
                 <div className='mt-8'>
-                    <div className='flex'>
-                    <Image height={100} width={100} className="p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/docs/images/people/profile-picture-5.jpg" alt="Bordered avatar"/>
-                        <div>
-                            <p className='font-semibold ml-6'>Deena Timmon</p>
-                            <div className="flex items-center ml-5 mt-1">
-                                <svg className="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                                </svg>
-                                <svg className="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                                </svg>
-                                <svg className="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                                </svg>
-                                <svg className="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                                </svg>
-                                <svg className="w-4 h-4 text-gray-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                                </svg>
-                                <p className='ml-3 text-sm text-slate-400'>il y a 5 heures</p>
-                            </div>
-                            <p className='mt-5 ml-6 text-slate-500'>
-                            J&apos;ai eu une séance de coaching hier avec Sarah, et c&apos;était incroyablement utile. Elle a su tout de suite comprendre mes objectifs et m’a donné des conseils très pertinents pour améliorer mon organisation professionnelle.
-                            </p>
-                        </div>   
+                    {encounter.slice(0, 3).map((customers, index) => (
+                        <div className='flex mb-5' key={index}>
+                        <div className="w-12 h-12">
+                        <Image
+                            width={48}
+                            height={48}
+                            className="rounded-full object-cover border"
+                            src="/docs/images/people/profile-picture-5.jpg"
+                            alt="Bordered avatar"
+                        />
                     </div>
-                </div>
-                <div className='mt-8'>
-                    <div className='flex'>
-                    <Image width={100} height={100} className="p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/docs/images/people/profile-picture-5.jpg" alt="Bordered avatar"/>
                         <div>
-                            <p className='font-semibold ml-6'>Deena Timmon</p>
+                            <p className='font-semibold ml-6'>{customers.name}</p>
                             <div className="flex items-center ml-5 mt-1">
-                                <svg className="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                            {[...Array(Math.floor(customers.rating))].map((_, index) => (
+                            <svg
+                            key={`gold-${index}`}
+                            className="w-4 h-4 text-yellow-300 ms-1"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="currentColor"
+                            viewBox="0 0 22 20"
+                            >
+                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                            </svg>
+                            ))}
+                            {[...Array(5 - Math.floor(customers.rating))].map((_, index) => (
+                                <svg
+                                key={`gray-${index}`}
+                                className="w-4 h-4 text-gray-300 ms-1"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                viewBox="0 0 22 20"
+                                >
+                                <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
                                 </svg>
-                                <svg className="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                                </svg>
-                                <svg className="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                                </svg>
-                                <svg className="w-4 h-4 text-yellow-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                                </svg>
-                                <svg className="w-4 h-4 text-gray-300 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
-                                    <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                                </svg>
-                                <p className='ml-3 text-sm text-slate-400'>il y a 5 heures</p>
+                            ))}
+                            <p className='ml-3 text-sm text-slate-400'>{customers.date}</p>
                             </div>
-                            <p className='mt-5 ml-6 text-slate-500'>
-                            J&apos;ai eu une séance de coaching hier avec Sarah, et c&apos;était incroyablement utile. Elle a su tout de suite comprendre mes objectifs et m’a donné des conseils très pertinents pour améliorer mon organisation professionnelle.
+                            <p className='ml-6 mt-2 text-sm text-slate-400'>{customers.source}</p>
+                            <p className='ml-6 mt-2 text-slate-500'>
+                            {customers.comment}
                             </p>
-                        </div>   
+                        </div>
+                        </div>
+                    ))}
                     </div>
-                </div>
+
             </div>
             <div className='mt-5 lg:ml-5 lg:w-1/3 border rounded p-7 bg-white'>
                 <div className='mt-1'>
-                    <p className='text-bold'>Prochains Rendez-vous</p>
+                    <p className='text-bold'>Sources des Rendez-vous</p>
                 </div>
-                <div className='mt-10'>
-                    <div className='border p-3 rounded-lg border-slate-300'>
-                        <div className='flex'>
-                            <Image height={100} width={100} className="p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/docs/images/people/profile-picture-5.jpg" alt="Bordered avatar"/>
-                            <div>
-                                <p className='font-semibold ml-6'>Deena Timmon</p>
-                                <p className='text-sm ml-6 text-slate-400'>Mardi, 12 2024</p>
-                                <p className='ml-6 text-sm'>Je recherche quelqu&apos;un qui a les même gout musicaux</p>
-                            </div>   
-                        </div>
-                    </div>
-                    <div className='border p-3 mt-5 rounded-lg border-slate-300'>
-                        <div className='flex'>
-                            <Image height={100} width={100} className="p-1 rounded-full ring-2 ring-gray-300 dark:ring-gray-500" src="/docs/images/people/profile-picture-5.jpg" alt="Bordered avatar"/>
-                            <div>
-                                <p className='font-semibold ml-6'>Deena Timmon</p>
-                                <p className='text-sm ml-6 text-slate-400'>Mardi, 12 2024</p>
-                                <p className='ml-6 text-sm'>Je recherche quelqu&apos;un qui a les même gout musicaux</p>
-                            </div>   
-                        </div>
-                    </div>
-                </div>
+                <GradualChart />
             </div>
         </div>  
         </div>
