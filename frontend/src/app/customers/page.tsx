@@ -103,6 +103,26 @@ const Page = () => {
     id_coach: "",
   });
 
+  const genderOptions = [
+    { value: "Male", label: "Hommes" },
+    { value: "Female", label: "Femmes" },
+  ];
+
+  const astroOptions = [
+    { value: "Aquarius", label: "Verseau" },
+    { value: "Aries", label: "Bélier" },
+    { value: "Cancer", label: "Cancer" },
+    { value: "Capricorn", label: "Capricorne" },
+    { value: "Taurus", label: "Taureau" },
+    { value: "Leo", label: "Lion" },
+    { value: "Libra", label: "Balance" },
+    { value: "Pisces", label: "Poissons" },
+    { value: "Scorpio", label: "Scorpion" },
+    { value: "Sagittarius", label: "Sagittaire" },
+    { value: "Virgo", label: "Vierge" },
+    { value: "Gemini", label: "Gémeaux" },
+  ];
+
   const [checkedItems, setCheckedItems] = useState<CheckedItems>(
     customersData.reduce((acc, customer) => {
       acc[customer.id] = false;
@@ -171,6 +191,9 @@ const Page = () => {
       phone_number: "",
       gender: "",
     });
+    setSelectedCoach("");
+    setSelectedAstro("");
+    setSelectedGender("");
     setIsModalAddOpen(false);
   };
 
@@ -206,11 +229,9 @@ const Page = () => {
         id: customer.id || "",
         name: customer.name || "",
         surname: customer.surname || "",
-        id_coach: customer.id_coach
-          ? customer.id_coach.toString()
-          : "Pas de Coach assigné",
+        id_coach: customer.id_coach ? customer.id_coach.toString() : "",
         birth_date: customer.birth_date || "",
-        description: customer.description || "Pas de description",
+        description: customer.description || "",
         astrological_sign: customer.astrological_sign || "",
         phone_number: customer.phone_number || "",
         gender: customer.gender || "",
@@ -234,6 +255,9 @@ const Page = () => {
       phone_number: "",
       gender: "",
     });
+    setSelectedCoach("");
+    setSelectedAstro("");
+    setSelectedGender("");
     setIsModalEditOpen(false);
   };
 
@@ -540,8 +564,10 @@ const Page = () => {
     }
   };
 
-  const handleGenderChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const gender = event.target.value;
+  const handleGenderChange = (
+    selectedOption: SingleValue<{ value: string; label: string }>
+  ) => {
+    const gender = selectedOption ? selectedOption.value : "";
     setSelectedGender(gender);
     setFormData({
       ...formData,
@@ -557,15 +583,16 @@ const Page = () => {
     });
   };
 
-  const handleAstroChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const astro = event.target.value;
+  const handleAstroChange = (
+    selectedOption: SingleValue<{ value: string; label: string }>
+  ) => {
+    const astro = selectedOption ? selectedOption.value : "";
     setSelectedAstro(astro);
     setFormData({
       ...formData,
       astrological_sign: astro || "",
     });
   };
-
   const handleCreateCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -972,48 +999,49 @@ const Page = () => {
               <div className="flex flex-row gap-4 w-full">
                 <div className="mb-4 w-full">
                   <label className="block text-gray-700">Genre</label>
-                  <select
+                  <Select
                     id="gender"
-                    value={selectedGender || formData.gender || ""}
+                    value={
+                      genderOptions.find(
+                        (genderOption) => genderOption.value === selectedGender
+                      ) ||
+                      genderOptions.find(
+                        (genderOption) =>
+                          genderOption.value === formData?.gender
+                      ) ||
+                      null
+                    }
                     onChange={handleGenderChange}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
-                      !selectedGender ? "text-gray-500" : "text-gray-700"
-                    }`}
-                  >
-                    <option value="" disabled hidden>
-                      Genre
-                    </option>
-                    <option value="Male">Homme</option>
-                    <option value="Female">Femme</option>
-                  </select>
+                    options={genderOptions}
+                    className="w-full"
+                    classNamePrefix="react-select"
+                    placeholder="Select Gender"
+                    isSearchable
+                  />
                 </div>
                 <div className="mb-4 w-full">
                   <label className="block text-gray-700">
                     Signe Astrologique
                   </label>
-                  <select
+                  <Select
                     id="astrological_sign"
-                    value={selectedAstro || formData?.astrological_sign || ""}
+                    value={
+                      astroOptions.find(
+                        (astroOption) => astroOption.value === selectedAstro
+                      ) ||
+                      astroOptions.find(
+                        (astroOption) =>
+                          astroOption.value === formData?.astrological_sign
+                      ) ||
+                      null
+                    }
                     onChange={handleAstroChange}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
-                      !selectedAstro ? "text-gray-500" : "text-gray-700"
-                    }`}
-                  >
-                    <option value="" disabled hidden>
-                      Signe Astrologique
-                    </option>
-                    <option value="Aquarius">Verseau</option>
-                    <option value="Aries">Bélier</option>
-                    <option value="Cancer">Cancer</option>
-                    <option value="Capricorn">Capricorne</option>
-                    <option value="Taurus">Taureau</option>
-                    <option value="Leo">Lion</option>
-                    <option value="Libra">Balance</option>
-                    <option value="Pisces">Poissons</option>
-                    <option value="Scorpio">Scorpion</option>
-                    <option value="Sagittarius">Sagittaire</option>
-                    <option value="Virgo">Vierge</option>
-                  </select>
+                    options={astroOptions}
+                    className="w-full"
+                    classNamePrefix="react-select"
+                    placeholder="Signe Astro"
+                    isSearchable
+                  />
                 </div>
               </div>
               <div className="mb-4 w-full">
@@ -1183,48 +1211,54 @@ const Page = () => {
               <div className="flex flex-row gap-4 w-full">
                 <div className="mb-4 w-full">
                   <label className="block text-gray-700">Genre</label>
-                  <select
+                  <Select
                     id="gender"
-                    value={selectedGender || ""}
+                    value={
+                      genderOptions.find(
+                        (genderOption) => genderOption.value === selectedGender
+                      ) ||
+                      genderOptions.find(
+                        (genderOption) =>
+                          genderOption.value === formData?.gender
+                      ) ||
+                      null
+                    }
                     onChange={handleGenderChange}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
-                      !selectedGender ? "text-gray-500" : "text-gray-700"
-                    }`}
-                  >
-                    <option value="" disabled hidden>
-                      Genre
-                    </option>
-                    <option value="Male">Homme</option>
-                    <option value="Female">Femme</option>
-                  </select>
+                    options={genderOptions}
+                    className="w-full"
+                    classNamePrefix="react-select"
+                    placeholder="Select Gender"
+                    isSearchable
+                  />
                 </div>
                 <div className="mb-4 w-full">
                   <label className="block text-gray-700">
                     Signe Astrologique
                   </label>
-                  <select
+                  <Select
                     id="astrological_sign"
-                    value={selectedAstro || ""}
+                    value={
+                      astroOptions.find(
+                        (astroOption) => astroOption.value === selectedAstro
+                      ) ||
+                      astroOptions.find(
+                        (astroOption) =>
+                          astroOption.value === formData?.astrological_sign
+                      ) ||
+                      null
+                    }
                     onChange={handleAstroChange}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg bg-white ${
-                      !selectedAstro ? "text-gray-500" : "text-gray-700"
-                    }`}
-                  >
-                    <option value="" disabled hidden>
-                      Signe Astrologique
-                    </option>
-                    <option value="Aquarius">Verseau</option>
-                    <option value="Aries">Bélier</option>
-                    <option value="Cancer">Cancer</option>
-                    <option value="Capricorn">Capricorne</option>
-                    <option value="Taurus">Taureau</option>
-                    <option value="Leo">Lion</option>
-                    <option value="Libra">Balance</option>
-                    <option value="Pisces">Poissons</option>
-                    <option value="Scorpio">Scorpion</option>
-                    <option value="Sagittarius">Sagittaire</option>
-                    <option value="Virgo">Vierge</option>
-                  </select>
+                    options={astroOptions}
+                    className="w-full"
+                    classNamePrefix="react-select"
+                    placeholder="Signe Astro"
+                    isSearchable
+                    menuPortalTarget={document.body}
+                    menuPosition="fixed"
+                    styles={{
+                      menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                    }}
+                  />
                 </div>
               </div>
               <div className="mb-4 w-full">
