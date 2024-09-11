@@ -27,19 +27,19 @@ if (!isset($_POST["id"]) || !isset($_POST["name"]) || !isset($_POST["date"]) || 
 
 try {
 
-    $sql = "SELECT * FROM events_colors WHERE type = :type";
+    $sql = "SELECT * FROM events_colors WHERE event_type = :event_type";
 
     $stm = $pdo->prepare($sql);
-    $stm->execute(["type" => $_POST["type"]]);
+    $stm->execute(["event_type" => $_POST["type"]]);
     $event = $stm->fetch(PDO::FETCH_ASSOC);
 
 
     if (empty($event)) {
-        $sql = "INSERT INTO events_colors (type, color) VALUES (:type, :color)";
+        $sql = "INSERT INTO events_colors (event_type, color) VALUES (:event_type, :color)";
 
         $stm = $pdo->prepare($sql);
         $res = $stm->execute([
-            "type" => $_POST["type"],
+            "event_type" => $_POST["type"],
             "color" => generate_readable_color()
         ]);
 
