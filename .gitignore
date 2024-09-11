@@ -40,3 +40,5 @@ next-env.d.ts
 .env
 *.log
 backend/db-backup/*.sql
+
+/vendor/

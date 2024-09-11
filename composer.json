@@ -1,0 +1,18 @@
+
+{
+    "name": "yann/survivor",
+    "autoload": {
+        "psr-4": {
+            "Yann\\Survivor\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Yann",
+            "email": "yann.perennes@epitech.eu"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    }
+}
