@@ -162,6 +162,8 @@ const Page = () => {
           })
         );
 
+        fetchCustomersImage();
+
         setCustomersData(formattedData);
       } else {
         console.error("Unexpected response format:", parsedResponse);
@@ -713,6 +715,40 @@ const Page = () => {
 
   const [selectedBulkAction, setSelectedBulkAction] = useState("");
 
+  const fetchCustomersImage = async () => {
+    const currentCoaches = itemsPerPage * currentPage;
+
+    try {
+      for (
+        let i = 0 + currentCoaches - itemsPerPage;
+        i <= currentCoaches;
+        i++
+      ) {
+        const response = await sendPostRequest(
+          `http://localhost/client_image.php`,
+          { id: i }
+        );
+
+        const parsedResponse = JSON.parse(response);
+
+        if (parsedResponse.status === true) {
+          const image = parsedResponse.data;
+          setCustomersData((prevData) =>
+            prevData.map((item, index) =>
+              index === i - 1 ? { ...item, image } : item
+            )
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching coaches data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomersImage();
+  }, [currentPage]);
+
   return (
     <div className="mx-6 flex flex-col">
       <div className="flex justify-between items-center mb-2 flex-row">
@@ -871,7 +907,11 @@ const Page = () => {
                 <td className="p-4 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full overflow-hidden">
                     <img
-                      src={`data:image/jpeg;base64,${customer.image}`}
+                      src={
+                        customer.image
+                          ? `data:image/jpeg;base64,${customer.image}`
+                          : ""
+                      }
                       alt={customer.name}
                       className="w-full h-full object-cover"
                     />

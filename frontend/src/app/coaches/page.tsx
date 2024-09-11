@@ -88,6 +88,36 @@ const Page = () => {
     }
   }, [coachesData]);
 
+  const fetchCoachesImage = async () => {
+    const currentCoaches = itemsPerPage * currentPage;
+
+    try {
+      for (
+        let i = 0 + currentCoaches - itemsPerPage;
+        i <= currentCoaches;
+        i++
+      ) {
+        const response = await sendPostRequest(
+          `http://localhost/employee_image.php`,
+          { id: i }
+        );
+
+        const parsedResponse = JSON.parse(response);
+
+        if (parsedResponse.status === true) {
+          const image = parsedResponse.data;
+          setCoachesData((prevData) =>
+            prevData.map((item, index) =>
+              index === i - 1 ? { ...item, image } : item
+            )
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching coaches data:", error);
+    }
+  };
+
   const fetchCoachesData = async () => {
     try {
       const response = await sendPostRequest(
@@ -105,11 +135,12 @@ const Page = () => {
           id: item.id.toString(),
           name: item.name,
           email: item.email,
-          image: item.image,
           surname: item.surname,
           phone_number: item.phone_number,
           amount_customer: item.amount_customer,
         }));
+
+        fetchCoachesImage();
 
         setCoachesData(formattedData);
       } else {
@@ -172,6 +203,10 @@ const Page = () => {
       gender: gender || "",
     });
   };
+
+  useEffect(() => {
+    fetchCoachesImage();
+  }, [currentPage]);
 
   const openAddModal = () => {
     setIsModalAddOpen(true);
@@ -681,7 +716,6 @@ const Page = () => {
                   setSelectedBulkAction(selectedOption?.value || "")
                 }
                 className="w-full"
-                classNamePrefix="react-select"
                 placeholder="Action Groupée"
                 isSearchable
                 isClearable
@@ -1061,7 +1095,6 @@ const Page = () => {
                     onChange={handleGenderChange}
                     options={genderOptions}
                     className="w-full"
-                    classNamePrefix="react-select"
                     placeholder="Genre"
                     isSearchable
                   />
@@ -1242,7 +1275,6 @@ const Page = () => {
                     onChange={handleGenderChange}
                     options={genderOptions}
                     className="w-full"
-                    classNamePrefix="react-select"
                     placeholder="Genre"
                     isSearchable
                   />
