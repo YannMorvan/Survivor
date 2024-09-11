@@ -81,16 +81,13 @@ const Page = () => {
   const [loading, setLoading] = useState(false);
   const [customersData, setCustomersData] = useState<Customers[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [minCustomers, setMinCustomers] = useState(0);
-  const [maxCustomers, setMaxCustomers] = useState(10);
-  const [customerData, setCustomerData] = useState<CustomerData | null>(null);
+  const [paginationOption, setPaginationOption] = useState(false);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [allChecked, setAllChecked] = useState(false);
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedCoach, setSelectedCoach] = useState("");
   const [selectedAstro, setSelectedAstro] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
   const [formData, setFormData] = useState<FormData>({
     id: "",
@@ -426,19 +423,11 @@ const Page = () => {
       ) {
         setDropdownOpen(null);
       }
-
-      if (
-        filterOpen &&
-        !(event.target as Element).closest(".filter-dropdown")
-      ) {
-        setFilterOpen(false);
-      }
     };
 
     if (
       isModalAddOpen ||
       dropdownOpen !== null ||
-      filterOpen ||
       isModalDeleteOpen ||
       isModalEditOpen
     ) {
@@ -450,15 +439,10 @@ const Page = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [
-    isModalAddOpen,
-    dropdownOpen,
-    filterOpen,
-    isModalDeleteOpen,
-    isModalEditOpen,
-  ]);
+  }, [isModalAddOpen, dropdownOpen, isModalDeleteOpen, isModalEditOpen]);
 
   const handleIconSearchClick = () => {
+    paginationOption && setPaginationOption(false);
     setIsSearchActive(true);
   };
 
@@ -537,8 +521,9 @@ const Page = () => {
     setDropdownOpen(dropdownOpen === id ? null : id);
   };
 
-  const handleFilterToggle = () => {
-    setFilterOpen(!filterOpen);
+  const handlePaginationToggle = () => {
+    isSearchActive && setIsSearchActive(false);
+    setPaginationOption(!paginationOption);
   };
 
   const handleDateChange = (birth_date: Date | null) => {
@@ -560,10 +545,8 @@ const Page = () => {
     const [firstName, lastName] = customer.name.split(" ");
     const search = searchQuery.toLowerCase();
     return (
-      (firstName.toLowerCase().includes(search) ||
-        lastName?.toLowerCase().includes(search)) &&
-      customer.name.length >= minCustomers &&
-      customer.name.length <= maxCustomers
+      firstName.toLowerCase().includes(search) ||
+      lastName?.toLowerCase().includes(search)
     );
   });
 
@@ -757,52 +740,47 @@ const Page = () => {
                   <Search className="w-5 h-5" />
                 </button>
               )}
-              <button
-                className="text-gray-500 hover:text-gray-700"
-                onClick={handleFilterToggle}
-              >
+              <button className="text-gray-500 hover:text-gray-700">
                 <Sliders className="w-5 h-5" />
               </button>
-              <button className="text-gray-500 hover:text-gray-700">
+              <button
+                className="text-gray-500 hover:text-gray-700"
+                onClick={handlePaginationToggle}
+              >
                 <Settings className="w-5 h-5" />
               </button>
             </div>
           </div>
 
-          {filterOpen && (
+          {paginationOption && (
             <div className="filter-dropdown absolute right-6 bg-white border border-gray-200 shadow-lg rounded-md p-4 z-10">
               <label className="block text-gray-700 mb-2">
-                Nombre de Clients
+                Clients par page
               </label>
               <div className="flex flex-row justify-between items-center">
-                <div className="flex flex-col gap-2 mr-2">
-                  <span>Min:</span>
-                  <span>Max:</span>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center">
-                    <input
-                      type="range"
-                      min="0"
-                      max="10"
-                      value={minCustomers}
-                      onChange={(e) => setMinCustomers(Number(e.target.value))}
-                      className="mr-2"
-                    />
-                    <span>{minCustomers}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="range"
-                      min="0"
-                      max="10"
-                      value={maxCustomers}
-                      onChange={(e) => setMaxCustomers(Number(e.target.value))}
-                      className="mr-2"
-                    />
-                    <span>{maxCustomers}</span>
-                  </div>
-                </div>
+                <button
+                  onClick={() =>
+                    setItemsPerPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  className="px-3 py-2 border rounded-l-lg bg-gray-200 hover:bg-gray-300"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  value={itemsPerPage}
+                  onChange={(e) =>
+                    setItemsPerPage(Math.max(Number(e.target.value), 1))
+                  }
+                  className="w-full px-3 py-2 border-t border-b border-gray-300 text-center"
+                  min="1"
+                />
+                <button
+                  onClick={() => setItemsPerPage((prev) => prev + 1)}
+                  className="px-3 py-2 border rounded-r-lg bg-gray-200 hover:bg-gray-300"
+                >
+                  +
+                </button>
               </div>
             </div>
           )}

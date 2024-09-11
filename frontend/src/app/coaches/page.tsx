@@ -129,7 +129,8 @@ const Page = () => {
   }, []);
 
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterNbrClients, setFilterNbrClients] = useState(false);
+  const [paginationOption, setPaginationOption] = useState(false);
   const [minCustomers, setMinCustomers] = useState(0);
   const [maxCustomers, setMaxCustomers] = useState(10);
 
@@ -139,7 +140,7 @@ const Page = () => {
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const filteredCoaches = coachesData.filter((coach) => {
     const [firstName, lastName] = coach.name.split(" ");
@@ -334,19 +335,11 @@ const Page = () => {
       ) {
         setDropdownOpen(null);
       }
-
-      if (
-        filterOpen &&
-        !(event.target as Element).closest(".filter-dropdown")
-      ) {
-        setFilterOpen(false);
-      }
     };
 
     if (
       isModalAddOpen ||
       dropdownOpen !== null ||
-      filterOpen ||
       isModalDeleteOpen ||
       isModalEditOpen
     ) {
@@ -361,14 +354,11 @@ const Page = () => {
   }, [
     isModalAddOpen,
     dropdownOpen,
-    filterOpen,
+    filterNbrClients,
     isModalDeleteOpen,
     isModalEditOpen,
+    paginationOption,
   ]);
-
-  const handleIconSearchClick = () => {
-    setIsSearchActive(true);
-  };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -585,7 +575,21 @@ const Page = () => {
   };
 
   const handleFilterToggle = () => {
-    setFilterOpen(!filterOpen);
+    isSearchActive && setIsSearchActive(false);
+    paginationOption && setPaginationOption(false);
+    setFilterNbrClients(!filterNbrClients);
+  };
+
+  const handlePaginationToggle = () => {
+    isSearchActive && setIsSearchActive(false);
+    filterNbrClients && setFilterNbrClients(false);
+    setPaginationOption(!paginationOption);
+  };
+
+  const handleIconSearchClick = () => {
+    filterNbrClients && setFilterNbrClients(false);
+    paginationOption && setPaginationOption(false);
+    setIsSearchActive(true);
   };
 
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -668,13 +672,49 @@ const Page = () => {
               >
                 <Sliders className="w-5 h-5" />
               </button>
-              <button className="text-gray-500 hover:text-gray-700">
+              <button
+                className="text-gray-500 hover:text-gray-700"
+                onClick={handlePaginationToggle}
+              >
                 <Settings className="w-5 h-5" />
               </button>
             </div>
           </div>
 
-          {filterOpen && (
+          {paginationOption && (
+            <div className="filter-dropdown absolute right-6 bg-white border border-gray-200 shadow-lg rounded-md p-4 z-10">
+              <label className="block text-gray-700 mb-2">
+                Coachs par page
+              </label>
+              <div className="flex flex-row justify-between items-center">
+                <button
+                  onClick={() =>
+                    setItemsPerPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  className="px-3 py-2 border rounded-l-lg bg-gray-200 hover:bg-gray-300"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  value={itemsPerPage}
+                  onChange={(e) =>
+                    setItemsPerPage(Math.max(Number(e.target.value), 1))
+                  }
+                  className="w-full px-3 py-2 border-t border-b border-gray-300 text-center"
+                  min="1"
+                />
+                <button
+                  onClick={() => setItemsPerPage((prev) => prev + 1)}
+                  className="px-3 py-2 border rounded-r-lg bg-gray-200 hover:bg-gray-300"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          )}
+
+          {filterNbrClients && (
             <div className="filter-dropdown absolute right-6 bg-white border border-gray-200 shadow-lg rounded-md p-4 z-10">
               <label className="block text-gray-700 mb-2">
                 Nombre de Clients
