@@ -73,7 +73,7 @@ const StarComparisonChart = ({ coach1, coach2, data1, data2 }) => {
     series1.fill = am4core.color("#AAD9FF");
 
     series2.fillOpacity = 0.5; 
-    series2.fill = am4core.color("#67b7dc");
+    series2.fill = am4core.color("#EBC1FF");
 
     chart.cursor = new am4charts.XYCursor();
     chart.cursor.xAxis = dateAxis;
