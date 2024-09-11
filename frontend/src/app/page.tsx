@@ -32,12 +32,6 @@ export default function Login() {
 
       console.log(parsedResponse);
 
-      if (parsedResponse.status === "false") {
-        setError(parsedResponse.error);
-        setLoading(false);
-        return;
-      }
-
       router.push("/dashboard");
     } catch (error) {
       setError("Invalid email or password.");
