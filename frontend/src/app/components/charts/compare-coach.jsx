@@ -25,7 +25,6 @@ const CoachMeetingComparisonChart = ({ coach1, coach2, data1, data2 }) => {
     const processedData1 = processData(data1);
     const processedData2 = processData(data2);
 
-    // Merge data, ensuring months align
     const months = [...new Set([...processedData1.map(d => d.month), ...processedData2.map(d => d.month)])];
     const mergedData = months.map(month => ({
       month,
@@ -48,6 +47,9 @@ const CoachMeetingComparisonChart = ({ coach1, coach2, data1, data2 }) => {
     series.clustered = false;
     series.tooltipText = coach1 + " encounters in {categoryX}: [bold]{valueY}[/]";
     series.name = coach1;
+    series.columns.template.adapter.add("fill", function (fill, target) {
+        return am4core.color("#EBC1FF");
+    } );
 
     let series2 = chart.series.push(new am4charts.ColumnSeries());
     series2.dataFields.valueY = "coach2";
