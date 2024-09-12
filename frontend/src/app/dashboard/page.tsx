@@ -93,6 +93,8 @@ export default function Dashboard() {
     const [clientsData, setClientsData] = useState<ClientData[]>([]);
     const [joinClients, setJoinClients] = useState([]);
     const [weekEvents, setWeekEvents] = useState<Event[]>([]);
+    const [allData, setAllData] = useState([]);
+    const [clientPerCoach, setClientPerCoach] = useState([]);
     
     useEffect(() => {
         if (localStorage.getItem("needRefresh") === "true") {
@@ -131,22 +133,36 @@ export default function Dashboard() {
     }, [selectedPeriod]);
 
     useEffect(() => {
+        const clientPerCoach = async () => {
+            try {
+                const response = await sendPostRequest(
+                    'http://localhost/client_per_coach.php',
+                    {}
+                );
+                const data = JSON.parse(response);
+
+            } catch (error) {
+                console.error('Erreur lors de la requête : ', error);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
         
         const fetchCoachData = async () => {
             try {
                 const response = await sendPostRequest(
-                    'http://localhost/employes_table.php',
+                    'http://localhost/client_per_coach.php',
                     {}
                 );
                 const data = JSON.parse(response);
-                console.log(data);
+                setClientPerCoach(data.data);
             } catch (error) {
                 console.error('Erreur lors de la requête : ', error);
             }
         }
         fetchCoachData();
     }, []);
-
 
       useEffect(() => {
 
@@ -250,6 +266,23 @@ export default function Dashboard() {
             return ((eventsByMonth - 1) / 1) * 100 + 100;
         }
         return previousMonth > 0 ? ((eventsByMonth - previousMonth) / previousMonth) * 100 : 0;
+    }
+
+    const ExportJsonButton = ( data: any, filename: string ) => {
+        const exportToJson = () => {
+          const json = JSON.stringify(data, null, 2); 
+          const blob = new Blob([json], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `${filename}.json`;
+
+          link.click();
+
+          URL.revokeObjectURL(url);
+        };
+        exportToJson();
     }
 
 
@@ -378,6 +411,30 @@ export default function Dashboard() {
     setSelectedPeriod(selectedMapPeriod);
   }, [selectedMapPeriod]);
 
+  useEffect(() => {
+
+    let OverviewData = joinClients;
+    let MeetingsData = meetings;
+    let EventsData = events;
+
+    console.log(meetings)
+
+    const allData: any = {
+        Overview: {
+            joinClients: OverviewData,
+        },
+        Meetings: {
+            meetings: MeetingsData,
+        },
+        EventsData: {
+            events: EventsData
+        },
+    };
+    console.log(allData)
+
+    setAllData(allData);
+}, [joinClients, meetings, events]);
+
   return (
     <div className="ml-6 sm:mr-6 mr-6 mb-5">
         <div className='md:flex md:justify-between'>
@@ -419,6 +476,7 @@ export default function Dashboard() {
                 type="button"
                 id="reports button"
                 aria-label='Reports button'
+                onClick={() => ExportJsonButton(allData, "statistics")}
                 className="xs:ml-5 xs:mt-0 mt-2 text-slate-900 bg-sky-700 font-medium border border-slate-200 rounded-sm text-sm px-5 py-2 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
                 <div className='flex'>
@@ -475,7 +533,7 @@ export default function Dashboard() {
                     </div>
                     <div className='md:text-left text-center'>
                         <p className='text-slate-500 text-sm'>Clients par coach</p>
-                        <p className='mt-1 text-slate-900 text-xl'>34</p>
+                        <p className='mt-1 text-slate-900 text-xl'>{clientPerCoach}</p>
                     </div>
                 </div>
                 <div className='mt-5'>
@@ -515,8 +573,8 @@ export default function Dashboard() {
                         <p className='text-slate-500 text-sm'>Hebdomadaire</p>
                         <p className='mt-1 text-slate-900 text-xl'>{weekEvents.length}</p>
                         <div className='flex md:justify-normal justify-center'>
-                            <ArrowDown size={12} className='text-red-700 mt-1.5'/>
-                            <p className='mt-1 text-xs text-red-700'>0</p>
+                            <ArrowUp size={12} className='text-green-700 mt-1.5'/>
+                            <p className='mt-1 text-xs text-green-700'>{weekEvents.length * 100}%</p>
                         </div>
                     </div>
                     <div className='md:text-left text-center'>

@@ -102,8 +102,12 @@ export default function Events() {
                                     ? `Day of ${selectedDay.toLocaleDateString('default', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`
                                     : selectedMonth}
                             </p>
-                            <ChevronLeft size={22} className='text-slate-400 cursor-pointer ml-5 mt-6' onClick={() => changeDate('prev')} />
-                            <ChevronRight size={22} className='text-slate-400 cursor-pointer ml-5 mt-6' onClick={() => changeDate('next')} />
+                            <div id='next'>
+                                <ChevronLeft size={22} className='text-slate-400 cursor-pointer ml-5 mt-6' onClick={() => changeDate('prev')} />
+                            </div>     
+                            <div id='prev'>  
+                                <ChevronRight size={22} className='text-slate-400 cursor-pointer ml-5 mt-6' onClick={() => changeDate('next')} />
+                            </div>         
                         </div>
                         <div className='flex mt-5 md:ml-0 ml-10'>
                             <div className='mr-5 flex border rounded overflow-hidden'>

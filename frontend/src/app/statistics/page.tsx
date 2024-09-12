@@ -419,10 +419,6 @@ export default function Page() {
                         </div>
                     </div>
                     </div>
-                    <div className='flex'>
-                        <p className='text-green-500'>+ 0.5</p>
-                        <p className='ml-1'>points depuis le dernier mois</p>
-                    </div>
                     <div className='mt-5'>
                         <Price encounters={encounter}/>
                     </div>
@@ -443,10 +439,6 @@ export default function Page() {
                         <div className='mt-1'>
                             <p className='text-slate-500'>Rendez-vous total</p>
                             <p className='text-5xl'>{encounter.length}</p>
-                        </div>
-                        <div className='mt-1 ml-10'>
-                            <p className='text-green-500'>Rendez-vous ce dernier mois</p>
-                            <p className='text-5xl text-green-600'>+ 1</p>
                         </div>
                     </div>
                     <div className='mt-5'>

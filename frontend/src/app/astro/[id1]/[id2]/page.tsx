@@ -377,15 +377,8 @@ export default function Astro() {
                                                 <p className='sm:text-lg text-xs'>{birthDateToAge(client1.birth_date)}</p>
                                             </div>
                                         </div>
-                                        <div className='md:flex justify-between'>
-                                            <div>
-                                                <div className='flex'>
-                                                    <Phone className='mt-1 mr-2 text-slate-400' size={18} />
-                                                    <p className='text-slate-400'>Téléphone</p>
-                                                </div>
-                                                <p className='sm:text-lg text-xs'>{client1.phone}</p>
-                                            </div>
-                                            <div className='md:text-right md:mt-0 mt-3'>
+                                        <div className='md:flex justify-center'>
+                                            <div className='md:text-center md:mt-0 mt-3'>
                                                 <div className='flex'>
                                                     <Telescope className='mt-1 mr-2 text-slate-400' size={18} />
                                                     <p className='text-slate-400'>Signe Astrologique</p>
@@ -459,15 +452,8 @@ export default function Astro() {
                                                 <p className='sm:text-lg text-xs'>{birthDateToAge(client2.birth_date)}</p>
                                             </div>
                                         </div>
-                                        <div className='md:flex justify-between'>
-                                            <div>
-                                                <div className='flex'>
-                                                    <Phone className='mt-1 mr-2 text-slate-400' size={18} />
-                                                    <p className='text-slate-400'>Téléphone</p>
-                                                </div>
-                                                <p className='sm:text-lg text-xs'>{client2.phone}</p>
-                                            </div>
-                                            <div className='md:text-right md:mt-0 mt-3'>
+                                        <div className='md:flex justify-center'>
+                                            <div className='md:text-center md:mt-0 mt-3'>
                                                 <div className='flex'>
                                                     <Telescope className='mt-1 mr-2 text-slate-400' size={18} />
                                                     <p className='text-slate-400'>Signe Astrologique</p>

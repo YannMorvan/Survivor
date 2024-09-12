@@ -67,6 +67,9 @@ const LineChart = ({ clientData, period }) => {
     };
 
     const dynamicData = generateComparisonData();
+    const reversedData = dynamicData.reverse();
+
+    console.log(dynamicData);
 
     const fixedData = [
       { date: new Date(2024, 8, 10).getTime(), value1: 10, value2: 0 },
@@ -74,7 +77,7 @@ const LineChart = ({ clientData, period }) => {
       { date: new Date(2024, 8, 4).getTime(), value1: 10, value2: 0 },
     ];
 
-    const data = [...dynamicData, ...fixedData];
+    const data = [...reversedData, ...fixedData];
 
     let series = chart.series.push(am5xy.LineSeries.new(root, {
       name: "Series 1",
@@ -179,6 +182,14 @@ const LineChart = ({ clientData, period }) => {
       visible: true,
       fill: am5.color("#FF0000")
     });
+
+
+    let cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+      behavior: "none",
+    }));
+    cursor.lineY.set("visible", false);
+    cursor.lineX.set("visible", true);
+    cursor.lineX.set("strokeDasharray", [2, 2]);
 
     xAxis.set("min", startDate);
     xAxis.set("max", endDate);
