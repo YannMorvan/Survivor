@@ -16,7 +16,7 @@ require_once __DIR__ . '/db_connection.php';
 require_once __DIR__ . '/functions.php';
 
 
-if (!isset($_POST['email']) || !isset($_POST['phone_number']) || !isset($_POST['name']) || !isset($_POST['surname']) || !isset($_POST['address']) || !isset($_POST['birth_date']) || !isset($_POST['gender']) || !isset($_POST['description']) || !isset($_POST['astrological_sign'])) {
+if (!isset($_POST['email']) || !isset($_POST['phone_number']) || !isset($_POST['name']) || !isset($_POST['surname']) || !isset($_POST['address']) || !isset($_POST['birth_date']) || !isset($_POST['gender']) || !isset($_POST['description'])) {
     echo json_encode([
         "status" => false,
         "message" => "Missing required fields"
@@ -40,7 +40,7 @@ try {
         "birth_date" => $_POST["birth_date"],
         "gender" => $_POST["gender"],
         "description" => $_POST["description"],
-        "astrological_sign" => $_POST["astrological_sign"],
+        "astrological_sign" => get_astrological_sign_from_birth_date(DateTime::createFromFormat('Y-m-d', $_POST["birth_date"])),
         "id_coach" => $_POST["id_coach"]
     ]);
 
