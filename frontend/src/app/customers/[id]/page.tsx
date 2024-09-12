@@ -344,49 +344,51 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
               </tbody>
             </table>
           </div>
-          <div>
-            <h2 className="text-xl font-semibold text-[#384B65] mb-4">
-              Historique de Paiement
-            </h2>
-            <table className="min-w-full bg-white border-collapse border border-[#E1E8F1] overflow-x-auto">
-              <thead>
-                <tr className="border-b border-[#E1E8F1]">
-                  <th className="text-left p-2 font-medium text-[#384B65]">
-                    Date
-                  </th>
-                  <th className="text-left p-2 font-medium text-[#384B65]">
-                    Method de Paiement
-                  </th>
-                  <th className="text-left p-2 font-medium text-[#384B65]">
-                    Montant
-                  </th>
-                  <th className="text-left p-2 font-medium text-[#384B65]">
-                    Commentaire
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {customerData.payment.map((pay, index) => (
-                  <tr key={index} className="border-b border-[#E1E8F1]">
-                    <td className="p-2 text-[#0369A1]">{pay.date}</td>
-                    <td className="p-2 text-[#384B65]">
-                      {pay.method === "Visa" ? (
-                        <img
+          {customerData.payment.length > 0 && (
+            <div>
+              <h2 className="text-xl font-semibold text-[#384B65] mb-4">
+                Historique de Paiement
+              </h2>
+                <table className="min-w-full bg-white border-collapse border border-[#E1E8F1] overflow-x-auto">
+                <thead>
+                  <tr className="border-b border-[#E1E8F1]">
+                    <th className="text-left p-2 font-medium text-[#384B65]">
+                      Date
+                    </th>
+                    <th className="text-left p-2 font-medium text-[#384B65]">
+                      Method de Paiement
+                    </th>
+                    <th className="text-left p-2 font-medium text-[#384B65]">
+                      Montant
+                    </th>
+                    <th className="text-left p-2 font-medium text-[#384B65]">
+                      Commentaire
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {customerData.payment.map((pay, index) => (
+                    <tr key={index} className="border-b border-[#E1E8F1]">
+                      <td className="p-2 text-[#0369A1]">{pay.date}</td>
+                      <td className="p-2 text-[#384B65]">
+                        {pay.method === "Visa" ? (
+                          <img
                           src="/images/visa-logo.png"
                           alt="Visa Logo"
                           className="w-9 h-3"
-                        />
-                      ) : (
-                        pay.method
-                      )}
-                    </td>
-                    <td className="p-2 text-[#384B65]">{pay.amount}</td>
-                    <td className="p-2 text-[#384B65]">{"No comment"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                          />
+                        ) : (
+                          pay.method
+                        )}
+                      </td>
+                      <td className="p-2 text-[#384B65]">{pay.amount}</td>
+                      <td className="p-2 text-[#384B65]">{"No comment"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>
