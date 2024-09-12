@@ -199,6 +199,81 @@ const COUNTRIES = [
     "Zimbabwe" => "ZW"
 ];
 
+const ASTROLOGICAL_SIGNS_PERIODS = [
+    "Aries" => [
+        "start_month" => 3,
+        "start_day" => 21,
+        "end_month" => 4,
+        "end_day" => 19
+    ],
+    "Taurus" => [
+        "start_month" => 4,
+        "start_day" => 20,
+        "end_month" => 5,
+        "end_day" => 20
+    ],
+    "Gemini" => [
+        "start_month" => 5,
+        "start_day" => 21,
+        "end_month" => 6,
+        "end_day" => 20
+    ],
+    "Cancer" => [
+        "start_month" => 6,
+        "start_day" => 21,
+        "end_month" => 7,
+        "end_day" => 22
+    ],
+    "Leo" => [
+        "start_month" => 7,
+        "start_day" => 23,
+        "end_month" => 8,
+        "end_day" => 22
+    ],
+    "Virgo" => [
+        "start_month" => 8,
+        "start_day" => 23,
+        "end_month" => 9,
+        "end_day" => 22
+    ],
+    "Libra" => [
+        "start_month" => 9,
+        "start_day" => 23,
+        "end_month" => 10,
+        "end_day" => 22
+    ],
+    "Scorpio" => [
+        "start_month" => 10,
+        "start_day" => 23,
+        "end_month" => 11,
+        "end_day" => 21
+    ],
+    "Sagittarius" => [
+        "start_month" => 11,
+        "start_day" => 22,
+        "end_month" => 12,
+        "end_day" => 21
+    ],
+    "Capricorn" => [
+        "start_month" => 12,
+        "start_day" => 22,
+        "end_month" => 1,
+        "end_day" => 19
+    ],
+    "Aquarius" => [
+        "start_month" => 1,
+        "start_day" => 20,
+        "end_month" => 2,
+        "end_day" => 18
+    ],
+    "Pisces" => [
+        "start_month" => 2,
+        "start_day" => 19,
+        "end_month" => 3,
+        "end_day" => 20
+    ]
+];
+
 
 
 /**
@@ -345,7 +420,8 @@ function get_country_from_address($address)
  * @param string $hex           Hexadecimal color
  * @return array                RGB color
  */
-function hex_to_rgb($hex) {
+function hex_to_rgb($hex)
+{
     $hex = str_replace("#", "", $hex);
 
     if (strlen($hex) == 3) {
@@ -368,7 +444,8 @@ function hex_to_rgb($hex) {
  * @param array $rgb            RGB color
  * @return float                Luminance
  */
-function get_luminance($rgb) {
+function get_luminance($rgb)
+{
     foreach ($rgb as &$value) {
         $value /= 255;
         $value = ($value <= 0.03928) ? $value / 12.92 : pow(($value + 0.055) / 1.055, 2.4);
@@ -428,4 +505,25 @@ function generate_readable_color($contrast_threshold = 4.0)
     } while ($contrast < $contrast_threshold);
 
     return $new_color;
+}
+
+
+
+/**
+ * Get the astrological sign from a birth date.
+ * @param DateTime $birth_date    Birth date
+ * @return bool|string            Astrological sign
+ */
+function get_astrological_sign_from_birth_date($birth_date)
+{
+    $birth_month = intval($birth_date->format("n"));
+    $birth_day = intval($birth_date->format("j"));
+
+    foreach (ASTROLOGICAL_SIGNS_PERIODS as $sign => $period) {
+        if (($birth_month == $period["start_month"] && $birth_day >= $period["start_day"]) || ($birth_month == $period["end_month"] && $birth_day <= $period["end_day"])) {
+            return $sign;
+        }
+    }
+
+    return false;
 }
