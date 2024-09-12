@@ -118,6 +118,8 @@ export default function Dashboard() {
   useEffect(() => {
     let route: string;
 
+
+
     if (selectedPeriod === "1M") {
       route = `http://localhost/last_month1_customers.php`;
     } else if (selectedPeriod === "7J") {
@@ -321,12 +323,15 @@ export default function Dashboard() {
           {}
         );
         const data = JSON.parse(response);
+        console.log(data.data.events);
         const events = data.data.events;
         const clients = data.data.clients;
 
         setEvents(events);
 
         const august: Event[] = getEventsByMonth(events, 8, 2024);
+        
+        console.log(august);
 
         const progressionMonth: number = getProgressionLastMonth(
           events,
