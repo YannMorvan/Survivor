@@ -12,8 +12,6 @@ const MapComponent = ({ clientData }) => {
         chart.logo.disabled = true;
     }
 
-    console.log(clientData);
-
     am4core.useTheme(am4themes_animated);
 
     chart.geodata = am4geodata_worldLow;
@@ -33,11 +31,11 @@ const MapComponent = ({ clientData }) => {
     hs.properties.fill = am4core.color("#9CADF3");
 
     const countryCounts = clientData.reduce((acc, client) => {
-      if (!client.country) return acc;
-      if (!acc[client.country]) {
-        acc[client.country] = 0;
+      if (!client.country_code) return acc;
+      if (!acc[client.country_code]) {
+        acc[client.country_code] = 0;
       }
-      acc[client.country]++;
+      acc[client.country_code]++;
       return acc;
     }, {});
 
