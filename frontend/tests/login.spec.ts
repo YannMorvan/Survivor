@@ -8,7 +8,7 @@ test("login with valid credentials", async ({ page }: { page: Page }) => {
   await page.locator('[placeholder="Password"]').fill("naouLeA82oeirn");
 
   await page.locator('text=Connexion').click();
-  await expect(page).toHaveURL("http://localhost:3000/dashboard");
+  await expect(page).toHaveURL("http://localhost:3000/");
 });
 
 
