@@ -16,13 +16,12 @@ session_start();
 require_once __DIR__ . "/db_connection.php";
 require_once __DIR__ . "/functions.php";
 
-
 try {
 
-    if ($_ENV["is_coach"]) {
-        $query = "SELECT * FROM customers WHERE removed = :removed, id_coach = :id_coach";
+    if (isset($_SESSION["is_coach"]) && $_SESSION["is_coach"]) {
+        $query = "SELECT * FROM customers WHERE removed = :removed AND id_coach = :id_coach";
         $stm = $pdo->prepare($query);
-        $stm->execute(["removed" => 0, "id_coach" => $_SESSION["id"]]);
+        $stm->execute(["removed" => 0, "id_coach" => $_SESSION["id_employee"]]);
     } else {
         $query = "SELECT * FROM customers WHERE removed = :removed";
         $stm = $pdo->prepare($query);
