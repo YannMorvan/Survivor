@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { sendPostRequest } from "../utils/utils";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useRouter } from "next/navigation";
+import LoadingScreen from "../components/loading";
 
 interface Tip {
   title: string;
@@ -11,6 +13,31 @@ interface Tip {
 export default function TipsPage() {
   const [data, setData] = useState<Tip[]>([]);
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await sendPostRequest(
+          "http://localhost/check_session.php",
+          {}
+        );
+
+        const data = JSON.parse(response);
+
+        if (data.status === true) {
+          setIsLoading(false);
+        } else {
+          router.push("/");
+        }
+      } catch (error) {
+        console.error("Error during the request: ", error);
+      }
+    };
+
+    fetchData();
+  }, [router]);
 
   useEffect(() => {
     const fetchTips = async () => {
@@ -34,11 +61,15 @@ export default function TipsPage() {
       }
     };
     fetchTips();
-  }, []);
+  }, [!isLoading]);
 
   const toggleRow = (index: number) => {
     setExpandedRow(expandedRow === index ? null : index);
   };
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="mx-6 flex flex-col">

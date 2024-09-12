@@ -20,6 +20,9 @@ import Select, { SingleValue } from "react-select";
 
 import { format, formatDuration, set } from "date-fns";
 
+import { useRouter } from "next/navigation";
+import LoadingScreen from "../components/loading";
+
 interface FormData {
   id: string;
   name: string;
@@ -40,6 +43,9 @@ const Page = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCoach, setIsCoach] = useState(false);
+  const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     id: "",
     name: "",
@@ -76,6 +82,33 @@ const Page = () => {
     }, {} as CheckedItems);
     return initialCheckedItems;
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await sendPostRequest(
+          "http://localhost/check_session.php",
+          {}
+        );
+
+        const data = JSON.parse(response);
+
+        if (data.status === true) {
+          setIsLoading(false);
+        }
+        if (data.isCoach === true) {
+          setIsCoach(true);
+          router.push("/dashboard");
+        } else {
+          router.push("/");
+        }
+      } catch (error) {
+        console.error("Error during the request: ", error);
+      }
+    };
+
+    fetchData();
+  }, [router]);
 
   useEffect(() => {
     if (coachesData.length > 0) {
@@ -152,8 +185,9 @@ const Page = () => {
   };
 
   useEffect(() => {
+    if (isLoading || isCoach) return;
     fetchCoachesData();
-  }, []);
+  }, [isLoading, isCoach]);
 
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const [filterNbrClients, setFilterNbrClients] = useState(false);
@@ -669,6 +703,10 @@ const Page = () => {
   ];
 
   const bulkActions = [{ value: "delete", label: "Supprimer" }];
+
+  if (isLoading || isCoach) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="mx-6 flex flex-col">
