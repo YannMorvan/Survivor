@@ -47,7 +47,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-[#F3F6FB]">
       <div className="bg-white p-8 rounded-lg shadow-md max-w-96 w-full mx-8">
         <h2 className="text-2xl font-semibold text-[#384B65] mb-6 text-center">
-          Login to Your Account
+          Connexion à votre compte
         </h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
@@ -74,7 +74,7 @@ export default function Login() {
             className="bg-[#0369A1] text-white py-3 rounded-lg font-semibold hover:bg-[#025f8d] transition-colors"
             disabled={loading}
           >
-            {loading ? "Loading..." : "Connexion"}
+            {loading ? "chargement..." : "Connexion"}
           </button>
         </form>
       </div>

@@ -29,10 +29,10 @@ try {
     $sql = "SELECT clo.type, img.image
             FROM clothes AS clo
             LEFT JOIN clothes_images AS img ON clo.id = img.id_cloth
-            WHERE clo.id_customer = :id";
+            WHERE clo.id_customer = :id AND clo.type = :type";
 
     $stm = $pdo->prepare($sql);
-    $stm->execute(["id" => $_POST["id"]]);
+    $stm->execute(["id" => $_POST["id"], "type" => $_POST["type"]]);
     $results = $stm->fetchAll(PDO::FETCH_ASSOC);
 
 
