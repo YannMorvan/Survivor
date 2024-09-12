@@ -43,7 +43,7 @@ const Navbar = () => {
             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Soul Connection</span>
           </a>
           <div className="flex items-center justify-end md:order-2 space-x-10 md:space-x-0 rtl:space-x-reverse">
-            <div className='lg:block hidden'>
+            <div className='lg:block hidden mr-5'>
               <MessageSquareMore onClick={() => setTriggerChat(!triggerChat)} className='text-sky-700 cursor-pointer mt-0.5 mr-3'/>
             </div>
             {triggerChat
