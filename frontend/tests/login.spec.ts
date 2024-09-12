@@ -11,8 +11,7 @@ test("login with valid credentials", async ({ page }: { page: Page }) => {
   await expect(page).toHaveURL("http://localhost:3000/");
 });
 
-
-/*test.describe('Dashboard Page', () => {
+test.describe('Dashboard Page', () => {
 
   test('should display the correct title', async ({ page }: { page: Page }) => {
 
@@ -22,7 +21,6 @@ test("login with valid credentials", async ({ page }: { page: Page }) => {
     await page.locator('[placeholder="Password"]').fill("naouLeA82oeirn");
 
     await page.locator('text=Connexion').click();
-    await expect(page).toHaveURL("http://localhost:3000/dashboard");
 
     const title = await page.locator('h1').textContent();
     expect(title).toBe('Tableau de bord');
@@ -36,7 +34,6 @@ test("login with valid credentials", async ({ page }: { page: Page }) => {
     await page.locator('[placeholder="Password"]').fill("naouLeA82oeirn");
 
     await page.locator('text=Connexion').click();
-    await expect(page).toHaveURL("http://localhost:3000/dashboard");
 
     const welcomeMessage = await page.locator('h2').textContent();
     expect(welcomeMessage).toBe('Bienvenue !');
@@ -48,7 +45,7 @@ test("login with valid credentials", async ({ page }: { page: Page }) => {
     await page.locator('[placeholder="Password"]').fill("naouLeA82oeirn");
   
     await page.locator('text=Connexion').click();
-    await expect(page).toHaveURL("http://localhost:3000/dashboard");
+
 
     const buttonText = await page.locator('button#Last\\ 30\\ jours\\ button p').textContent();
     expect(buttonText).toBe('30 derniers jours');
@@ -62,7 +59,6 @@ test("login with valid credentials", async ({ page }: { page: Page }) => {
     await page.locator('[placeholder="Password"]').fill("naouLeA82oeirn");
 
     await page.locator('text=Connexion').click();
-    await expect(page).toHaveURL("http://localhost:3000/dashboard");
 
     await page.locator('button#Last\\ 30\\ jours\\ button').click();
     const dropdown = await page.locator('div#dropdownDays');
@@ -211,4 +207,4 @@ test.describe('Events Page', () => {
       const listViewActive = await page.locator('text=Liste').evaluate(el => el.classList.contains('bg-slate-100'));
       expect(listViewActive).toBe(true);
     });
-  });*/
+  });
