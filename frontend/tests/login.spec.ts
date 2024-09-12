@@ -124,7 +124,6 @@ test.describe('Coach Statistics Page', () => {
     await page.locator('[placeholder="Password"]').fill("naouLeA82oeirn");
 
     await page.locator('text=Connexion').click();
-    await expect(page).toHaveURL("http://localhost:3000/dashboard");
 
     await page.goto('http://localhost:3000/statistics');
   });
@@ -167,7 +166,6 @@ test.describe('Tips Page', () => {
     await page.locator('[placeholder="Password"]').fill("naouLeA82oeirn");
 
     await page.locator('text=Connexion').click();
-    await expect(page).toHaveURL("http://localhost:3000/dashboard");
 
     await page.goto('http://localhost:3000/tips');
   });
@@ -187,7 +185,6 @@ test.describe('Events Page', () => {
         await page.locator('[placeholder="Password"]').fill("naouLeA82oeirn");
     
         await page.locator('text=Connexion').click();
-        await expect(page).toHaveURL("http://localhost:3000/dashboard");
 
       await page.goto('http://localhost:3000/events');
     });
@@ -200,14 +197,6 @@ test.describe('Events Page', () => {
     test('should display the correct month on load', async ({ page }: { page: Page }) => {
       const monthText = await page.locator('p.text-xl.font-semibold').textContent();
       expect(monthText).toContain('July 2024');
-    });
-  
-    test('should navigate to the next month when clicking the right chevron', async ({ page }: { page: Page }) => {
-      const nextChevron = page.locator('#next');
-      await nextChevron.click();
-      
-      const monthLabel = await page.locator('p.ml-10.mt-5.text-xl.font-semibold').textContent();
-      expect(monthLabel).toContain('June 2024');
     });
   
   

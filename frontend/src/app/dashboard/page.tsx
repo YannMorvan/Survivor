@@ -106,6 +106,7 @@ export default function Dashboard() {
   const [allData, setAllData] = useState([]);
   const [clientPerCoach, setClientPerCoach] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeUsers, setActiveUsers] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
@@ -114,6 +115,21 @@ export default function Dashboard() {
       localStorage.removeItem("needRefresh");
     }
   }, []);
+
+  useEffect(() => {
+
+    const fetchClientsData = async () => {
+      try {
+        const response = await sendPostRequest("http://localhost/get_percentage_actif_client.php", {});
+        const data = JSON.parse(response);
+        setActiveUsers(data.data);
+      } catch (error) {
+        console.error("Erreur lors de la requête : ", error);
+      }
+    };
+    fetchClientsData();
+
+  });
 
   useEffect(() => {
     let route: string;
@@ -139,20 +155,6 @@ export default function Dashboard() {
     };
     fetchClientsData();
   }, [selectedPeriod]);
-
-  useEffect(() => {
-    const clientPerCoach = async () => {
-      try {
-        const response = await sendPostRequest(
-          "http://localhost/client_per_coach.php",
-          {}
-        );
-        const data = JSON.parse(response);
-      } catch (error) {
-        console.error("Erreur lors de la requête : ", error);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     const fetchCoachData = async () => {
@@ -615,12 +617,8 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="md:text-left text-center">
-              <p className="text-slate-500 text-sm">Faire des réunions</p>
-              <p className="mt-1 text-slate-900 text-xl">28.49%</p>
-              <div className="flex md:justify-normal justify-center">
-                <ArrowDown size={12} className="text-red-700 mt-1.5" />
-                <p className="mt-1 text-xs text-red-700">12.37%</p>
-              </div>
+              <p className="text-slate-500 text-sm">Fait des réunions</p>
+              <p className="mt-1 text-slate-900 text-xl">{activeUsers} %</p>
             </div>
             <div className="md:text-left text-center">
               <p className="text-slate-500 text-sm">Clients par coach</p>
