@@ -14,7 +14,7 @@ const getAfterComma: (str: string) => string = (str: string) => {
 };
 
 const Event = ({ event, index, onEventClick }: any) => {
-    const { date, duration, name, location_name } = event;
+    const { date, duration, name, location_name, color } = event;
 
     const startDate = new Date(date);
     const endDate = new Date(startDate.getTime() + duration * 60000);
@@ -22,8 +22,6 @@ const Event = ({ event, index, onEventClick }: any) => {
     const dayCount = Math.ceil((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
 
     const verticalOffset = index * 30;
-
-    const color = useMemo(() => getRandomColor(), [event.id]);
 
     const handleClick = () => {
         if (onEventClick) {
