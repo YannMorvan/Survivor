@@ -39,7 +39,7 @@ const MonthView = ({ events, month, list, onEventClick }: any) => {
                                 <div className="w-10/12">
                                     {events.length > 0 ? (
                                         events.map((event: any, eventIndex: number) => (
-                                            <div key={eventIndex} className="mb-2 bg-sky-600 rounded p-1.5">
+                                            <div key={eventIndex} className="mb-2 rounded p-1.5" style={{backgroundColor: `${event.color}`}}>
                                                 <p className="text-white cursor-pointer" onClick={() => onEventClick(event)}>
                                                     {event.name}
                                                 </p>
