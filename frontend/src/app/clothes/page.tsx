@@ -6,6 +6,8 @@ import { ArrowLeft, ArrowRight, CloudDownload, Trash2Icon } from "lucide-react";
 
 import html2canvas from "html2canvas";
 import { saveAs } from "file-saver";
+import LoadingScreen from "../components/loading";
+import { useRouter } from "next/navigation";
 
 interface ClothingItem {
   id: number;
@@ -28,6 +30,31 @@ export default function Clothes() {
   const [modalImageURL, setModalImageURL] = useState<string | null>(null);
 
   const [clothesTypes, setClothesTypes] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await sendPostRequest(
+          "http://localhost/check_session.php",
+          {}
+        );
+
+        const data = JSON.parse(response);
+
+        if (data.status === true) {
+          setIsLoading(false);
+        } else {
+          router.push("/");
+        }
+      } catch (error) {
+        console.error("Error during the request: ", error);
+      }
+    };
+
+    fetchData();
+  }, [router]);
 
   useEffect(() => {
     const fetchClothesTypes = async () => {
@@ -178,6 +205,10 @@ export default function Clothes() {
 
   const isScreenLessThanLg = () =>
     window.matchMedia("(max-width: 1024px)").matches;
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="mx-6 flex flex-col">

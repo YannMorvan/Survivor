@@ -14,13 +14,13 @@ import { useRouter } from "next/navigation";
 import Select from "react-select";
 
 import { sendPostRequest } from "../utils/utils.js";
-import ProfileDetails from "./[id]/page";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import { format, formatDuration } from "date-fns";
 import { SingleValue, ActionMeta } from "react-select";
+import LoadingScreen from "../components/loading";
 
 interface FormData {
   id: string;
@@ -79,6 +79,8 @@ const Page = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
   const [customersData, setCustomersData] = useState<Customers[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState<string | null>(null);
   const [paginationOption, setPaginationOption] = useState(false);
@@ -396,8 +398,6 @@ const Page = () => {
   const closeDeleteModal = () => {
     setIsModalDeleteOpen(false);
   };
-
-  const router = useRouter();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -748,6 +748,33 @@ const Page = () => {
   useEffect(() => {
     fetchCustomersImage();
   }, [currentPage]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await sendPostRequest(
+          "http://localhost/check_session.php",
+          {}
+        );
+
+        const data = JSON.parse(response);
+
+        if (data.status === true) {
+          setIsLoading(false);
+        } else {
+          router.push("/");
+        }
+      } catch (error) {
+        console.error("Error during the request: ", error);
+      }
+    };
+
+    fetchData();
+  }, [router]);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="mx-6 flex flex-col">

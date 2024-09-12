@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowLeft, Bookmark, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { sendPostRequest } from "../../utils/utils.js";
+import LoadingScreen from "@/app/components/loading.jsx";
 
 const StarRating = ({ rating }: { rating: number }) => {
   const totalStars = 5;
@@ -73,8 +74,6 @@ interface Coach {
 }
 
 const ProfileDetails = ({ params }: { params: { id: string } }) => {
-  const router = useRouter();
-
   const [customerData, setCustomerData] = React.useState<Customer>({
     address: "",
     email: "",
@@ -95,6 +94,9 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
     []
   );
 
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
   const [payment, setPayments] = React.useState<Payment[]>([]);
 
   const [coachData, setCoachData] = React.useState<Coach>({
@@ -102,6 +104,29 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
     name: "",
     surname: "",
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await sendPostRequest(
+          "http://localhost/check_session.php",
+          {}
+        );
+
+        const data = JSON.parse(response);
+
+        if (data.status === true) {
+          setIsLoading(false);
+        } else {
+          router.push("/");
+        }
+      } catch (error) {
+        console.error("Error during the request: ", error);
+      }
+    };
+
+    fetchData();
+  }, [router]);
 
   useEffect(() => {
     const fetchCustomerData = async () => {
@@ -197,6 +222,9 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
     }
   }, [customerData.id_coach]);
 
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
   return (
     <div className="mx-6 flex flex-col">
       <div className="flex justify-between items-center mb-6 flex-row">

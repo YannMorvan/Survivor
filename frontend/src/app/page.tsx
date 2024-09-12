@@ -2,12 +2,14 @@
 
 import React, { useState } from "react";
 import { sendPostRequest } from "./utils/utils";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,19 +30,14 @@ export default function Login() {
 
       const parsedResponse = JSON.parse(response);
 
-      console.log(parsedResponse);
-
-      if (parsedResponse.error) {
-        setError(parsedResponse.error);
-        return;
+      if (!parsedResponse.status) {
+        throw new Error("Invalid email or password.");
+      } else {
+        router.push("/dashboard");
+        localStorage.setItem("needRefresh", "true");
       }
-
-      console.log(parsedResponse);
-
-      //window.location.href = "/dashboard";
     } catch (error) {
-      console.error(error);
-      setError("An error occurred. Please try again.");
+      setError("Invalid email or password.");
     } finally {
       setLoading(false);
     }
