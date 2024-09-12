@@ -95,8 +95,7 @@ const Page = () => {
 
         if (data.status === true) {
           setIsLoading(false);
-        }
-        if (data.isCoach === true) {
+        } else if (data.isCoach === true) {
           setIsCoach(true);
           router.push("/dashboard");
         } else {

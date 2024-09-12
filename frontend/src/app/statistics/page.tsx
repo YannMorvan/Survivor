@@ -165,8 +165,7 @@ export default function Page() {
 
         if (data.status === true) {
           setIsLoading(false);
-        }
-        if (data.isCoach === true) {
+        } else if (data.isCoach === true) {
           setIsCoach(true);
           router.push("/dashboard");
         } else {
@@ -327,7 +326,7 @@ export default function Page() {
     fetchClientsData();
   }, [selectedCoach]);
 
-  if (isLoading || !isCoach) {
+  if (isLoading) {
     return <LoadingScreen />;
   }
 
