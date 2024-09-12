@@ -39,6 +39,7 @@ export default function Clothes() {
 
   const [clothesTypes, setClothesTypes] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCoach, setIsCoach] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -52,6 +53,7 @@ export default function Clothes() {
         const data = JSON.parse(response);
 
         if (data.status === true) {
+          setIsCoach(data.isCoach);
           setIsLoading(false);
         } else {
           router.push("/");
@@ -84,39 +86,76 @@ export default function Clothes() {
   }
 
   const fetchClothes = async (type: string) => {
-    try {
-      const response = await sendPostRequest(
-        `http://localhost/clothes_data.php`,
-        { type }
-      );
+    if (!isCoach) {
+      try {
+        const response = await sendPostRequest(
+          `http://localhost/clothes_data.php`,
+          { type }
+        );
 
-      const parsedResponse: { data: ResponseItem[] } = JSON.parse(response);
+        const parsedResponse: { data: ResponseItem[] } = JSON.parse(response);
 
-      const mappedResponse: ClothingItem[] = parsedResponse.data.map(
-        (item: ResponseItem, index: number) => ({
-          id: index,
-          imageURL: item.image,
-        })
-      );
+        const mappedResponse: ClothingItem[] = parsedResponse.data.map(
+          (item: ResponseItem, index: number) => ({
+            id: index,
+            imageURL: item.image,
+          })
+        );
 
-      switch (type) {
-        case "hat/cap":
-          setHats(mappedResponse);
-          break;
-        case "top":
-          setTops(mappedResponse);
-          break;
-        case "bottom":
-          setBottoms(mappedResponse);
-          break;
-        case "shoes":
-          setShoes(mappedResponse);
-          break;
-        default:
-          console.error("Unknown type:", type);
+        switch (type) {
+          case "hat/cap":
+            setHats(mappedResponse);
+            break;
+          case "top":
+            setTops(mappedResponse);
+            break;
+          case "bottom":
+            setBottoms(mappedResponse);
+            break;
+          case "shoes":
+            setShoes(mappedResponse);
+            break;
+          default:
+            console.error("Unknown type:", type);
+        }
+      } catch (error) {
+        console.error("Error fetching clothes:", error);
       }
-    } catch (error) {
-      console.error("Error fetching clothes:", error);
+    } else {
+      try {
+        const response = await sendPostRequest(
+          `http://localhost/get_clothes_by_user_id.php`,
+          { type, id: selectedCustomer }
+        );
+
+        const parsedResponse: { data: { [key: string]: string[] } } =
+          JSON.parse(response);
+
+        const mappedResponse: ClothingItem[] =
+          parsedResponse.data[type]?.map((item: string, index: number) => ({
+            id: index,
+            imageURL: item,
+          })) || [];
+
+        switch (type) {
+          case "hat/cap":
+            setHats(mappedResponse);
+            break;
+          case "top":
+            setTops(mappedResponse);
+            break;
+          case "bottom":
+            setBottoms(mappedResponse);
+            break;
+          case "shoes":
+            setShoes(mappedResponse);
+            break;
+          default:
+            console.error("Unknown type:", type);
+        }
+      } catch (error) {
+        console.error("Error fetching clothes:", error);
+      }
     }
   };
 
@@ -223,10 +262,15 @@ export default function Clothes() {
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
 
   const handleCustomerChange = (selectedOption: SingleValue<any>) => {
+    setTops([]);
+    setBottoms([]);
+    setHats([]);
+    setShoes([]);
+    if (activeTabs.length > 0) {
+      setActiveTabs([]);
+    }
     setSelectedCustomer(selectedOption.value);
   };
-
-  const [optionsCustomers, setOptionsCustomers] = useState([]);
 
   const [customersNames, setCustomersNames] = useState<CustomersNames[]>([]);
 
@@ -236,34 +280,62 @@ export default function Clothes() {
   }));
 
   const fetchCustomersData = async () => {
-    try {
-      const response = await sendPostRequest(
-        `http://localhost/get_coach_clients.php`,
-        {}
-      );
-
-      const parsedResponse = JSON.parse(response);
-
-      console.log(parsedResponse);
-
-      if (
-        parsedResponse.status === true &&
-        Array.isArray(parsedResponse.coaches)
-      ) {
-        const formattedData: CustomersNames[] = parsedResponse.coaches.map(
-          (item: any) => ({
-            id: item.id.toString(),
-            name: item.name,
-            surname: item.surname,
-          })
+    if (!isCoach) {
+      try {
+        const response = await sendPostRequest(
+          `http://localhost/get_coach_clients.php`,
+          {}
         );
 
-        setCustomersNames(formattedData);
-      } else {
-        console.error("Unexpected response format:", parsedResponse);
+        const parsedResponse = JSON.parse(response);
+
+        if (
+          parsedResponse.status === true &&
+          Array.isArray(parsedResponse.clients)
+        ) {
+          const formattedData: CustomersNames[] = parsedResponse.clients.map(
+            (item: any) => ({
+              id: item.id.toString(),
+              name: item.name,
+              surname: item.surname,
+            })
+          );
+
+          setCustomersNames(formattedData);
+        } else {
+          console.error("Unexpected response format:", parsedResponse);
+        }
+      } catch (error) {
+        console.error("Error fetching coaches data:", error);
       }
-    } catch (error) {
-      console.error("Error fetching coaches data:", error);
+    } else {
+      try {
+        const response = await sendPostRequest(
+          `http://localhost/get_coach_clients.php`,
+          {}
+        );
+
+        const parsedResponse = JSON.parse(response);
+
+        if (
+          parsedResponse.status === true &&
+          Array.isArray(parsedResponse.clients)
+        ) {
+          const formattedData: CustomersNames[] = parsedResponse.clients.map(
+            (item: any) => ({
+              id: item.id.toString(),
+              name: item.name,
+              surname: item.surname,
+            })
+          );
+
+          setCustomersNames(formattedData);
+        } else {
+          console.error("Unexpected response format:", parsedResponse);
+        }
+      } catch (error) {
+        console.error("Error fetching coaches data:", error);
+      }
     }
   };
 

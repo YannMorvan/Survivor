@@ -11,6 +11,7 @@ if ($origin == $_ENV["FRONT_HOST"]) {
 
 header("Access-Control-Allow-Credentials: true");
 header('Content-Type: application/json');
+session_start();
 
 require_once __DIR__ . '/db_connection.php';
 
@@ -20,7 +21,7 @@ try {
 
     $stm = $pdo->prepare($query);
     $stm->execute([
-        'id_coach' => $_SESSION['id'],
+        'id_coach' => $_SESSION['id_employee'],
         'removed' => 0
     ]);
     $clients = $stm->fetchAll(PDO::FETCH_ASSOC);
