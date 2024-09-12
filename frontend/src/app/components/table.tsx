@@ -1,8 +1,8 @@
-"use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
 import Image from "next/image";
+import { sendPostRequest } from "../utils/utils";
 
 interface Client {
   id: number;
@@ -10,7 +10,7 @@ interface Client {
   surname: string;
   email: string;
   phone_number: string;
-  image: string;
+  image?: string; // Rendre image optionnelle pour l'instant
 }
 
 interface ClientTableProps {
@@ -19,18 +19,17 @@ interface ClientTableProps {
   };
 }
 
-
-const ClientTable: React.FC<ClientTableProps>  = ({ data }) => {
+const ClientTable: React.FC<ClientTableProps> = ({ data }) => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("Last 30 days");
   const [searchTerm, setSearchTerm] = useState("");
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
+  const [clients, setClients] = useState<Client[]>([]);
   const itemsPerPage = 10;
 
   const router = useRouter();
 
-  const clients = data.data || [];
   const totalPages = Math.ceil(clients.length / itemsPerPage);
 
   const filters = ["Last day", "Last 7 days", "Last 30 days", "Last month", "Last year"];
@@ -72,6 +71,35 @@ const ClientTable: React.FC<ClientTableProps>  = ({ data }) => {
     }
   };
 
+  useEffect(() => {
+    const fetchCoachImages = async () => {
+      try {
+        const imagePromises = data.data.map(async (client) => {
+          const response = await sendPostRequest(`http://localhost/client_image.php`, { id: client.id });
+          const data = JSON.parse(response);
+          return { id: client.id, image: data.data };
+        });
+
+        const allImages = await Promise.all(imagePromises);
+
+        const updatedClients = data.data.map(client => {
+          const image = allImages.find(img => img.id === client.id)?.image;
+          return { ...client, image };
+        });
+
+        console.log(updatedClients);
+
+        setClients(updatedClients);
+      } catch (error) {
+        console.error("Erreur lors de la requête : ", error);
+      }
+    };
+
+    if (data?.data) {
+      fetchCoachImages();
+    }
+  }, [data]);
+
   const handleTryComptability: () => void = () => {
     if (checkedItems.size === 2) {
       const [firstClient, secondClient] = Array.from(checkedItems);
@@ -91,41 +119,6 @@ const ClientTable: React.FC<ClientTableProps>  = ({ data }) => {
   return (
     <div className="relative overflow-x-auto sm:rounded-lg">
       <div className="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4">
-        <div>
-          {/*<button
-            id="dropdownRadioButton"
-            onClick={handleDropdownToggle}
-            className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
-            type="button"
-          >
-            <svg className="w-3 h-3 text-gray-500 dark:text-gray-400 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 0a10 10 0 1 0 10 10A10.011 10.011 0 0 0 10 0Zm3.982 13.982a1 1 0 0 1-1.414 0l-3.274-3.274A1.012 1.012 0 0 1 9 10V6a1 1 0 0 1 2 0v3.586l2.982 2.982a1 1 0 0 1 0 1.414Z" />
-            </svg>
-            {selectedFilter}
-            <svg className="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-              <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
-            </svg>
-          </button>
-          {isDropdownOpen && (
-            <div className="z-10 absolute w-48 bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600">
-              <ul className="p-3 space-y-1 text-sm text-gray-700 dark:text-gray-200">
-                {filters.map((filter) => (
-                  <li key={filter}>
-                    <div className="flex items-center p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-600">
-                      <input
-                        type="radio"
-                        checked={selectedFilter === filter}
-                        onChange={() => handleFilterChange(filter)}
-                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                      />
-                      <label className="w-full ms-2 text-sm font-medium text-gray-900 rounded dark:text-gray-300">{filter}</label>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )} */}
-        </div>
         <label htmlFor="table-search" className="sr-only">Search</label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 flex items-center ps-3 pointer-events-none">
@@ -176,7 +169,11 @@ const ClientTable: React.FC<ClientTableProps>  = ({ data }) => {
                 </div>
               </td>
               <th scope="row" className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
-                <Image width={10} height={10} className="w-10 h-10 rounded-full" src={`data:image/png;base64,${client.image}`} alt="Client" />
+                {client.image ? (
+                  <Image width={40} height={40} className="w-10 h-10 rounded-full" src={`data:image/png;base64,${client.image}`} alt="Client" />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gray-300"></div> // Placeholder image if no image
+                )}
                 <div className="ps-3">
                   <div className="text-base font-semibold">{client.name}</div>
                 </div>
