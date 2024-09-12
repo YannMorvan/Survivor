@@ -5,7 +5,7 @@ import { ArrowLeft, Bookmark, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { sendPostRequest } from "../../utils/utils.js";
-import LoadingScreen from "@/app/components/loading.jsx";
+import LoadingScreen from "../../components/loading"; 
 
 const StarRating = ({ rating }: { rating: number }) => {
   const totalStars = 5;
