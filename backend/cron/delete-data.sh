@@ -16,7 +16,7 @@ mkfifo $pipe_events
 mkfifo $pipe_encounters
 
 
-php /usr/local/bin/php-scripts/login.php > $pipe_login &
+php /usr/local/php-scripts/src/login.php > $pipe_login &
 pid_login=$!
 
 output_login=$(cat $pipe_login)
@@ -37,13 +37,13 @@ token=$(echo $output_login | jq -r ".token")
 echo "$(date +"%Y-%m-%d %H:%M:%S") [Delete data]: $output_login"
 
 
-php /usr/local/bin/php-scripts/delete-data/delete-employees.php token=$token > $pipe_employees &
+php /usr/local/php-scripts/src/delete-data/delete-employees.php token=$token > $pipe_employees &
 
-php /usr/local/bin/php-scripts/delete-data/delete-customers.php token=$token > $pipe_customers &
+php /usr/local/php-scripts/src/delete-data/delete-customers.php token=$token > $pipe_customers &
 
-php /usr/local/bin/php-scripts/delete-data/delete-events.php token=$token > $pipe_events &
+php /usr/local/php-scripts/src/delete-data/delete-events.php token=$token > $pipe_events &
 
-php /usr/local/bin/php-scripts/delete-data/delete-encounters.php token=$token > $pipe_encounters &
+php /usr/local/php-scripts/src/delete-data/delete-encounters.php token=$token > $pipe_encounters &
 
 
 output_1=$(cat $pipe_employees)

@@ -31,6 +31,6 @@ RUN chmod +x /usr/local/bin/update-data.sh
 COPY delete-data.sh /usr/local/bin/delete-data.sh
 RUN chmod +x /usr/local/bin/delete-data.sh
 
-COPY php-scripts/ /usr/local/bin/php-scripts/
+COPY src/ /usr/local/php-scripts/src/
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
