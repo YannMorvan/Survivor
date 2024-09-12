@@ -26,10 +26,20 @@ if (!isset($_POST['type'])) {
 
 try {
 
-    $query = "SELECT ci.image FROM clothes c LEFT JOIN clothes_images ci ON c.id = ci.id_cloth WHERE c.type = :type";
+    if (!$_ENV["is_coach"]) {
+        $query = "SELECT ci.image FROM clothes c LEFT JOIN clothes_images ci ON c.id = ci.id_cloth WHERE c.type = :type";
 
-    $stm = $pdo->prepare($query);
-    $stm->execute(["type" => $_POST['type']]);
+        $stm = $pdo->prepare($query);
+        $stm->execute(["type" => $_POST['type']]);
+
+    } else {
+
+        $query = "SELECT ci.image FROM clothes c LEFT JOIN clothes_images ci ON ci.id = ci.id_cloth LEFT JOIN clients cl ON c.id_client = cl.id WHERE cl.id_coach = :id_coach AND c.type = :type";
+
+        $stm = $pdo->prepare($query);
+        $stm->execute(["type" => $_POST["type"], "id_coach" => $_SESSION["id"]]);
+    }
+
     $clothes = $stm->fetchAll(PDO::FETCH_ASSOC);
 
     if (empty($clothes)) {
