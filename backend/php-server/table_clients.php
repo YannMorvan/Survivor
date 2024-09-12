@@ -19,10 +19,16 @@ require_once __DIR__ . "/functions.php";
 
 try {
 
-    $query = "SELECT * FROM customers WHERE removed = :removed";
+    if ($_ENV["is_coach"]) {
+        $query = "SELECT * FROM customers WHERE removed = :removed, id_coach = :id_coach";
+        $stm = $pdo->prepare($query);
+        $stm->execute(["removed" => 0, "id_coach" => $_SESSION["id"]]);
+    } else {
+        $query = "SELECT * FROM customers WHERE removed = :removed";
+        $stm = $pdo->prepare($query);
+        $stm->execute(["removed" => 0]);
+    }
 
-    $stm = $pdo->prepare($query);
-    $stm->execute(["removed" => 0]);
     $customers = $stm->fetchAll(PDO::FETCH_ASSOC);
 
 
