@@ -1,11 +1,13 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquareMore, UserRound, Menu } from 'lucide-react';
+import Chat from './chat';
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [pathname, setPathname] = useState('');
+  const [triggerChat, setTriggerChat] = useState(false);
 
   useEffect(() => {
     setPathname(window.location.pathname);
@@ -41,9 +43,12 @@ const Navbar = () => {
             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Soul Connection</span>
           </a>
           <div className="flex items-center justify-end md:order-2 space-x-10 md:space-x-0 rtl:space-x-reverse">
-            <div className='lg:block hidden'>
-              <MessageSquareMore className='text-sky-700 cursor-pointer mt-0.5 mr-3'/>
+            <div className='lg:block hidden mr-5'>
+              <MessageSquareMore onClick={() => setTriggerChat(!triggerChat)} className='text-sky-700 cursor-pointer mt-0.5 mr-3'/>
             </div>
+            {triggerChat
+              ? <Chat />
+            : null}
             <div className='lg:block pr-6 hidden'>
               <svg className="w-6 h-6" enableBackground="new 0 0 512 512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><circle cx="256" cy="256" fill="#f0f0f0" r="256"/><path d="m512 256c0-110.071-69.472-203.906-166.957-240.077v480.155c97.485-36.172 166.957-130.007 166.957-240.078z" fill="#d80027"/><path d="m0 256c0 110.071 69.473 203.906 166.957 240.077v-480.154c-97.484 36.171-166.957 130.006-166.957 240.077z" fill="#0052b4"/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/><g/></svg>
             </div>
@@ -115,7 +120,7 @@ const Navbar = () => {
       { label: 'Tableau', path: 'dashboard' },
       { label: 'Coachs', path: 'coaches' },
       { label: 'Clients', path: 'customers' },
-      { label: 'Conseils', path: 'conseils' },
+      { label: 'Conseils', path: 'tips' },
       { label: 'Evènement', path: 'events' },
       { label: 'Vêtements', path: 'clothes' },
       { label: 'Compatibilité', path: 'astro' },

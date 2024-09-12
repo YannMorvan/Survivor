@@ -21,7 +21,7 @@ try {
     $current_date = date("Y-m-d H:i:s");
     $starting_date = date("Y-m-d H:i:s", strtotime('-1 week', strtotime($current_date)));
 
-    $query = "SELECT id, name, surname, country FROM customers WHERE join_date >= :starting_date AND join_date <= :current_date AND removed = 0";
+    $query = "SELECT id, name, surname, country, join_date FROM customers WHERE join_date >= :starting_date AND join_date <= :current_date AND removed = 0";
 
     $stm = $pdo->prepare($query);
     $stm->execute([
@@ -29,6 +29,11 @@ try {
         "current_date" => $current_date
     ]);
     $customers = $stm->fetchAll(PDO::FETCH_ASSOC);
+
+    $customers = array_map(function ($customer) {
+        $customer["country_code"] = get_country_code($customer["country"]);
+        return $customer;
+    }, $customers);
 
     echo json_encode([
         "status" => true,

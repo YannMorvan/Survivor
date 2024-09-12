@@ -72,8 +72,6 @@ const PieChartComponent = ({ data }) => {
       },
     ];
 
-    console.log(chartData);
-
     chart.data = chartData;
 
 

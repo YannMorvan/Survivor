@@ -33,7 +33,7 @@ const DayView = ({ events, day, list, onEventClick }: any) => {
                             <div className={`${dayEvents.length === 0 ? '' : ''} w-full rounded p-1.5`}>
                                 {dayEvents.length > 0 ? (
                                     dayEvents.map((event: any, index: number) => (
-                                        <div key={event.id} className='mb-2 bg-sky-600 rounded p-1.5'>
+                                        <div key={event.id} className='mb-2 rounded p-1.5' style={{backgroundColor: `${event.color}`}}>
                                             <p className='text-white cursor-pointer' onClick={() => handleClick(event)}>
                                                 {event.name}
                                             </p>

@@ -65,11 +65,6 @@ const PieChartComponent = ({ data }) => {
 
     chart.legend.labels.template.fontSize = 12;
     chart.legend.labels.template.fill = am4core.color("#91A3B9");
-  
-    const filteredData = data.filter((entry) => {
-      const date = parseDate(entry.date);
-      return date.getFullYear() === 2024 && date.getMonth() === 6;
-    });
 
     const countOccurrences = (arr) => {
       return arr.reduce((acc, item) => {
@@ -78,7 +73,7 @@ const PieChartComponent = ({ data }) => {
       }, {});
     };
 
-    const occurrences = countOccurrences(filteredData.map((entry) => entry.source));
+    const occurrences = countOccurrences(data.map((entry) => entry.source));
 
     const sortedOccurrences = Object.entries(occurrences)
       .sort((a, b) => b[1] - a[1]);
