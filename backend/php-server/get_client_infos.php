@@ -18,11 +18,11 @@ require_once __DIR__ . "/db_connection.php";
 try {
 
     if ($_ENV["is_coach"]) {
-        $query = "SELECT * FROM customers WHERE removed = :removed, id_coach = :id_coach";
+        $query = "SELECT id, name, surname FROM customers WHERE removed = :removed, id_coach = :id_coach";
         $stm = $pdo->prepare($query);
         $stm->execute(["removed" => 0, "id_coach" => $_SESSION["id"]]);
     } else {
-        $query = "SELECT * FROM customers WHERE removed = :removed";
+        $query = "SELECT id, name, surname FROM customers WHERE removed = :removed";
         $stm = $pdo->prepare($query);
         $stm->execute(["removed" => 0]);
     }

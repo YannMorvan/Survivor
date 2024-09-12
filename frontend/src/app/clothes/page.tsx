@@ -41,6 +41,7 @@ export default function Clothes() {
   const [isLoading, setIsLoading] = useState(true);
   const [isCoach, setIsCoach] = useState(true);
   const router = useRouter();
+  const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,6 +55,7 @@ export default function Clothes() {
 
         if (data.status === true) {
           setIsCoach(data.isCoach);
+          setIsFetching(true);
           setIsLoading(false);
         } else {
           router.push("/");
@@ -86,7 +88,7 @@ export default function Clothes() {
   }
 
   const fetchClothes = async (type: string) => {
-    if (!isCoach) {
+    if (!selectedCustomer) {
       try {
         const response = await sendPostRequest(
           `http://localhost/clothes_data.php`,
@@ -283,7 +285,7 @@ export default function Clothes() {
     if (!isCoach) {
       try {
         const response = await sendPostRequest(
-          `http://localhost/get_coach_clients.php`,
+          `http://localhost/get_client_infos.php`,
           {}
         );
 
@@ -291,9 +293,9 @@ export default function Clothes() {
 
         if (
           parsedResponse.status === true &&
-          Array.isArray(parsedResponse.clients)
+          Array.isArray(parsedResponse.data)
         ) {
-          const formattedData: CustomersNames[] = parsedResponse.clients.map(
+          const formattedData: CustomersNames[] = parsedResponse.data.map(
             (item: any) => ({
               id: item.id.toString(),
               name: item.name,
@@ -341,7 +343,7 @@ export default function Clothes() {
 
   useEffect(() => {
     fetchCustomersData();
-  }, []);
+  }, [isFetching]);
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -353,7 +355,7 @@ export default function Clothes() {
         <h1 className="text-3xl font-semibold text-[#384B65]">
           Gestion des Vêtements
         </h1>
-        <div className="mb-4">
+        <div className="mb-4 w-[200px]">
           <Select
             id="customer"
             value={
