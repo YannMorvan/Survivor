@@ -174,7 +174,7 @@ const ProfileDetails = ({ params }: { params: { id: string } }) => {
   useEffect(() => {
     const fetchCoach = async () => {
       if (!customerData.id_coach || isNaN(Number(customerData.id_coach))) {
-        console.log("Coach ID is not valid:", customerData.id_coach);
+        console.error("Coach ID is not valid:", customerData.id_coach);
         return;
       }
 

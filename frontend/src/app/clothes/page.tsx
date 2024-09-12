@@ -1,13 +1,21 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { sendPostRequest } from "../utils/utils.js";
-import { ArrowLeft, ArrowRight, CloudDownload, Trash2Icon } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  CloudDownload,
+  Shirt,
+  Trash2Icon,
+} from "lucide-react";
 
 import html2canvas from "html2canvas";
 import { saveAs } from "file-saver";
 import LoadingScreen from "../components/loading";
 import { useRouter } from "next/navigation";
+
+import Select, { SingleValue } from "react-select";
 
 interface ClothingItem {
   id: number;
@@ -59,7 +67,7 @@ export default function Clothes() {
   useEffect(() => {
     const fetchClothesTypes = async () => {
       const response = await sendPostRequest(
-        `http://${process.env.NEXT_PUBLIC_PHP_HOST}/clothes_types.php`,
+        `http://localhost/clothes_types.php`,
         {}
       );
 
@@ -78,7 +86,7 @@ export default function Clothes() {
   const fetchClothes = async (type: string) => {
     try {
       const response = await sendPostRequest(
-        `http://${process.env.NEXT_PUBLIC_PHP_HOST}/clothes_data.php`,
+        `http://localhost/clothes_data.php`,
         { type }
       );
 
@@ -124,7 +132,7 @@ export default function Clothes() {
   useEffect(() => {
     const fetchClothesTypes = async () => {
       const response = await sendPostRequest(
-        `http://${process.env.NEXT_PUBLIC_PHP_HOST}/clothes_types.php`,
+        `http://localhost/clothes_types.php`,
         {}
       );
 
@@ -206,6 +214,63 @@ export default function Clothes() {
   const isScreenLessThanLg = () =>
     window.matchMedia("(max-width: 1024px)").matches;
 
+  interface CustomersNames {
+    id: string;
+    name: string;
+    surname: string;
+  }
+
+  const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
+
+  const handleCustomerChange = (selectedOption: SingleValue<any>) => {
+    setSelectedCustomer(selectedOption.value);
+  };
+
+  const [optionsCustomers, setOptionsCustomers] = useState([]);
+
+  const [customersNames, setCustomersNames] = useState<CustomersNames[]>([]);
+
+  const options = customersNames.map((customer) => ({
+    value: customer.id,
+    label: `${customer.name} ${customer.surname}`,
+  }));
+
+  const fetchCustomersData = async () => {
+    try {
+      const response = await sendPostRequest(
+        `http://localhost/get_coach_clients.php`,
+        {}
+      );
+
+      const parsedResponse = JSON.parse(response);
+
+      console.log(parsedResponse);
+
+      if (
+        parsedResponse.status === true &&
+        Array.isArray(parsedResponse.coaches)
+      ) {
+        const formattedData: CustomersNames[] = parsedResponse.coaches.map(
+          (item: any) => ({
+            id: item.id.toString(),
+            name: item.name,
+            surname: item.surname,
+          })
+        );
+
+        setCustomersNames(formattedData);
+      } else {
+        console.error("Unexpected response format:", parsedResponse);
+      }
+    } catch (error) {
+      console.error("Error fetching coaches data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomersData();
+  }, []);
+
   if (isLoading) {
     return <LoadingScreen />;
   }
@@ -216,6 +281,22 @@ export default function Clothes() {
         <h1 className="text-3xl font-semibold text-[#384B65]">
           Gestion des Vêtements
         </h1>
+        <div className="mb-4">
+          <Select
+            id="customer"
+            value={
+              options.find((option) => option.value === selectedCustomer) ||
+              null
+            }
+            onChange={(selectedOption) => handleCustomerChange(selectedOption)}
+            options={options}
+            className="w-full"
+            classNamePrefix="react-select"
+            placeholder="Client"
+            isSearchable
+            required
+          />
+        </div>
       </div>
       <div className="flex flex-row lg:justify-between justify-center">
         {/*Left Part*/}
@@ -354,7 +435,7 @@ export default function Clothes() {
               <ArrowLeft
                 size={24}
                 onClick={() =>
-                  currentHatIndex > 0
+                  currentHatIndex >= 0
                     ? setCurrentHatIndex((prev) => prev - 1)
                     : setCurrentHatIndex(hats.length - 1)
                 }
@@ -362,7 +443,7 @@ export default function Clothes() {
               <ArrowLeft
                 size={24}
                 onClick={() =>
-                  currentTopIndex > 0
+                  currentTopIndex >= 0
                     ? setCurrentTopIndex((prev) => prev - 1)
                     : setCurrentTopIndex(tops.length - 1)
                 }
@@ -370,7 +451,7 @@ export default function Clothes() {
               <ArrowLeft
                 size={24}
                 onClick={() =>
-                  currentBottomIndex > 0
+                  currentBottomIndex >= 0
                     ? setCurrentBottomIndex((prev) => prev - 1)
                     : setCurrentBottomIndex(bottoms.length - 1)
                 }
@@ -378,7 +459,7 @@ export default function Clothes() {
               <ArrowLeft
                 size={24}
                 onClick={() =>
-                  currentShoeIndex > 0
+                  currentShoeIndex >= 0
                     ? setCurrentShoeIndex((prev) => prev - 1)
                     : setCurrentShoeIndex(shoes.length - 1)
                 }
@@ -386,53 +467,85 @@ export default function Clothes() {
             </div>
             <div className="flex flex-col items-center gap-6 justify-around">
               {hats.length > 0 && currentHatIndex !== -1 ? (
-                <img
-                  src={`data:image/jpeg;base64,${hats[currentHatIndex]?.imageURL}`}
-                  alt="Hat"
-                  className="w-[150px] h-[150px]"
-                  onClick={() => openModal(hats[currentHatIndex]?.imageURL)}
-                />
+                <div className="border border-4 w-[170px] h-[170px] flex items-center justify-center bg-white">
+                  <img
+                    src={`data:image/jpeg;base64,${hats[currentHatIndex]?.imageURL}`}
+                    alt="Hat"
+                    className="w-[150px] h-[150px]"
+                    onClick={() => openModal(hats[currentHatIndex]?.imageURL)}
+                  />
+                </div>
               ) : (
-                <div className="w-[150px] h-[150px] bg-transparent"></div>
+                <div className="flex w-[170px] h-[170px] bg-white items-center justify-center border border-4">
+                  <img
+                    src="/images/hat.svg"
+                    alt="Hat"
+                    className="w-[80px] h-[80px]"
+                  />
+                </div>
               )}
               {tops.length > 0 && currentTopIndex !== -1 ? (
-                <img
-                  src={`data:image/jpeg;base64,${tops[currentTopIndex]?.imageURL}`}
-                  alt="Top"
-                  className="w-[150px] h-[150px]"
-                  onClick={() => openModal(tops[currentTopIndex]?.imageURL)}
-                />
+                <div className="border border-4 w-[170px] h-[170px] flex items-center justify-center bg-white">
+                  <img
+                    src={`data:image/jpeg;base64,${tops[currentTopIndex]?.imageURL}`}
+                    alt="Top"
+                    className="w-[150px] h-[150px]"
+                    onClick={() => openModal(tops[currentTopIndex]?.imageURL)}
+                  />
+                </div>
               ) : (
-                <div className="w-[150px] h-[150px] bg-transparent"></div>
+                <div className="flex w-[170px] h-[170px] bg-white items-center justify-center border border-4">
+                  <img
+                    src="/images/shirt.svg"
+                    alt="Top"
+                    className="w-[100px] h-[100px]"
+                  />
+                </div>
               )}
               {bottoms.length > 0 && currentBottomIndex !== -1 ? (
-                <img
-                  src={`data:image/jpeg;base64,${bottoms[currentBottomIndex]?.imageURL}`}
-                  alt="Bottom"
-                  className="w-[150px] h-[150px]"
-                  onClick={() =>
-                    openModal(bottoms[currentBottomIndex]?.imageURL)
-                  }
-                />
+                <div className="border border-4 w-[170px] h-[170px] flex items-center justify-center bg-white">
+                  <img
+                    src={`data:image/jpeg;base64,${bottoms[currentBottomIndex]?.imageURL}`}
+                    alt="Bottom"
+                    className="w-[150px] h-[150px]"
+                    onClick={() =>
+                      openModal(bottoms[currentBottomIndex]?.imageURL)
+                    }
+                  />
+                </div>
               ) : (
-                <div className="w-[150px] h-[150px] bg-transparent"></div>
+                <div className="flex w-[170px] h-[170px] bg-white items-center justify-center border border-4">
+                  <img
+                    src="/images/trouser.svg"
+                    alt="Bottom"
+                    className="w-[100px] h-[100px]"
+                  />
+                </div>
               )}
               {shoes.length > 0 && currentShoeIndex !== -1 ? (
-                <img
-                  src={`data:image/jpeg;base64,${shoes[currentShoeIndex]?.imageURL}`}
-                  alt="Shoes"
-                  className="w-[150px] h-[150px]"
-                  onClick={() => openModal(shoes[currentShoeIndex]?.imageURL)}
-                />
+                <div className="border border-4 w-[170px] h-[170px] flex items-center justify-center bg-white">
+                  <img
+                    src={`data:image/jpeg;base64,${shoes[currentShoeIndex]?.imageURL}`}
+                    alt="Shoes"
+                    className="w-[150px] h-[150px]"
+                    onClick={() => openModal(shoes[currentShoeIndex]?.imageURL)}
+                  />
+                </div>
               ) : (
-                <div className="w-[150px] h-[150px] bg-transparent"></div>
+                <div className="flex w-[170px] h-[170px] bg-white items-center justify-center border border-4">
+                  <img
+                    src="/images/boots.svg"
+                    alt="Shoes"
+                    className="w-[80px] h-[80px]"
+                  />
+                </div>
               )}
             </div>
             <div className="flex flex-col items-center gap-6 justify-around">
               <ArrowRight
                 size={24}
                 onClick={() =>
-                  currentHatIndex < hats.length - 1
+                  currentHatIndex <= hats.length - 1
                     ? setCurrentHatIndex((prev) => prev + 1)
                     : setCurrentHatIndex(0)
                 }
@@ -440,7 +553,7 @@ export default function Clothes() {
               <ArrowRight
                 size={24}
                 onClick={() =>
-                  currentTopIndex < tops.length - 1
+                  currentTopIndex <= tops.length - 1
                     ? setCurrentTopIndex((prev) => prev + 1)
                     : setCurrentTopIndex(0)
                 }
@@ -448,7 +561,7 @@ export default function Clothes() {
               <ArrowRight
                 size={24}
                 onClick={() =>
-                  currentBottomIndex < bottoms.length - 1
+                  currentBottomIndex <= bottoms.length - 1
                     ? setCurrentBottomIndex((prev) => prev + 1)
                     : setCurrentBottomIndex(0)
                 }
@@ -456,7 +569,7 @@ export default function Clothes() {
               <ArrowRight
                 size={24}
                 onClick={() =>
-                  currentShoeIndex < shoes.length - 1
+                  currentShoeIndex <= shoes.length - 1
                     ? setCurrentShoeIndex((prev) => prev + 1)
                     : setCurrentShoeIndex(0)
                 }
