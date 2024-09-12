@@ -10,6 +10,8 @@ const LineChart = ({ data }) => {
 
     const myTheme = am5.Theme.new(root);
 
+    console.log(data);
+
     myTheme.rule("AxisLabel", ["minor"]).setAll({
       dy: 1
     });
@@ -45,8 +47,8 @@ const LineChart = ({ data }) => {
         minorLabelsEnabled: true
       }),
       tooltip: am5.Tooltip.new(root, {}),
-      min: new Date(2024, 6, 1).getTime(),
-      max: new Date(2024, 6, 31).getTime(),
+      min: new Date(2024, 8, 1).getTime(),
+      max: new Date(2024, 8, 31).getTime(),
     }));
 
     xAxis.set("minorDateFormats", {
@@ -107,14 +109,14 @@ const LineChart = ({ data }) => {
       });
     }
 
-    createRange(new Date(2024, 6, 1).getTime(), xAxis, "01 jui, 2024");
-    createRange(new Date(2024, 6, 31).getTime(), xAxis, "31 jui, 2024");
+    createRange(new Date(2024, 8, 1).getTime(), xAxis, "01 sep, 2024");
+    createRange(new Date(2024, 8, 31).getTime(), xAxis, "31 sep, 2024");
 
     xAxis.get("renderer").grid.template.set("forceHidden", true);
 
     const eventsInAugust = data.filter((event) => {
       const eventDate = new Date(event.date);
-      return eventDate.getMonth() === 6 && eventDate.getFullYear() === 2024;
+      return eventDate.getMonth() === 8 && eventDate.getFullYear() === 2024;
     });
 
     const dateCounts = eventsInAugust.reduce((acc, event) => {
@@ -139,7 +141,7 @@ const LineChart = ({ data }) => {
   }, [data]);
 
   return (
-    <div id="chartdiv1" style={{ width: "100%", height: "250px" }}></div>
+    <div id="chartdiv1" style={{ width: "100%", height: "250px" }} className='z-0'></div>
   );
 };
 
