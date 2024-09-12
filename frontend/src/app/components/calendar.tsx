@@ -36,7 +36,6 @@ const Calendar = ({ month, week, day, list, view, onEventClick }: any) => {
                 );
                 
                 const data = JSON.parse(response);
-                console.log(data);
                 const fetchedEvents = data.data.events;
                 setEvents(fetchedEvents);
             } catch (error) {

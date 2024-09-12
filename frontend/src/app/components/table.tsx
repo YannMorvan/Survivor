@@ -87,8 +87,6 @@ const ClientTable: React.FC<ClientTableProps> = ({ data }) => {
           return { ...client, image };
         });
 
-        console.log(updatedClients);
-
         setClients(updatedClients);
       } catch (error) {
         console.error("Erreur lors de la requête : ", error);

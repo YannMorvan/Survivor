@@ -10,8 +10,6 @@ const LineChart = ({ data }) => {
 
     const myTheme = am5.Theme.new(root);
 
-    console.log(data);
-
     myTheme.rule("AxisLabel", ["minor"]).setAll({
       dy: 1
     });

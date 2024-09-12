@@ -107,7 +107,6 @@ export default function Statistics() {
                 { id: customer.id }
               );
               const imageData = JSON.parse(imageResponse);
-              console.log(imageData);
               customer.image = imageData.data;
             } catch (error) {
               console.error("Erreur lors de la requête : ", error);
@@ -122,8 +121,6 @@ export default function Statistics() {
           encounter.image = customer?.image;
         });
 
-        console.log(all_encounters);
-
         setEncounter1(all_encounters);
 
         const avgStar =
@@ -131,8 +128,6 @@ export default function Statistics() {
           all_encounters.length;
 
         setAvgStar1(avgStar);
-
-        console.log(all_encounters);
       } catch (error) {
         console.error("Erreur lors de la requête : ", error);
       }
@@ -146,7 +141,6 @@ export default function Statistics() {
           { id_coach: id1 }
         );
         const data = JSON.parse(response);
-        console.log(data);
         setData2(data.coach);
 
         for (const customer of data.coach.customers) {
@@ -168,7 +162,6 @@ export default function Statistics() {
                 { id: customer.id }
               );
               const imageData = JSON.parse(imageResponse);
-              console.log(imageData);
               customer.image = imageData.data;
             } catch (error) {
               console.error("Erreur lors de la requête : ", error);
@@ -183,8 +176,6 @@ export default function Statistics() {
           encounter.image = customer?.image;
         });
 
-        console.log(all_encounters);
-
         setEncounter2(all_encounters);
 
         const avgStar =
@@ -193,7 +184,6 @@ export default function Statistics() {
 
         setAvgStar2(avgStar);
 
-        console.log(all_encounters);
       } catch (error) {
         console.error("Erreur lors de la requête : ", error);
       }

@@ -92,7 +92,7 @@ export default function Page() {
           {}
         );
         const data = JSON.parse(response);
-        console.log(data);
+
         setCoaches(data.data);
       } catch (error) {
         console.error("Erreur lors de la requête : ", error);
@@ -148,10 +148,6 @@ export default function Page() {
       fetchClientsData();
     }
   }, [selectedCoach]);
-
-  useEffect(() => {
-    console.log(coachCustomers);
-  }, [coachCustomers]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -212,7 +208,6 @@ export default function Page() {
                   { id: customer.id }
                 );
                 const imageData = JSON.parse(imageResponse);
-                console.log(imageData);
                 customer.image = imageData.data;
               } catch (error) {
                 console.error("Erreur lors de la requête : ", error);
@@ -226,9 +221,6 @@ export default function Page() {
             );
             encounter.image = customer?.image;
           });
-
-          console.log(all_encounters);
-
           setEncounter(all_encounters);
 
           const avgStar =
@@ -294,7 +286,6 @@ export default function Page() {
                 { id: customer.id }
               );
               const imageData = JSON.parse(imageResponse);
-              console.log(imageData);
               customer.image = imageData.data;
             } catch (error) {
               console.error("Erreur lors de la requête : ", error);
@@ -308,9 +299,6 @@ export default function Page() {
           );
           encounter.image = customer?.image;
         });
-
-        console.log(all_encounters);
-
         setEncounter(all_encounters);
 
         const avgStar =

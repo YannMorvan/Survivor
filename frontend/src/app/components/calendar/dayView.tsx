@@ -14,8 +14,6 @@ const DayView = ({ events, day, list, onEventClick }: any) => {
     };
 
     const dayEvents = getDayEvents(dayNumber);
-    
-    console.log(dayEvents);
 
     const handleClick = (event: any) => {
         if (onEventClick) {

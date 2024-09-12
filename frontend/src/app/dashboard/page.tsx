@@ -323,15 +323,12 @@ export default function Dashboard() {
           {}
         );
         const data = JSON.parse(response);
-        console.log(data.data.events);
         const events = data.data.events;
         const clients = data.data.clients;
 
         setEvents(events);
 
         const august: Event[] = getEventsByMonth(events, 8, 2024);
-        
-        console.log(august);
 
         const progressionMonth: number = getProgressionLastMonth(
           events,
@@ -370,7 +367,6 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    console.log(augustEvents);
   }, [augustEvents]);
 
   useEffect(() => {
@@ -451,8 +447,6 @@ export default function Dashboard() {
     let MeetingsData = meetings;
     let EventsData = events;
 
-    console.log(meetings);
-
     const allData: any = {
       Overview: {
         joinClients: OverviewData,
@@ -464,7 +458,6 @@ export default function Dashboard() {
         events: EventsData,
       },
     };
-    console.log(allData);
 
     setAllData(allData);
   }, [joinClients, meetings, events]);

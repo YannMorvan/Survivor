@@ -50,7 +50,6 @@ const CrudModal = () => {
       );
 
       const data = JSON.parse(response);
-      console.log(data);
     } catch (error) {
       console.error("Erreur lors de la requête : ", error);
     }

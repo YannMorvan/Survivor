@@ -8,8 +8,6 @@ const LineChart = ({ clientData, period }) => {
 
     let root = am5.Root.new("chartdiv");
 
-    console.log(period);
-
     root.setThemes([am5themes_Animated.new(root)]);
 
     let chart = root.container.children.push(am5xy.XYChart.new(root, {
@@ -68,8 +66,6 @@ const LineChart = ({ clientData, period }) => {
 
     const dynamicData = generateComparisonData();
     const reversedData = dynamicData.reverse();
-
-    console.log(dynamicData);
 
     const fixedData = [
       { date: new Date(2024, 8, 10).getTime(), value1: 10, value2: 0 },
