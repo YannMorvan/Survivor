@@ -51,7 +51,7 @@ const Chat = () => {
               </div>
             </span>
             <p className="leading-relaxed">
-              <span className="block font-bold text-gray-700">{m.role === "user" ? "You" : "AI"}</span>
+              <span className="block font-bold text-gray-700">{m.role === "user" ? "You" : "Soul Bot"}</span>
               {m.content}
             </p>
           </div>
