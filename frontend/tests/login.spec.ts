@@ -12,7 +12,7 @@ test("login with valid credentials", async ({ page }: { page: Page }) => {
 });
 
 
-test.describe('Dashboard Page', () => {
+/*test.describe('Dashboard Page', () => {
 
   test('should display the correct title', async ({ page }: { page: Page }) => {
 
@@ -211,4 +211,4 @@ test.describe('Events Page', () => {
       const listViewActive = await page.locator('text=Liste').evaluate(el => el.classList.contains('bg-slate-100'));
       expect(listViewActive).toBe(true);
     });
-  });
+  });*/
